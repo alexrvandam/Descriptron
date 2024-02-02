@@ -1,5 +1,5 @@
 # Descriptron
-A Detectron2 model zoo of dark taxa morphology and computer vision to make it useful for taxonomists
+A model zoo for dark taxa morphology and computer vision to make it useful for taxonomists
 
 Descriptron Version
 v0.1.0
