@@ -46,6 +46,25 @@ matplotlib
 you can look in the .yaml file to see the versions I used and if there is anything compatable on your system, so probbly the easiest way to do this is just via the .yaml file provided to do the training and prediction.
 
 to run the training first annotate some polygons with VIA2 found here:(https://www.robots.ox.ac.uk/~vgg/software/via/)
-For the custom extraction of contours and subsequent semi-landmark collection
-It can be installed via: 
+For the custom extraction of contours and subsequent semi-landmark collection. 
+
+Use the polygon tool to make your annotations and the dropdown menu to make your classes, you can follow the bare_base.json file as a template.
+
+Export as a plain .json file of polygon contours.
+
+The .json file is how you define your classes and what you want to train.
+
+Then configure the configuration file with the file paths where your input and output data is going to be.
+
+Next simply run the trainer.
+
+```shell
+python res50_train_stop5kv7.py
+```
+you can examine the log file if you run in sbatch or the screen output if you &
+Then simply run the predictor on your test data set.
+
+```shell
+python contour_pred_rn50_v9_part2.py
+```
 
