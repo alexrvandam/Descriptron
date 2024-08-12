@@ -5,20 +5,22 @@ Descriptron Version
 v0.1.0
 
 # Introduction
-Descriptron v0.1.0 is intended to automate geometric morphometrics of organismal morphological features. It combines the state-of-the-art CNN based instance segmentation of Detectron2 implemented in PyTorch with classic computer vision implemented in OpenCV. The instance segmentation is via a CNN because that is what CNN's are best at and the precise pixel level data extraction is done using OpenCV as that is what classic computer vision is best at. I aim to use the correct tool for the job at hand. It is all written in python so it is more stable and all the programs play well together.
+Descriptron v0.1.0 is intended to automate geometric morphometrics of organismal morphological features. It combines the state-of-the-art CNN based instance segmentation of Detectron2 (https://github.com/facebookresearch/detectron2) implemented in PyTorch with classic computer vision implemented in OpenCV. The instance segmentation is via a CNN because that is what CNN's are best at and the precise pixel level data extraction is done using OpenCV as that is what classic computer vision is best at. I aim to use the correct tool for the job at hand. It is all written in python so it is more stable and all the programs play well together.
 
 # Installation
 The initial model is available through GoogleDrive found here:
 
-You will need to make sure that your version of pytorch and cuda are compatible with the detectron2 version you want to install if you don't want to use the requirements.txt or the .yaml provide.
+You will need conda or miniconda3 (https://docs.anaconda.com/miniconda/)
 
-you will need conda or miniconda3 
+You need to make sure that your version of pytorch (https://pytorch.org/get-started/previous-versions/) and cuda (https://developer.nvidia.com/cuda-toolkit-archive) compatible with the detectron2 version you want to install if you don't want to use the requirements.txt or the .yaml provide.
+
 
 # install dependencies
-you will need to install the version of cuda that works for your system, but it was built and tested on cuda 11.7.1 which is what I recommend
+Once you have conda/miniconda and cuda installed you then need to install detectron2 and pytorch to match.  The version of cuda that works for your system, you will need to find out but it was built and tested on cuda 11.7.1 which is what I recommend
 it may also work on cuda 10.2.89
 it was run on a single Teslav100-32 GPU so a single GPU but with fairly beefy memory (32GB) it may use less mem but I have not tested it on smaller systems.
-# install via .yaml
+
+# Quick install via .yaml, installs everything accept for conda/miniconda and cuda/cudatoolkit
 
 ```shell 
 conda env create -f detectron2-env.yaml
