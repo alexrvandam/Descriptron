@@ -23,8 +23,8 @@ it was run on a single Teslav100-32 GPU so a single GPU but with fairly beefy me
 # Quick install via .yaml, installs everything accept for conda/miniconda and cuda/cudatoolkit
 
 ```shell 
-conda env create -f detectron2-env.yaml
-conda activate detectron2-env
+conda env create -f descriptron-train-predict.yaml
+conda activate descriptron-tp
 ```
 If you want to configure to your own environment without making a new one (not recommended) then the minimum packages some of which are
 some of these are default in a conda environment with python but I list them all 
