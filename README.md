@@ -1,5 +1,5 @@
 # Descriptron
-A pipeline and model zoo for dart taxa mophology using CNNs/ViTs and classic computer vision
+A pipeline and model zoo for dark taxa mophology using CNNs/ViTs and classic computer vision
 
 Descriptron Version
 v0.1.0
@@ -43,6 +43,8 @@ matplotlib
 
 you can look in the .yaml file to see the versions I used and if there is anything compatable on your system, so probbly the easiest way to do this is just via the .yaml file provided to do the training and prediction.
 
+to run the training first annotate some polygons with VIA2 found here: [
+](https://www.robots.ox.ac.uk/~vgg/software/via/)
 For the custom extraction of contours and subsequent semi-landmark collection
 It can be installed via: 
 
