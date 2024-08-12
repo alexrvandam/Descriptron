@@ -15,25 +15,34 @@ You will need to make sure that your version of pytorch and cuda are compatible 
 you will need conda or miniconda3 
 
 # install dependencies
-
+you will need to install the version of cuda that works for your system, but it was built and tested on cuda 11.7.1 which is what I recommend
+it may also work on cuda 10.2.89
+it was run on a single Teslav100-32 GPU so a single GPU but with fairly beefy memory (32GB) it may use less mem but I have not tested it on smaller systems.
 # install via .yaml
 
 ```shell 
 conda env create -f detectron2-env.yaml
 conda activate detectron2-env
 ```
-# as an alternative install with requirements.txt 
-you can see if it will work in your environment if you have pip or install pip just skip the conda create statment
+If you want to configure to your own environment without making a new one (not recommended) then the minimum packages some of which are
+some of these are default in a conda environment with python but I list them all 
 
-```shell
-cd descriptron
-conda env create -n detectron2-env python=3.9.15
-conda activate detectron2-env
-pip install -r requirements.txt
-```
+detectron2
+os
+sys
+json
+cuda
+numpy
+opencv
+random
+shapely
+warnings
+pandas
+torch
+matplotlib
 
+you can look in the .yaml file to see the versions I used and if there is anything compatable on your system, so probbly the easiest way to do this is just via the .yaml file provided to do the training and prediction.
 
-The python environment can be found here:
-
+For the custom extraction of contours and subsequent semi-landmark collection
 It can be installed via: 
 
