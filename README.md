@@ -18,8 +18,8 @@ you will need conda or miniconda3
 
 # install via .yaml
 
-'''shell 
-conda env create -f detectron2-env.yaml'''
+```shell 
+conda env create -f detectron2-env.yaml```
 
 
 
