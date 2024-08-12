@@ -10,6 +10,19 @@ Descriptron v0.1.0 is intended to automate geometric morphometrics of organismal
 # Installation
 The initial model is available through GoogleDrive found here:
 
+You will need to make sure that your version of pytorch and cuda are compatible with the detectron2 version you want to install if you don't want to use the requirements.txt or the .yaml provide.
+
+you will need conda or miniconda3 
+
+# install dependencies
+
+# install via .yaml
+
+'''shell 
+conda env create -f detectron2-env.yaml'''
+
+
+
 The python environment can be found here:
 
 It can be installed via: 
