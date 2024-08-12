@@ -20,8 +20,17 @@ you will need conda or miniconda3
 
 ```shell 
 conda env create -f detectron2-env.yaml
+conda activate detectron2-env
 ```
+# as an alternative install with requirements.txt 
+you can see if it will work in your environment if you have pip or install pip just skip the conda create statment
 
+```shell
+cd descriptron
+conda env create -n detectron2-env python=3.9.15
+conda activate detectron2-env
+pip install -r requirements.txt
+```
 
 
 The python environment can be found here:
