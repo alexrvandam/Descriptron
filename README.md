@@ -61,10 +61,18 @@ Next simply run the trainer.
 ```shell
 python res50_train_stop5kv7.py
 ```
-you can examine the log file if you run in sbatch or the screen output if you &
-Then simply run the predictor on your test data set.
+you can examine the log file if you and then plot the AP scores to examine for overfitting
+
+```shell
+python plot.log.v3
+```
+
+Then if the training looks good simply run the predictor on your test data set.
 
 ```shell
 python contour_pred_rn50_v9_part2.py
 ```
+
+
+
 
