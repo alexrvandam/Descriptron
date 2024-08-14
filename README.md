@@ -177,7 +177,6 @@ Before with PC alingment
 After semi-landmark conversion
 ![Resampled_contours_figure](https://github.com/user-attachments/assets/f2698066-3de3-405a-9511-f52c5bf5e27b)
 ![Procrustes_aligned_contours_figure](https://github.com/user-attachments/assets/e05984c0-e71e-4ec6-bcd5-126f9cbe85c5)
-
 # Optional Color Analyses in python
 Both color analyses is invariant to the ordering of the points in the contours, and the color cube analyses is invariant to the shape and ordering of the color as both are crude, a more sophosticated color analyses of color pattern and average color is coming in future versions, but for now you can extract RGB values and basic color statistics, hue normalize, FHS color segment the interior regions of specific contours derived from the predicted sclerites and perform a PCA on the color cube histograms.
 
