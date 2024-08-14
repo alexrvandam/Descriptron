@@ -15,7 +15,7 @@ You will need conda or miniconda3 (https://docs.anaconda.com/miniconda/)
 You need to make sure that your version of pytorch (https://pytorch.org/get-started/previous-versions/) and cuda (https://developer.nvidia.com/cuda-toolkit-archive) compatible with the detectron2 version you want to install if you don't want to use the requirements.txt or the .yaml provide.
 
 
-# install dependencies
+# Dependencies
 Once you have conda/miniconda and cuda installed you then need to install detectron2 and pytorch to match.  The version of cuda that works for your system, you will need to find out but it was built and tested on cuda 11.7.1 which is what I recommend
 it may also work on cuda 10.2.89
 it was run on a single Teslav100-32 GPU so a single GPU but with fairly beefy memory (32GB) it may use less mem but I have not tested it on smaller systems.
@@ -45,6 +45,7 @@ matplotlib
 
 you can look in the .yaml file to see the versions I used and if there is anything compatable on your system, so probbly the easiest way to do this is just via the .yaml file provided to do the training and prediction.
 
+# Image Data Annotation
 to run the training first annotate some polygons with VIA2 found here:(https://www.robots.ox.ac.uk/~vgg/software/via/)
 For the custom extraction of contours and subsequent semi-landmark collection. 
 
@@ -54,6 +55,7 @@ Export as a plain .json file of polygon contours.
 
 The .json file is how you define your classes and what you want to train.
 
+# Configuration file setup
 Then configure the configuration file with the file paths where your input and output data is going to be.
 
 ```shell
@@ -73,7 +75,7 @@ image_directory = /vandam/insect_images/coleoptera/big_training/lateral/Curculio
 color_output = /vandam/insect_images/coleoptera/pred_output/color_output # output from color analyses
 ```
 
-You will need to pay attention to this file carefully if the scripts do not work for you the most likely source of the erro ris not having the file system set up correctly in the config file for the input and output files you need to be read correctly by the scripts, you will need to modify the config and possibly the config related section of the scripts to work on your file system and how your data is structured if you encounter significant number of errors. I am working on setting this up in future versions in a more dynamic way so the user can specify the input and output at each step via command options but for now a config file will have to do so I can make these scripts available to the community.  
+You will need to pay attention to this file carefully if the scripts do not work for you the most likely source of the erro ris not having the file system set up correctly in the config file for the input and output files you need to be read correctly by the scripts, you will need to modify the config and possibly the config related section of the scripts to work on your file system and how your data is structured if you encounter significant number of errors. I am working on setting this up for future versions in a more dynamic way so the user can specify the input and output at each step via command options but for now a config file will have to do so I can make these scripts available to the community.  
 
 Next simply run the trainer.
 
