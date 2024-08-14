@@ -56,6 +56,25 @@ The .json file is how you define your classes and what you want to train.
 
 Then configure the configuration file with the file paths where your input and output data is going to be.
 
+```shell
+[Paths]
+train_data = /vandam/insect_images/coleoptera/coleoptera_train  # Image directory for training
+val_data = /vandam/insect_images/coleoptera/coleoptera_val  # Image directory for validation
+test_data = /vandam/insect_images/coleoptera/big_training # main root dir of test data big_training/view/family/image.jpg
+model_output = /vandam/insect_images/coleoptera/output  # Output directory for model, config, etc.
+plot_output = /vandam/insect_images/coleoptera/plots  # Directory for saving plots
+train_json_file_path = /vandam/insect_images/coleoptera/via_project_13Jun2024_16h38m_curculionidae_json.json  # Handcrafted polygons JSON
+json_input = /vandam/insect_images/coleoptera/pred_output/inference_results.json  # Inference results JSON (output)
+json_output = /vandam/insect_images/coleoptera/pred_output  # Parent folder for inference results
+coco_json_path = /vandam/insect_images/coleoptera/coco_format_rn50_5kstp.json  # COCO format JSON path
+log_file_path = ./detectron2_rn50_trainstp.18.6.24.out  # Log file from training here it is coded as your current working directory
+metadata_json_path = /vandam/insect_images/coleoptera/output/metadata_big35kv4_rn50.json  # Metadata JSON from training
+image_directory = /vandam/insect_images/coleoptera/big_training/lateral/Curculionidae  # Use the same path as test_data but a specific subdirectory where the images are housed
+color_output = /vandam/insect_images/coleoptera/pred_output/color_output # output from color analyses
+```
+
+You will need to pay attention to this file carefully if the scripts do not work for you the most likely source of the erro ris not having the file system set up correctly in the config file for the input and output files you need to be read correctly by the scripts, you will need to modify the config and possibly the config related section of the scripts to work on your file system and how your data is structured if you encounter significant number of errors. I am working on setting this up in future versions in a more dynamic way so the user can specify the input and output at each step via command options but for now a config file will have to do so I can make these scripts available to the community.  
+
 Next simply run the trainer.
 
 ```shell
