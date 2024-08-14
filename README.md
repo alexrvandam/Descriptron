@@ -106,7 +106,6 @@ Examine the log file if you and then plot the AP scores to examine for overfitti
 ```shell
 python plot.log.v3
 ```
-![training_loss_curve](https://github.com/user-attachments/assets/cfde8506-bfba-4313-9ee2-2aa0f904e26c)
 ![training_loss_curve_v3](https://github.com/user-attachments/assets/d7fe61f0-9029-42ef-9507-7bfc1e2beabe)
 ![validation_ap50_bbox_curve](https://github.com/user-attachments/assets/8ccdd14e-792e-47a1-9259-987aad833bdf)
 ![validation_ap_bbox_curve](https://github.com/user-attachments/assets/101643c1-918a-48e9-8d06-e311e5fb3209)
@@ -114,9 +113,15 @@ python plot.log.v3
 Then if the training looks good simply run the predictor on your test data set.
 
 ```shell
-python contour_pred_rn50_v9_part2.py
+python contour_pred_rn50_v9_part2.py > prediction_output.log 2> prediction_error_.log &
 ```
 
+It is optional but you can plot the overall numbers and percentages of the bbox probability scores and numbers as well as generate some summary statistics via another plotting script, as well as to visualize for a very crude quantitative assessment.
+
+```shell
+python updated_create_overlays-V6.py
+```
+![overlayed_images_lateral_reduced](https://github.com/user-attachments/assets/10b7c9e3-cc07-4db2-a365-ffb00fba82a4)
 
 
 
