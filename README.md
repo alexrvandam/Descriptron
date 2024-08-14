@@ -4,6 +4,9 @@ A pipeline and code hub for dark taxa mophology using CNNs/ViTs and classic comp
 Descriptron Version
 v0.1.0
 
+![lateral_6_prediction](https://github.com/user-attachments/assets/d14a5582-30d9-467e-acd8-e1f11db5edfd)
+example of unfiltered output
+
 # Introduction
 Descriptron v0.1.0 is intended to automate geometric morphometrics of organismal morphological features. It combines the state-of-the-art CNN based instance segmentation of Detectron2 (https://github.com/facebookresearch/detectron2) implemented in PyTorch with classic computer vision implemented in OpenCV. The instance segmentation is via a CNN because that is what CNN's are best at and the precise pixel level data extraction is done using OpenCV as that is what classic computer vision is best at. I aim to use the correct tool for the job at hand. It is all written in python so it is more stable and all the programs play well together.
 
