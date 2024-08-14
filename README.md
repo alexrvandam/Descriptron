@@ -106,6 +106,9 @@ Examine the log file if you and then plot the AP scores to examine for overfitti
 ```shell
 python plot.log.v3
 ```
+![training_loss_curve](https://github.com/user-attachments/assets/cfde8506-bfba-4313-9ee2-2aa0f904e26c)
+![training_loss_curve_v3](https://github.com/user-attachments/assets/d7fe61f0-9029-42ef-9507-7bfc1e2beabe)
+![validation_ap50_bbox_curve](https://github.com/user-attachments/assets/8ccdd14e-792e-47a1-9259-987aad833bdf)
 
 Then if the training looks good simply run the predictor on your test data set.
 
