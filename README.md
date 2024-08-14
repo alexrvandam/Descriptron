@@ -116,7 +116,26 @@ Then if the training looks good simply run the predictor on your test data set.
 python contour_pred_rn50_v9_part2.py > prediction_output.log 2> prediction_error_.log &
 ```
 
-It is optional but you can plot the overall numbers and percentages of the bbox probability scores and numbers as well as generate some summary statistics via another plotting script, as well as to visualize for a very crude quantitative assessment.
+It is optional but you can plot the overall percent success and possibly overprediction of the bbox detections and numbers as well as generate some summary statistics via another plotting script, as well as to visualize for a very crude quantitative assessment. It unfortunatley requires some hard-coded file paths at the momenent and you need to change directory into where your output .json predictions are to run it. To do this change line 77 from
+
+```shell
+image_counts = count_images_by_family_and_view('/vandam/insect_images/coleoptera/big_training/', ["dorsal", "lateral", "frontal"])
+```
+to your own file path of the parent directory for your images that you use for prediction where the file below big training contains family names eg. "Lucanidae" and then inside of that folder the files have the view followed by the imageID eg. "dorsal_987987ID_.jpg" this was just an example but it is basically going to look for the files to be two levels down.
+
+```shell
+image_counts = count_images_by_family_and_view('/your/parent/directory/coleoptera/big_training/', ["dorsal", "lateral", "frontal"])
+```
+once you have that accomplished then run the script in the folder where your predicted sclerites or predictions are eg. in the same folder as your inference_results.json
+
+```shell
+cd /your/predictions/pre_output/
+python updated_extract_json_stats8.py
+```
+
+![heatmap_percentages_lateral](https://github.com/user-attachments/assets/f87655fb-bc14-488b-aa55-7fa4acae9876)
+
+It might also be a good idea to get a qualitative assessment for how good or not the predictions are this can be done by another graphing script that shows thumbnails of the images in a grid layout. It should give you results similar to those below but hopefully with better scores.
 
 ```shell
 python updated_create_overlays-V6.py
