@@ -1,5 +1,5 @@
 # Descriptron
-A pipeline and model zoo for dark taxa mophology using CNNs/ViTs and classic computer vision
+A pipeline and code hub for dark taxa mophology using CNNs/ViTs and classic computer vision
 
 Descriptron Version
 v0.1.0
@@ -9,7 +9,7 @@ Descriptron v0.1.0 is intended to automate geometric morphometrics of organismal
 
 This work here helps move towards solving automated semi-landmarking of 2D data using Coleoptera sclerites as an example. This should be helpful to people interested in ground-truthing measurements for species delimitation using morphological shape and size as data in that delimitation process. This is a first version future versions will continue to expand the capabilities of computer vision and deep-learning for making geometrica and standard morphometric analyses more available and in a stable format for the community.
 
-The long term goal of this project is to combine LLM ViTs with instance segmentation and depth data to produce fine grained descriptions and concomitant semi-supervised and unsupervised clustering for putative novel species binning and description.
+The long term goal of this project is to combine LLM ViTs with instance segmentation and image depth data to produce fine grained descriptions and concomitant semi-supervised and unsupervised clustering for putative novel species binning and description.
 
 # Installation
 The initial model is available through GoogleDrive found here:
@@ -58,8 +58,20 @@ Use the polygon tool to make your annotations and the dropdown menu to make your
 Export as a plain .json file of polygon contours.
 
 The .json file is how you define your classes and what you want to train.
+The data structure is like so:
+```shell
+/your_folder/insect_images/coleoptera/big_training/Family/view_imageID_.jpg
+/your_folder/insect_images/coleoptera/big_training/Curculionidae/dorsal_1234ID_.jpg
+/your_folder/insect_images/coleoptera/big_training/Curculionidae/lateral_1234ID_.jpg
+/your_folder/insect_images/coleoptera/big_training/Curculionidae/lateral_9375ID_.jpg
+.......
+```
+Please sort your images in advance by view hopefully you have some notes on their orientation, at the moment the two views the model was trained on was dorsal and later, but you can add as many views as you want and fine-tune a new model and post to the git community here or on hugging face page that would be wonderful. The ideas is that as a community we slowly build up more and more morphological features for fine grained instance segmentation for ground-truthed measurements of shape, size, etc.
+
+If you do not want to pre-sort view I have an experimental script that might work for soting automatically by cardinal views, dorsal, lateral, ventral, frontal, posterior for Coleoptera only it is in the View folder. It is not thoroughly tested but it may work for you if you use it please cite this page. A more genral arthropoda view sorting script as part of Descriptron will be produced in future versions.
 
 # Configuration file setup
+
 Then configure the configuration file with the file paths where your input and output data is going to be.
 
 ```shell
@@ -81,6 +93,8 @@ color_output = /vandam/insect_images/coleoptera/pred_output/color_output # outpu
 
 Careful attention is needed at this step, if the scripts do not work for you the most likely source of the erro ris not having the file system set up correctly in the config file for the input and output files you need to be read correctly by the scripts, you will need to modify the config and possibly the config related section of the scripts to work on your file system and how your data is structured if you encounter significant number of errors. I am working on setting this up for future versions in a more dynamic way so the user can specify the input and output at each step via command options but for now a config file will have to do so I can make these scripts available to the community. If you are really struggling to get these to work please write to me I can try to help solve the issue but please try first.
 
+# Model Training
+
 Next simply run the trainer. Remove the last "&" if you do not want it to run in the background.
 
 ```shell
@@ -88,6 +102,7 @@ python res50_train_stop5kv7.py > res50_train_output.log 2> error.re50.train.log 
 ```
 Examine the log file if you and then plot the AP scores to examine for overfitting
 
+# Plot the loss and AP scores and inspect for over-fitting
 ```shell
 python plot.log.v3
 ```
