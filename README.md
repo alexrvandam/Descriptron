@@ -7,6 +7,10 @@ v0.1.0
 # Introduction
 Descriptron v0.1.0 is intended to automate geometric morphometrics of organismal morphological features. It combines the state-of-the-art CNN based instance segmentation of Detectron2 (https://github.com/facebookresearch/detectron2) implemented in PyTorch with classic computer vision implemented in OpenCV. The instance segmentation is via a CNN because that is what CNN's are best at and the precise pixel level data extraction is done using OpenCV as that is what classic computer vision is best at. I aim to use the correct tool for the job at hand. It is all written in python so it is more stable and all the programs play well together.
 
+This work here helps move towards solving automated semi-landmarking of 2D data using Coleoptera sclerites as an example. This should be helpful to people interested in ground-truthing measurements for species delimitation using morphological shape and size as data in that delimitation process. This is a first version future versions will continue to expand the capabilities of computer vision and deep-learning for making geometrica and standard morphometric analyses more available and in a stable format for the community.
+
+The long term goal of this project is to combine LLM ViTs with instance segmentation and depth data to produce fine grained descriptions and concomitant semi-supervised and unsupervised clustering for putative novel species binning and description.
+
 # Installation
 The initial model is available through GoogleDrive found here:
 
@@ -75,14 +79,14 @@ image_directory = /vandam/insect_images/coleoptera/big_training/lateral/Curculio
 color_output = /vandam/insect_images/coleoptera/pred_output/color_output # output from color analyses
 ```
 
-You will need to pay attention to this file carefully if the scripts do not work for you the most likely source of the erro ris not having the file system set up correctly in the config file for the input and output files you need to be read correctly by the scripts, you will need to modify the config and possibly the config related section of the scripts to work on your file system and how your data is structured if you encounter significant number of errors. I am working on setting this up for future versions in a more dynamic way so the user can specify the input and output at each step via command options but for now a config file will have to do so I can make these scripts available to the community.  
+Careful attention is needed at this step, if the scripts do not work for you the most likely source of the erro ris not having the file system set up correctly in the config file for the input and output files you need to be read correctly by the scripts, you will need to modify the config and possibly the config related section of the scripts to work on your file system and how your data is structured if you encounter significant number of errors. I am working on setting this up for future versions in a more dynamic way so the user can specify the input and output at each step via command options but for now a config file will have to do so I can make these scripts available to the community. If you are really struggling to get these to work please write to me I can try to help solve the issue but please try first.
 
-Next simply run the trainer.
+Next simply run the trainer. Remove the last "&" if you do not want it to run in the background.
 
 ```shell
-python res50_train_stop5kv7.py
+python res50_train_stop5kv7.py > res50_train_output.log 2> error.re50.train.log &
 ```
-you can examine the log file if you and then plot the AP scores to examine for overfitting
+Examine the log file if you and then plot the AP scores to examine for overfitting
 
 ```shell
 python plot.log.v3
