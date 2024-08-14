@@ -168,9 +168,19 @@ The previous output should have generated some simple xy coordinates this is the
     resampled_ordered_contours = [resample_contour_points_fixed_first(contour, 800) for contour in ordered_contours]
 ```
 Then just run the script
+
+```shell
+python updated_modified_resampling_contour_via_pca_with_tps_scalebarV6_align_resample_reorder-3.py
+```
 Before with PC alingment 
 ![aligned_contours](https://github.com/user-attachments/assets/17d841d8-50e9-45f0-86c7-fbe47ff747d3)
 
 After semi-landmark conversion
+
+![Resampled_contours_figure](https://github.com/user-attachments/assets/f2698066-3de3-405a-9511-f52c5bf5e27b)
+
+![Procrustes_aligned_contours_figure](https://github.com/user-attachments/assets/e05984c0-e71e-4ec6-bcd5-126f9cbe85c5)
+
+
 
 
