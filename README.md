@@ -102,7 +102,7 @@ python res50_train_stop5kv7.py > res50_train_output.log 2> error.re50.train.log 
 ```
 Examine the log file if you and then plot the AP scores to examine for overfitting
 
-# Plot the loss and AP scores and inspect for over-fitting
+# Plot the loss and AP scores and inspect for over-fitting and model performance
 ```shell
 python plot.log.v3
 ```
@@ -126,7 +126,7 @@ to your own file path of the parent directory for your images that you use for p
 ```shell
 image_counts = count_images_by_family_and_view('/your/parent/directory/coleoptera/big_training/', ["dorsal", "lateral", "frontal"])
 ```
-once you have that accomplished then run the script in the folder where your predicted sclerites or predictions are eg. in the same folder as your inference_results.json
+once you have that accomplished then run the script in the folder where your predicted sclerites or predictions are eg. in the same folder as your inference_results.json. It should give you results similar to those below but hopefully with better scores.
 
 ```shell
 cd /your/predictions/pre_output/
@@ -135,12 +135,42 @@ python updated_extract_json_stats8.py
 
 ![heatmap_percentages_lateral](https://github.com/user-attachments/assets/f87655fb-bc14-488b-aa55-7fa4acae9876)
 
-It might also be a good idea to get a qualitative assessment for how good or not the predictions are this can be done by another graphing script that shows thumbnails of the images in a grid layout. It should give you results similar to those below but hopefully with better scores.
+It might also be a good idea to get a qualitative assessment for how good or not the predictions are this can be done by another graphing script that shows thumbnails of the images in a grid layout. 
 
 ```shell
 python updated_create_overlays-V6.py
 ```
 ![overlayed_images_lateral_reduced](https://github.com/user-attachments/assets/10b7c9e3-cc07-4db2-a365-ffb00fba82a4)
 
+# Automated extraction of semi-landmark data from 2D images
+
+Ok now that you have a .json file of predicted contours you can now extract the contours as you like and or also extract binary and foreground masks of the image that 'mask' or cover over all the other parts of the image you do not want. If the config file was setup correctly then by running the 
+
+To get specific sclerites from a single folder and return the binary and foreground mask as well as simple xy coordinates and a .npy file of the contours run simply add or remove the classes you want on line 48 desired_classes from file "updated_get_masks_from_contours_multi-V2-4.py", it should return the images and files in subdirectories by sclerite you need to decide on the view in the script in this case the two views returned are lateral and dorsal and on the specified folder via the config, below is the line that specifies the view if you have more or less change this line
+
+```python
+    relevant_files = [os.path.basename(f) for f in os.listdir(image_dir) if f.startswith(('lateral', 'dorsal')) and f.endswith(('.jpg', '.jpeg', '.png'))]To return all the sclerites
+````
+and finally run the script
+
+```shell
+python updated_get_masks_from_contours_multi-V2-4.py
+```
+The previous output should have generated some simple xy coordinates this is the input for the next script, the following script turns the contours into semi-landmakrs. It will in this order, align them via principal component PC, redistribute the points evenly along the contour given a number of the users choosing 800 in this case, and then re-order the numbering based on a clockwise coordinate rule based on the first file with the others following a similar numbering scheme to preserve homology. It will export the new semi-landmark contours in a variety of formats some might be useful for your project more than others you decide. If you want fewer or more points change the 800 on the following lines to whatever you want. You will need to adjust the graphing number of points as well, but many contours have more than 800 points some have fewer it seemed like a comfortable middle ground but you should choose what ever works best for your downstream analyses.
+
+```python
+    # Normalize and resample all contours to 800 points
+    normalized_contours = [resample_contour_points_fixed_first(contour, 800) for contour in contours]
+```
+
+```python
+    # Resample all ordered contours to distribute points evenly along the contour
+    resampled_ordered_contours = [resample_contour_points_fixed_first(contour, 800) for contour in ordered_contours]
+```
+Then just run the script
+Before with PC alingment 
+![aligned_contours](https://github.com/user-attachments/assets/17d841d8-50e9-45f0-86c7-fbe47ff747d3)
+
+After semi-landmark conversion
 
 
