@@ -181,15 +181,8 @@ After semi-landmark conversion
 ![Resampled_contours_figure](https://github.com/user-attachments/assets/f2698066-3de3-405a-9511-f52c5bf5e27b)
 ![Procrustes_aligned_contours_figure](https://github.com/user-attachments/assets/e05984c0-e71e-4ec6-bcd5-126f9cbe85c5)
 # Foreground Mask Color Analyses and Extraction in python
-The provided color analyses is invariant to the ordering of the points in the contours, and the color cube analyses is invariant to the shape and ordering of the color as both are crude, a more sophosticated color analyses of color pattern and average color is coming in future versions, but for now you can extract RGB values and basic color statistics, hue normalize, FHS color segment the interior regions of specific contours derived from the predicted sclerites and perform a PCA on the color cube histograms. As the starting material you need the binary mask and the foreground mask produced from the updated_get_masks_from_contours_multi-V2-4.py ran previously. If you are not familiar the binary mask is black background white is the region of interest or RoI.
-![binary_mask_ASUCOB0015169_habitus_lateral_1616580905_lg_test](https://github.com/user-attachments/assets/90d93032-cc0b-42ba-a51b-31a1ed80cc96)
-the foreground mask is the same shape but with RGB colors from the original image.
-![foreground_maskASUCOB0015169_habitus_lateral_1616580905_lg_test](https://github.com/user-attachments/assets/02b8d817-3482-4555-a4c7-4c09e13d84f9)
-The script will CLAHE normalize the hue 
-![normalized_only_foreground_maskASUCOB0015169_habitus_lateral_1616580905_lg_test](https://github.com/user-attachments/assets/1ae2aeea-00fe-4645-8ada-0ebbe5c3e6aa)
-and also perform the Felzenzwalb segmentation
-![normalized_foreground_maskASUCOB0015169_habitus_lateral_1616580905_lg_test](https://github.com/user-attachments/assets/b7c49a9d-37e0-4f60-9d06-a023d08a47c7)
-you can mix and match what you want performed simply comment out the parts you don't want the FHS analyses takes a lot of memory and time to run. In this example it is CLAHE hue normalization only found towards the bottom of the script
+The provided color analyses is invariant to the ordering of the points in the contours, and the color cube analyses is invariant to the shape and ordering of the color as both are crude, a more sophosticated color analyses of color pattern and average color is coming in future versions, but for now you can extract RGB values and basic color statistics, hue normalize, FHS color segment the interior regions of specific contours derived from the predicted sclerites and perform a PCA on the color cube histograms. As the starting material you need the binary mask and the foreground mask produced from the updated_get_masks_from_contours_multi-V2-4.py ran previously. If you are not familiar the binary mask is black background white is the region of interest or RoI.the foreground mask is the same shape but with RGB colors from the original image.The script will CLAHE normalize the hue and also perform the Felzenzwalb segmentationyou can mix and match what you want performed simply comment out the parts you don't want the FHS analyses takes a lot of memory and time to run. In this example it is CLAHE hue normalization only found towards the bottom of the script
+<img width="288" alt="Screen Shot 2024-08-15 at 5 30 36 AM" src="https://github.com/user-attachments/assets/8f5ec748-f728-45e1-93d5-e00e4c15b3ff">
 ```python
 # Process each pair of image and mask
 for base_name, files in file_pairs.items():
