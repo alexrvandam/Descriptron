@@ -191,7 +191,24 @@ and also perform the Felzenzwalb segmentation
 ![normalized_foreground_maskASUCOB0015169_habitus_lateral_1616580905_lg_test](https://github.com/user-attachments/assets/b7c49a9d-37e0-4f60-9d06-a023d08a47c7)
 you can mix and match what you want performed simply comment out the parts you don't want the FHS analyses takes a lot of memory and time to run. In this example it is CLAHE hue normalization only found towards the bottom of the script
 ```python
-
+# Process each pair of image and mask
+for base_name, files in file_pairs.items():
+    if 'binary_mask' in files and 'foreground_mask' in files:
+        image_path = os.path.join(input_dir, files['foreground_mask'])
+        mask_path = os.path.join(input_dir, files['binary_mask'])
+        #recolorized_path = os.path.join(output_dir, f"recolorized_{files['foreground_mask']}")
+        
+        # Perform recolorization
+        #recolorize_like_segmentation(image_path, mask_path, recolorized_path)
+        
+        # Perform hue normalization
+        normalized_path = os.path.join(output_dir, f"normalized_{files['foreground_mask']}")
+        normalize_color(recolorized_path, normalized_path)
+```
+then simply run
+```shell
+python updated_FHS_and_normalize.py
+```
 
 
 
