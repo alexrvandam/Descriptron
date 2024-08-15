@@ -180,6 +180,30 @@ Before with PC alingment
 After semi-landmark conversion
 ![Resampled_contours_figure](https://github.com/user-attachments/assets/f2698066-3de3-405a-9511-f52c5bf5e27b)
 ![Procrustes_aligned_contours_figure](https://github.com/user-attachments/assets/e05984c0-e71e-4ec6-bcd5-126f9cbe85c5)
+![later-toy-height-length](https://github.com/user-attachments/assets/3a61d20e-0bcf-43e8-9bee-3bea5f550c7d)
+and with output similar to this for morphometrics of specific sclerites
+```shell
+Length in pixels: 1655.2730712890625
+Height in pixels: 449.5775146484375
+Length to height ratio: 3.6818413734436035
+Area in pixels: 598013.5
+Perimeter in pixels: 3902.452004432678
+Aspect ratio: 3.681841322921721
+Extent: 0.8035941212302876
+Solidity: 0.9638111585215986
+Equivalent diameter in pixels: 872.5906465723095
+Orientation in degrees: 95.48037719726562
+Major axis length in pixels: 464.1995849609375
+Minor axis length in pixels: 1774.2918701171875
+Length in um: 3492.137281200554
+Height in um: 948.475769300501
+Area in um^2: 2661670.5834179
+Perimeter in um: 8233.021106398055
+Equivalent diameter in um: 1840.908537072383
+Major axis length in um: 979.3240189049314
+Minor axis length in um: 3743.231793496176
+```
+
 # Foreground Mask Color Analyses and Extraction in python
 The provided color analyses is invariant to the ordering of the points in the contours, and the color cube analyses is invariant to the shape and ordering of the color as both are crude, a more sophosticated color analyses of color pattern and average color is coming in future versions, but for now you can extract RGB values and basic color statistics, hue normalize, FHS color segment the interior regions of specific contours derived from the predicted sclerites and perform a PCA on the color cube histograms. As the starting material you need the binary mask and the foreground mask produced from the updated_get_masks_from_contours_multi-V2-4.py ran previously. If you are not familiar the binary mask is black background white is the region of interest or RoI.the foreground mask is the same shape but with RGB colors from the original image.The script will CLAHE normalize the hue and also perform the Felzenzwalb segmentationyou can mix and match what you want performed simply comment out the parts you don't want the FHS analyses takes a lot of memory and time to run. 
 
@@ -205,7 +229,69 @@ then simply run
 ```shell
 python updated_FHS_and_normalize.py
 ```
+to get color values and human readable output run
+```shell
+python color_analyses_out_to_human_readable_LAB.py
+```
+with results for an individual sclerite similar to this that can be used as quantitative color data for evolutionary biology studies
+```shell
+Average color of ASUCOB0015133_habitus_dorsal_1615428878_lg foreground_mask: [46.48795589,21.08326686,12.18220018] -> black
+Average color of ASUCOB0015133_habitus_dorsal_1615428878_lg recolorized: [45.79914431,20.52126361,11.83857177] -> black
+Average color of ASUCOB0015133_habitus_dorsal_1615428878_lg normalized: [70.77440976,45.71462225,37.67963767] -> coffee brown
+Average color of ASUCOB0015133_habitus_dorsal_1615428878_lg normalized_only: [74.09385714,48.49679117,39.94669202] -> coffee brown
+Dominant color of ASUCOB0015133_habitus_dorsal_1615428878_lg foreground_mask: [1,1,3] -> black
+Dominant color of ASUCOB0015133_habitus_dorsal_1615428878_lg recolorized: [18,2,2] -> black
+Dominant color of ASUCOB0015133_habitus_dorsal_1615428878_lg normalized: [25,11,10] -> black
+Dominant color of ASUCOB0015133_habitus_dorsal_1615428878_lg normalized_only: [9,10,12] -> black
+Top 10 colors of ASUCOB0015133_habitus_dorsal_1615428878_lg foreground_mask: [25.91003838,4.82128161,3.0798225] -> black
+[147.48581158,103.03450624,67.0282255] -> sienna
+[72.19642359,36.78169786,18.79985873] -> coffee brown
+[232.27738337,202.97008114,148.57302231] -> burly wood
+[55.41154443,22.23220952,10.29126414] -> coffee brown
+[9.22327199,1.48090335,2.02440026] -> black
+[113.43202623,76.40000852,48.27887768] -> deep brown
+[40.18283057,11.95099754,5.75521212] -> black
+[90.28516928,55.7377211,32.42806072] -> coffee brown
+[190.50227964,144.64620061,93.33054711] -> peru
+Top 10 colors of ASUCOB0015133_habitus_dorsal_1615428878_lg recolorized: [27.43188712,6.46149292,3.53816531] -> black
+[91.35335104,56.72663411,34.11859276] -> coffee brown
+[185.62928958,139.39780253,91.50692354] -> peru
+[40.3451744,13.09716831,6.00971895] -> black
+[143.85589137,100.71408235,66.75667981] -> sienna
+[13.78980982,2.45581299,2.23362326] -> black
+[232.92755682,202.51136364,149.4765625] -> burly wood
+[55.29070091,24.14743574,11.72277128] -> coffee brown
+[116.89117092,73.36614731,48.84855996] -> deep brown
+[74.02878927,39.66555209,22.51782105] -> coffee brown
+Top 10 colors of ASUCOB0015133_habitus_dorsal_1615428878_lg normalized: [20.32547889,11.4713023,10.80859859] -> black
+[151.20188869,111.50175329,84.55344929] -> gray / grey
+[69.39466122,40.10302962,35.54353538] -> coffee brown
+[50.20186618,28.99579513,26.91027808] -> coffee brown
+[218.27702617,173.96940195,124.71387027] -> tan
+[131.59950135,91.95844615,69.71775556] -> deep brown
+[174.4154708,134.72507553,101.85548842] -> rosy brown
+[110.42066428,71.91500218,55.46182591] -> chestnut brown
+[34.79129036,21.4945286,19.93186633] -> black
+[88.68779349,53.66320921,44.52150434] -> coffee brown
+Top 10 colors of ASUCOB0015133_habitus_dorsal_1615428878_lg normalized_only: [17.30226725,10.81619125,10.79391683] -> black
+[113.75907963,73.78527072,58.76725686] -> deep brown
+[158.68930934,119.29709906,89.57009849] -> gray / grey
+[71.43125296,41.05031519,36.50784457] -> coffee brown
+[136.01659321,94.7005509,72.04795064] -> deep brown
+[187.04458816,147.1529223,108.34061072] -> rosy brown
+[51.93298127,29.41846141,27.41216775] -> coffee brown
+[92.34595141,56.20035592,47.31100789] -> taupe brown
+[229.05110962,190.2896772,137.1565232] -> burly wood
+[34.08382534,19.90815538,19.00964704] -> black
+```
 
+Color Cube Histogram PCA via
+```shell
+python updated_color_color_cube-V2.py
+```
+![color_cube4](https://github.com/user-attachments/assets/cfcbdeee-0f85-4b3f-a5f0-2a4985027752)
 
+![PCA_color_histograms](https://github.com/user-attachments/assets/87e432ec-db6e-413d-b267-5f7ea9502f58)
 
+This is an ongoing project and improvements will be made. Probably the best application is to work on a genus or tribe with a somewhat similar appearence. Probably about 50-100 annotations will get you very accurate predictions depending on how large/small the feature or sclerite is and how variable the appearence of your taxonomic group of interest. I'm happy you are interested in this projct, please let me know if you have comments or questions and please cite this page and or the pre-print if you use the scripts for your own work.
 
