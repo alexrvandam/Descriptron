@@ -17,40 +17,7 @@ The long term goal of this project is to combine LLM ViTs with instance segmenta
 # Installation
 The initial model is available through GoogleDrive found here:
 
-You will need conda or miniconda3 (https://docs.anaconda.com/miniconda/)
-
-You need to make sure that your version of pytorch (https://pytorch.org/get-started/previous-versions/) and cuda (https://developer.nvidia.com/cuda-toolkit-archive) compatible with the detectron2 version you want to install if you don't want to use the requirements.txt or the .yaml provide.
-
-
-# Dependencies
-Once you have conda/miniconda and cuda installed you then need to install detectron2 and pytorch to match.  The version of cuda that works for your system, you will need to find out but it was built and tested on cuda 11.7.1 which is what I recommend
-it may also work on cuda 10.2.89
-it was run on a single Teslav100-32 GPU so a single GPU but with fairly beefy memory (32GB) it may use less mem but I have not tested it on smaller systems.
-
-# Quick install via .yaml, installs everything accept for conda/miniconda and cuda/cudatoolkit
-
-```shell 
-conda env create -f descriptron-train-predict.yaml
-conda activate descriptron-tp
-```
-If you want to configure to your own environment without making a new one (not recommended) then the minimum packages some of which are
-some of these are default in a conda environment with python but I list them all 
-
-detectron2
-os
-sys
-json
-cuda
-numpy
-opencv
-random
-shapely
-warnings
-pandas
-torch
-matplotlib
-
-you can look in the .yaml file to see the versions I used and if there is anything compatable on your system, so probbly the easiest way to do this is just via the .yaml file provided to do the training and prediction.
+https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
 
 # Image Data Annotation
 to run the training first annotate some polygons with VIA2 found here:(https://www.robots.ox.ac.uk/~vgg/software/via/)
