@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Descriptron"
+version: "main"
+date-released: 2024-12-31
+authors:
+  - family-names: Van Dam
+    given-names: Alex R.
+    orcid: https://orcid.org/0000-0002-1825-0097
+repository-code: https://github.com/alexrvandam/Descriptron
