@@ -19,3 +19,14 @@ The initial model is available through GoogleDrive found here:
 
 https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
 
+
+# Citation for now a Bibtex of this page
+@software{Van_Dam_Descriptron_2024,
+  author = {Van Dam, Alex R.},
+  title = {Descriptron},
+  version = {main},
+  url = {https://github.com/alexrvandam/Descriptron},
+  date = {2024-12-31},
+  note = {Accessed: 2024-12-31}
+}
+
