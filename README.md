@@ -11,8 +11,18 @@ v0.1.0
 ![lateral_6_prediction](https://github.com/user-attachments/assets/d14a5582-30d9-467e-acd8-e1f11db5edfd)
 
 
+Descriptron is licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-it is distributed under and Apache-2 license
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 
 Apache License
 Version 2.0, January 2004
