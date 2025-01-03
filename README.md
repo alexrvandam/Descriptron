@@ -8,7 +8,6 @@ Descriptron Version
 v0.1.0
 
 ![marmot](https://github.com/user-attachments/assets/52116f4a-e6bf-45d8-a783-8b2bfcb33ee4)
-<img https://github.com/user-attachments/assets/52116f4a-e6bf-45d8-a783-8b2bfcb33ee4, width=75%>
 
 
 ![lateral_6_prediction](https://github.com/user-attachments/assets/d14a5582-30d9-467e-acd8-e1f11db5edfd)
