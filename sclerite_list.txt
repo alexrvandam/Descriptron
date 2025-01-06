@@ -1,0 +1,10 @@
+entire_forewing
+pterostigma
+cell-csc
+cell-Rs
+cell-cu1
+cell-cu2
+cell-m1
+cell-m2
+cell-r2
+cell-a

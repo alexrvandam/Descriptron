@@ -1,0 +1,1287 @@
+Species Description for *nana*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *nana* is broad with a short width-to-length ratio and an oblong oval shape. It features pale brown veins and a completely hyaline membrane, moderately covered with spinules forming a pattern of two hexagonal rows. The veins are pale yellow, with no color pigmentation present along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Spinule-free strips are narrow and present along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and slightly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length, with its apex moderately arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin, and is without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2295 mm, Height 0.4840 mm, Area2 0.4466 mm, Perimeter 3.0114 mm, Equivalent diameter 0.7541 mm
+- **Cell-m1**: Length 0.3713 mm, Height 0.1719 mm, Area2 0.0406 mm, Perimeter 0.9839 mm, Equivalent diameter 0.2274 mm
+- **Cell-m2**: Length 0.5857 mm, Height 0.1258 mm, Area2 0.0592 mm, Perimeter 1.4086 mm, Equivalent diameter 0.2745 mm
+- **Cell-r2**: Length 0.9319 mm, Height 0.1428 mm, Area2 0.0864 mm, Perimeter 2.1418 mm, Equivalent diameter 0.3317 mm
+- **Cell-cu2**: Length 0.6019 mm, Height 0.1875 mm, Area2 0.0902 mm, Perimeter 1.4719 mm, Equivalent diameter 0.3390 mm
+- **Cell-cu1**: Length 0.3538 mm, Height 0.1225 mm, Area2 0.0341 mm, Perimeter 0.8669 mm, Equivalent diameter 0.2084 mm
+- **Cell-Rs**: Length 0.6584 mm, Height 0.1073 mm, Area2 0.0600 mm, Perimeter 1.4675 mm, Equivalent diameter 0.2763 mm
+- **Pterostigma**: Length 0.4565 mm, Height 0.0381 mm, Area2 0.0109 mm, Perimeter 0.9698 mm, Equivalent diameter 0.1176 mm
+
+Diagnosis:
+
+*nana* is distinguished by its broad forewing with a short width-to-length ratio, pale brown veins, and a hyaline membrane. The absence of a pterostigma cell and the presence of a moderately arced apex of vein Cu1a are key features that differentiate it from other species.
+
+---
+
+Species Description for *chorizanthis*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *chorizanthis* is broad and long with an oblong oval shape, characterized by a pale yellow color with pale brown veins. The membrane is moderately covered with spinules that are randomly distributed. The veins are pale yellow, with no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Spinule-free strips are broad along all veins. The apical two-thirds of vein C+Sc is nearly straight, with a convex base. There is a costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and slightly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and short. Vein Cu1a is strongly convex in the apical two-thirds, with its apex strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin, and is without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2279 mm, Height 0.4688 mm, Area2 0.4583 mm, Perimeter 3.0117 mm, Equivalent diameter 0.7639 mm
+- **Cell-m1**: Length 0.2924 mm, Height 0.1241 mm, Area2 0.0270 mm, Perimeter 0.7517 mm, Equivalent diameter 0.1850 mm
+- **Cell-m2**: Length 0.5751 mm, Height 0.1468 mm, Area2 0.0539 mm, Perimeter 1.3996 mm, Equivalent diameter 0.2619 mm
+- **Cell-r2**: Length 0.9089 mm, Height 0.1499 mm, Area2 0.0902 mm, Perimeter 2.0737 mm, Equivalent diameter 0.3390 mm
+- **Cell-cu2**: Length 0.6527 mm, Height 0.2079 mm, Area2 0.0937 mm, Perimeter 1.5322 mm, Equivalent diameter 0.3453 mm
+- **Cell-a**: Length 0.2843 mm, Height 0.0506 mm, Area2 0.0098 mm, Perimeter 0.6250 mm, Equivalent diameter 0.1115 mm
+- **Cell-Rs**: Length 0.6246 mm, Height 0.1274 mm, Area2 0.0618 mm, Perimeter 1.3950 mm, Equivalent diameter 0.2805 mm
+- **Pterostigma**: Length 0.4050 mm, Height 0.0350 mm, Area2 0.0093 mm, Perimeter 0.8508 mm, Equivalent diameter 0.1087 mm
+
+Diagnosis:
+
+*chorizanthis* is identified by its broad and long forewing with pale yellow coloration and randomly distributed spinules. The presence of a costal break and the strong arc of vein Cu1a's apex are distinguishing features.
+
+---
+
+Species Description for *fabianae*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *fabianae* is broad and short with an oblong oval shape, featuring a pale yellow color with pale brown veins. The membrane is moderately covered with spinules forming a pattern of transverse rows. The veins are pale yellow, with no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Spinule-free strips are narrow along all veins. The apical two-thirds of vein C+Sc is strongly convex, with a convex base. There is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is narrow and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length, with its apex strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin, and is covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2327 mm, Height 0.4977 mm, Area2 0.4845 mm, Perimeter 3.0709 mm, Equivalent diameter 0.7854 mm
+- **Cell-m1**: Length 0.2866 mm, Height 0.1303 mm, Area2 0.0251 mm, Perimeter 0.7147 mm, Equivalent diameter 0.1789 mm
+- **Cell-m2**: Length 0.5685 mm, Height 0.1341 mm, Area2 0.0593 mm, Perimeter 1.3174 mm, Equivalent diameter 0.2749 mm
+- **Cell-r2**: Length 0.9175 mm, Height 0.1501 mm, Area2 0.1016 mm, Perimeter 2.1146 mm, Equivalent diameter 0.3597 mm
+- **Cell-cu2**: Length 0.6458 mm, Height 0.1938 mm, Area2 0.0925 mm, Perimeter 1.4975 mm, Equivalent diameter 0.3432 mm
+- **Cell-cu1**: Length 0.3038 mm, Height 0.0952 mm, Area2 0.0257 mm, Perimeter 0.7398 mm, Equivalent diameter 0.1808 mm
+- **Cell-a**: Length 0.3001 mm, Height 0.0526 mm, Area2 0.0111 mm, Perimeter 0.6724 mm, Equivalent diameter 0.1191 mm
+- **Cell-Rs**: Length 0.6626 mm, Height 0.1262 mm, Area2 0.0668 mm, Perimeter 1.5075 mm, Equivalent diameter 0.2917 mm
+- **Pterostigma**: Length 0.4538 mm, Height 0.0538 mm, Area2 0.0146 mm, Perimeter 0.9631 mm, Equivalent diameter 0.1363 mm
+
+Diagnosis:
+
+*fabianae* is characterized by its broad and short forewing with pale yellow coloration and transverse row spinule pattern. The strong convexity of vein C+Sc and the dense setae coverage are distinctive features.
+
+---
+
+Species Description for adesmiae:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *adesmiae* is characterized by a broad, oblong oval shape, with a width-to-length ratio of 0.53–0.57. It is pale brown with distinct pale areas along the veins and in the middle of the cells. The membrane is densely covered with spinules arranged in transverse rows, with narrow spinule-free strips along all veins. The veins are pale brown, with brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex, with no costal break between vein C+Sc and the pterostigma. The pterostigma is absent. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. Both veins and membrane have short setae, dense on veins and sparse on the membrane.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2340 mm, Height 0.5087 mm, Area2 0.4713 mm, Perimeter 3.0648 mm, Equivalent diameter 0.7747 mm
+- **Cell-cu2**: Length 0.6066 mm, Height 0.1926 mm, Area2 0.0898 mm, Perimeter 1.4310 mm, Equivalent diameter 0.3382 mm
+- **Cell-r2**: Length 0.8429 mm, Height 0.1600 mm, Area2 0.0995 mm, Perimeter 2.0152 mm, Equivalent diameter 0.3559 mm
+- **Cell-a**: Length 0.2546 mm, Height 0.0443 mm, Area2 0.0077 mm, Perimeter 0.5722 mm, Equivalent diameter 0.0992 mm
+- **Cell-m2**: Length 0.5271 mm, Height 0.1564 mm, Area2 0.0603 mm, Perimeter 1.2621 mm, Equivalent diameter 0.2771 mm
+- **Cell-m1**: Length 0.2696 mm, Height 0.1474 mm, Area2 0.0256 mm, Perimeter 0.6972 mm, Equivalent diameter 0.1806 mm
+- **Cell-cu1**: Length 0.3100 mm, Height 0.1100 mm, Area2 0.0271 mm, Perimeter 0.7529 mm, Equivalent diameter 0.1858 mm
+- **Cell-Rs**: Length 0.6181 mm, Height 0.1487 mm, Area2 0.0645 mm, Perimeter 1.4003 mm, Equivalent diameter 0.2866 mm
+- **Pterostigma**: Length 0.4362 mm, Height 0.0467 mm, Area2 0.0130 mm, Perimeter 0.9492 mm, Equivalent diameter 0.1289 mm
+
+Diagnosis:
+
+*adesmiae* can be distinguished by its pale brown forewing with a broad, oblong oval shape, densely covered spinules in transverse rows, and the absence of a pterostigma. The veins are pale brown with brown pigmentation along specific apices, and the forewing is widest in the middle with a broadly and evenly rounded apical margin.
+
+---
+
+Species Description for nigra:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *nigra* is broad and long with a width-to-length ratio of approximately 0.4, and an oblong oval shape. It is pale brown with dark brown veins. The membrane is densely covered with spinules forming two hexagonal rows, with narrow spinule-free strips along all veins. The veins are brown, with no pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex and convex at the base, with no costal break between vein C+Sc and the pterostigma. The pterostigma is absent. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane is bare, while the veins are covered with short, dense setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2218 mm, Height 0.4852 mm, Area2 0.4560 mm, Perimeter 3.0606 mm, Equivalent diameter 0.7620 mm
+- **Cell-m1**: Length 0.2979 mm, Height 0.1471 mm, Area2 0.0293 mm, Perimeter 0.7619 mm, Equivalent diameter 0.1931 mm
+- **Cell-cu2**: Length 0.6319 mm, Height 0.1793 mm, Area2 0.0899 mm, Perimeter 1.4757 mm, Equivalent diameter 0.3382 mm
+- **Cell-r2**: Length 0.9088 mm, Height 0.1538 mm, Area2 0.0917 mm, Perimeter 2.1307 mm, Equivalent diameter 0.3417 mm
+- **Cell-m2**: Length 0.5571 mm, Height 0.1530 mm, Area2 0.0592 mm, Perimeter 1.3734 mm, Equivalent diameter 0.2746 mm
+- **Cell-Rs**: Length 0.6597 mm, Height 0.1274 mm, Area2 0.0605 mm, Perimeter 1.4741 mm, Equivalent diameter 0.2776 mm
+- **Cell-a**: Length 0.2925 mm, Height 0.0320 mm, Area2 0.0061 mm, Perimeter 0.6486 mm, Equivalent diameter 0.0883 mm
+- **Cell-cu1**: Length 0.2965 mm, Height 0.1264 mm, Area2 0.0285 mm, Perimeter 0.7532 mm, Equivalent diameter 0.1906 mm
+- **Pterostigma**: Length 0.4119 mm, Height 0.0425 mm, Area2 0.0133 mm, Perimeter 0.8861 mm, Equivalent diameter 0.1302 mm
+
+Diagnosis:
+
+*nigra* is identified by its pale brown forewing with dark brown veins, densely covered spinules forming two hexagonal rows, and the absence of a pterostigma. The veins are brown without pigmentation along specific apices, and the forewing is widest in the middle with a broadly and evenly rounded apical margin.
+
+---
+
+Species Description for solanicola:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *solanicola* is broad and short with an oblong oval shape. It has a pale brown color pattern with pale yellow veins. The membrane is moderately covered with spinules arranged in transverse rows, with broad spinule-free strips along all veins. The veins have brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex, with no costal break between vein C+Sc and the pterostigma. The pterostigma is absent. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. Both the forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2225 mm, Height 0.4668 mm, Area2 0.4366 mm, Perimeter 2.9600 mm, Equivalent diameter 0.7456 mm
+- **Cell-cu2**: Length 0.6278 mm, Height 0.1763 mm, Area2 0.0855 mm, Perimeter 1.4609 mm, Equivalent diameter 0.3300 mm
+- **Cell-r2**: Length 0.9150 mm, Height 0.1475 mm, Area2 0.0790 mm, Perimeter 2.1219 mm, Equivalent diameter 0.3171 mm
+- **Cell-m1**: Length 0.3389 mm, Height 0.1550 mm, Area2 0.0320 mm, Perimeter 0.8463 mm, Equivalent diameter 0.2018 mm
+- **Cell-Rs**: Length 0.6529 mm, Height 0.1238 mm, Area2 0.0612 mm, Perimeter 1.4503 mm, Equivalent diameter 0.2791 mm
+- **Pterostigma**: Length 0.4469 mm, Height 0.0362 mm, Area2 0.0127 mm, Perimeter 0.9503 mm, Equivalent diameter 0.1269 mm
+- **Cell-m2**: Length 0.5633 mm, Height 0.1373 mm, Area2 0.0578 mm, Perimeter 1.3623 mm, Equivalent diameter 0.2714 mm
+- **Cell-a**: Length 0.2844 mm, Height 0.0316 mm, Area2 0.0064 mm, Perimeter 0.6290 mm, Equivalent diameter 0.0900 mm
+- **Cell-cu1**: Length 0.2780 mm, Height 0.1169 mm, Area2 0.0254 mm, Perimeter 0.7120 mm, Equivalent diameter 0.1798 mm
+
+Diagnosis:
+
+*solanicola* is distinguished by its pale brown forewing with pale yellow veins, moderately covered spinules in transverse rows, and the absence of a pterostigma. The veins have brown pigmentation along specific apices, and the forewing is widest in the middle with a broadly and evenly rounded apical margin.
+
+---
+
+Species Description for adelpha_female:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *adelpha_female* is characterized by a broad and long oblong oval shape with a width-to-length ratio of 0.41-0.46. It is pale brown with a distinct dark brown stripe along vein CuA1 and scattered brown dots. The veins are yellowish-brown, and there is dark brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The forewing membrane is moderately covered with spinules that form two hexagonal rows, with broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, while the base is convex. A costal break is present between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length and its apex is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and unevenly rounded apical margin. The forewing membrane and veins are covered by short, densely scattered setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2110 mm, Height 0.5500 mm, Area2 0.5221 mm, Perimeter 3.0878 mm, Equivalent diameter 0.8154 mm
+- **Cell-cu2**: Length 0.6369 mm, Height 0.2063 mm, Area2 0.0960 mm, Perimeter 1.5346 mm, Equivalent diameter 0.3496 mm
+- **Cell-r2**: Length 0.7631 mm, Height 0.1876 mm, Area2 0.0895 mm, Perimeter 1.7843 mm, Equivalent diameter 0.3332 mm
+- **Cell-m1**: Length 0.2820 mm, Height 0.1574 mm, Area2 0.0311 mm, Perimeter 0.7708 mm, Equivalent diameter 0.1991 mm
+- **Cell-m2**: Length 0.5587 mm, Height 0.1696 mm, Area2 0.0660 mm, Perimeter 1.3798 mm, Equivalent diameter 0.2899 mm
+- **Cell-a**: Length 0.3945 mm, Height 0.0661 mm, Area2 0.0151 mm, Perimeter 0.8793 mm, Equivalent diameter 0.1382 mm
+- **Pterostigma**: Length 0.4351 mm, Height 0.0437 mm, Area2 0.0155 mm, Perimeter 0.9361 mm, Equivalent diameter 0.1404 mm
+
+Diagnosis:
+
+*adelpha_female* is distinguished by its broad, long forewing with a pale brown color and distinct dark brown stripe along vein CuA1. The presence of two hexagonal rows of spinules and broad spinule-free strips along all veins are unique features.
+
+---
+
+Species Description for nolanae_male:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *nolanae_male* is broad and short with an ovoid shape. It is pale brown with dark brown veins and brownish, irregularly scattered patches. The veins are brown, with dark brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The forewing membrane is densely covered with randomly distributed spinules, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex in the apical two-thirds, and its apex is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and unevenly rounded apical margin. The forewing membrane and veins are covered by short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2264 mm, Height 0.5435 mm, Area2 0.5065 mm, Perimeter 3.1019 mm, Equivalent diameter 0.8031 mm
+- **Cell-m1**: Length 0.2518 mm, Height 0.1455 mm, Area2 0.0232 mm, Perimeter 0.6568 mm, Equivalent diameter 0.1720 mm
+- **Cell-r2**: Length 0.8681 mm, Height 0.2013 mm, Area2 0.1085 mm, Perimeter 2.1063 mm, Equivalent diameter 0.3717 mm
+- **Cell-cu2**: Length 0.6421 mm, Height 0.2212 mm, Area2 0.0996 mm, Perimeter 1.5321 mm, Equivalent diameter 0.3561 mm
+- **Cell-a**: Length 0.3289 mm, Height 0.0632 mm, Area2 0.0144 mm, Perimeter 0.7392 mm, Equivalent diameter 0.1353 mm
+- **Cell-m2**: Length 0.5220 mm, Height 0.1419 mm, Area2 0.0556 mm, Perimeter 1.2965 mm, Equivalent diameter 0.2661 mm
+- **Pterostigma**: Length 0.3439 mm, Height 0.0363 mm, Area2 0.0112 mm, Perimeter 0.7384 mm, Equivalent diameter 0.1192 mm
+- **Cell-cu1**: Length 0.2400 mm, Height 0.1377 mm, Area2 0.0259 mm, Perimeter 0.6776 mm, Equivalent diameter 0.1815 mm
+- **Cell-Rs**: Length 0.5753 mm, Height 0.1588 mm, Area2 0.0628 mm, Perimeter 1.3406 mm, Equivalent diameter 0.2829 mm
+
+Diagnosis:
+
+*nolanae_male* can be identified by its broad, short ovoid forewing with pale brown color and dark brown veins. The dense, randomly distributed spinules and narrow spinule-free strips along all veins are distinctive.
+
+---
+
+Species Description for didyma:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *didyma* is broad and short with an oblong oval shape. It has a pale brown color pattern with pale yellow veins. There is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The forewing membrane is densely covered with randomly distributed spinules, with broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length, and its apex is weakly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2212 mm, Height 0.4917 mm, Area2 0.4564 mm, Perimeter 3.0304 mm, Equivalent diameter 0.7623 mm
+- **Cell-cu2**: Length 0.6207 mm, Height 0.1913 mm, Area2 0.0915 mm, Perimeter 1.4566 mm, Equivalent diameter 0.3413 mm
+- **Cell-a**: Length 0.2823 mm, Height 0.0415 mm, Area2 0.0086 mm, Perimeter 0.6350 mm, Equivalent diameter 0.1044 mm
+- **Cell-m2**: Length 0.5789 mm, Height 0.1451 mm, Area2 0.0649 mm, Perimeter 1.4025 mm, Equivalent diameter 0.2874 mm
+- **Cell-m1**: Length 0.2989 mm, Height 0.1359 mm, Area2 0.0289 mm, Perimeter 0.7579 mm, Equivalent diameter 0.1917 mm
+- **Pterostigma**: Length 0.4864 mm, Height 0.0514 mm, Area2 0.0201 mm, Perimeter 1.0501 mm, Equivalent diameter 0.1601 mm
+- **Cell-r2**: Length 0.9203 mm, Height 0.1513 mm, Area2 0.0871 mm, Perimeter 2.1838 mm, Equivalent diameter 0.3330 mm
+- **Cell-Rs**: Length 0.6716 mm, Height 0.1389 mm, Area2 0.0606 mm, Perimeter 1.4926 mm, Equivalent diameter 0.2777 mm
+
+Diagnosis:
+
+*didyma* is recognized by its broad, short oblong oval forewing with pale brown color and pale yellow veins. The absence of pigmentation along the apices of the pterostigma and veins, along with broad spinule-free strips, are key identifiers.
+
+---
+
+Species Description for maculata:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *maculata* is broad and short with a high width-to-length ratio, presenting an oblong oval shape. The forewing features pale brown veins and a whitish membrane, adorned with a distinct pale brown pattern consisting of a large spot along vein Cu1 and scattered spots in the apical half. The membrane is densely covered in spinules, which are randomly distributed, with narrow spinule-free strips along all veins. The veins are brown, with color pigmentation present along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex on the wing margin, and the vein is convex at the base. There is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is moderately convex in the apical two-thirds and strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane has distinct brown setae-bearing spots, sometimes forming transverse bands, and veins with brown setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2355 mm, Height 0.4595 mm, Area2 0.4432 mm, Perimeter 3.0797 mm, Equivalent diameter 0.7512 mm
+- **Cell-m1**: Length 0.3180 mm, Height 0.1547 mm, Area2 0.0312 mm, Perimeter 0.8010 mm, Equivalent diameter 0.1993 mm
+- **Cell-cu2**: Length 0.6151 mm, Height 0.1768 mm, Area2 0.0841 mm, Perimeter 1.4429 mm, Equivalent diameter 0.3272 mm
+- **Cell-r2**: Length 0.9116 mm, Height 0.1600 mm, Area2 0.0920 mm, Perimeter 2.1289 mm, Equivalent diameter 0.3423 mm
+- **Cell-m2**: Length 0.5364 mm, Height 0.1522 mm, Area2 0.0586 mm, Perimeter 1.2705 mm, Equivalent diameter 0.2731 mm
+- **Cell-cu1**: Length 0.2850 mm, Height 0.0963 mm, Area2 0.0226 mm, Perimeter 0.6901 mm, Equivalent diameter 0.1696 mm
+- **Cell-Rs**: Length 0.6451 mm, Height 0.1113 mm, Area2 0.0618 mm, Perimeter 1.4347 mm, Equivalent diameter 0.2805 mm
+- **Cell-a**: Length 0.3227 mm, Height 0.0331 mm, Area2 0.0073 mm, Perimeter 0.7038 mm, Equivalent diameter 0.0967 mm
+- **Pterostigma**: Length 0.3058 mm, Height 0.0391 mm, Area2 0.0062 mm, Perimeter 0.6685 mm, Equivalent diameter 0.0889 mm
+
+Diagnosis:
+
+*maculata* is distinguished by its broad and short forewing with a high width-to-length ratio, dense spinule coverage, and distinct pale brown pattern on the whitish membrane. The absence of a pterostigma cell and the presence of brown setae-bearing spots on the membrane are also key identifiers.
+
+---
+
+Species Description for monticola:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *monticola* is broad and short with a low width-to-length ratio, taking an oblong oval shape. It has a pale brown membrane with brown veins, moderately covered with spinules forming a pattern of two hexagonal rows. The veins are yellowish-brown, with brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Narrow spinule-free strips are present along all veins. The apical two-thirds of vein C+Sc is strongly convex, but not convex at the base, and there is a costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length and strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2289 mm, Height 0.4851 mm, Area2 0.4499 mm, Perimeter 3.0065 mm, Equivalent diameter 0.7568 mm
+- **Cell-cu2**: Length 0.6121 mm, Height 0.1941 mm, Area2 0.0898 mm, Perimeter 1.4401 mm, Equivalent diameter 0.3381 mm
+- **Cell-m2**: Length 0.5395 mm, Height 0.1365 mm, Area2 0.0521 mm, Perimeter 1.2690 mm, Equivalent diameter 0.2576 mm
+- **Cell-a**: Length 0.2724 mm, Height 0.0490 mm, Area2 0.0095 mm, Perimeter 0.6147 mm, Equivalent diameter 0.1099 mm
+- **Cell-r2**: Length 0.9196 mm, Height 0.1516 mm, Area2 0.0963 mm, Perimeter 2.1254 mm, Equivalent diameter 0.3502 mm
+- **Cell-m1**: Length 0.3138 mm, Height 0.1428 mm, Area2 0.0303 mm, Perimeter 0.7860 mm, Equivalent diameter 0.1965 mm
+- **Cell-cu1**: Length 0.2838 mm, Height 0.1113 mm, Area2 0.0244 mm, Perimeter 0.7023 mm, Equivalent diameter 0.1762 mm
+- **Cell-Rs**: Length 0.6650 mm, Height 0.1288 mm, Area2 0.0620 mm, Perimeter 1.5113 mm, Equivalent diameter 0.2809 mm
+- **Pterostigma**: Length 0.4796 mm, Height 0.0504 mm, Area2 0.0164 mm, Perimeter 1.0313 mm, Equivalent diameter 0.1447 mm
+
+Diagnosis:
+
+*monticola* is characterized by its broad and short forewing with a low width-to-length ratio, moderate spinule coverage forming two hexagonal rows, and the presence of a costal break between vein C+Sc and the pterostigma. The absence of setae on the forewing membrane and veins further distinguishes this species.
+
+---
+
+Species Description for bulbosa:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *bulbosa* is broad and short with an oblong oval shape. It features yellow veins and a yellow membrane, densely covered with randomly distributed spinules. Broad spinule-free strips are present along all veins. The veins are yellow, with no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex, but not convex at the base, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length and moderately arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are not covered with setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2185 mm, Height 0.4677 mm, Area2 0.4527 mm, Perimeter 2.9952 mm, Equivalent diameter 0.7592 mm
+- **Cell-r2**: Length 0.9176 mm, Height 0.1239 mm, Area2 0.0948 mm, Perimeter 2.0378 mm, Equivalent diameter 0.3474 mm
+- **Cell-cu2**: Length 0.6803 mm, Height 0.1591 mm, Area2 0.0836 mm, Perimeter 1.5585 mm, Equivalent diameter 0.3262 mm
+- **Cell-m1**: Length 0.2887 mm, Height 0.1153 mm, Area2 0.0208 mm, Perimeter 0.7007 mm, Equivalent diameter 0.1627 mm
+- **Cell-m2**: Length 0.5974 mm, Height 0.1190 mm, Area2 0.0533 mm, Perimeter 1.3521 mm, Equivalent diameter 0.2606 mm
+- **Cell-Rs**: Length 0.7053 mm, Height 0.1326 mm, Area2 0.0725 mm, Perimeter 1.6314 mm, Equivalent diameter 0.3039 mm
+- **Cell-a**: Length 0.4971 mm, Height 0.0518 mm, Area2 0.0141 mm, Perimeter 1.0676 mm, Equivalent diameter 0.1340 mm
+- **Cell-cu1**: Length 0.2654 mm, Height 0.0862 mm, Area2 0.0194 mm, Perimeter 0.6419 mm, Equivalent diameter 0.1570 mm
+- **Pterostigma**: Length 0.4263 mm, Height 0.0476 mm, Area2 0.0121 mm, Perimeter 0.9158 mm, Equivalent diameter 0.1241 mm
+
+Diagnosis:
+
+*bulbosa* is identified by its yellow veins and membrane, dense spinule coverage with broad spinule-free strips, and the absence of pigmentation along the apices of the pterostigma and veins. The absence of setae on the forewing membrane and veins is also a distinguishing feature.
+
+---
+
+Species Description for *queirozae*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *queirozae* is broad and long with a width-to-length ratio of approximately 1:2.7, and it is oblong oval in shape. The entire forewing is pale yellow with brown veins, and the membrane is moderately covered with spinules arranged in transverse rows. Spinule-free strips are broad and present along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is present, short in length, broad in relative width, and broadest at the apical 2/3. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is relatively broad and short, while cell Cu1 is broad and short. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, and the apical margin is broadly and evenly rounded. The forewing membrane and veins are covered by short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.1425 mm, Height 0.3838 mm, Area2 0.3451 mm, Perimeter 2.7267 mm, Equivalent diameter 0.6629 mm
+- **Cell-m1**: Length 0.2146 mm, Height 0.1182 mm, Area2 0.0148 mm, Perimeter 0.5699 mm, Equivalent diameter 0.1373 mm
+- **Cell-cu2**: Length 0.5565 mm, Height 0.1482 mm, Area2 0.0613 mm, Perimeter 1.2890 mm, Equivalent diameter 0.2795 mm
+- **Cell-r2**: Length 0.8526 mm, Height 0.1451 mm, Area2 0.0748 mm, Perimeter 1.9717 mm, Equivalent diameter 0.3086 mm
+- **Cell-a**: Length 0.2301 mm, Height 0.0407 mm, Area2 0.0066 mm, Perimeter 0.5071 mm, Equivalent diameter 0.0914 mm
+- **Cell-m2**: Length 0.5503 mm, Height 0.1467 mm, Area2 0.0509 mm, Perimeter 1.2536 mm, Equivalent diameter 0.2546 mm
+- **Cell-cu1**: Length 0.2633 mm, Height 0.0900 mm, Area2 0.0210 mm, Perimeter 0.6476 mm, Equivalent diameter 0.1635 mm
+- **Cell-Rs**: Length 0.6433 mm, Height 0.0993 mm, Area2 0.0482 mm, Perimeter 1.4227 mm, Equivalent diameter 0.2477 mm
+- **Pterostigma**: Length 0.4365 mm, Height 0.0437 mm, Area2 0.0085 mm, Perimeter 0.9255 mm, Equivalent diameter 0.1039 mm
+
+Diagnosis:
+
+*queirozae* can be distinguished by its pale yellow forewing with brown veins, moderate spinule coverage in transverse rows, and broad spinule-free strips along the veins. The pterostigma is broadest at the apical 2/3, and the forewing is widest in the middle.
+
+---
+
+Species Description for *longicauda*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *longicauda* is broad and relatively short with a high width-to-length ratio, and it is oblong oval in shape. The forewing is pale yellow with pale brown veins and distinct brown patches in the middle of the discal cell and at the base of the second subcostal, the first median, and the cubital sectors. The membrane is sparsely covered with spinules arranged in transverse rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is relatively broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, and the apical margin is broadly and evenly rounded. The forewing membrane is covered with short, densely distributed setae, while the veins are bare.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2293 mm, Height 0.4804 mm, Area2 0.4547 mm, Perimeter 3.0697 mm, Equivalent diameter 0.7609 mm
+- **Cell-m1**: Length 0.2834 mm, Height 0.1544 mm, Area2 0.0294 mm, Perimeter 0.7303 mm, Equivalent diameter 0.1934 mm
+- **Cell-cu2**: Length 0.6186 mm, Height 0.1915 mm, Area2 0.0896 mm, Perimeter 1.4591 mm, Equivalent diameter 0.3379 mm
+- **Cell-r2**: Length 0.9062 mm, Height 0.1829 mm, Area2 0.0951 mm, Perimeter 2.1683 mm, Equivalent diameter 0.3479 mm
+- **Cell-a**: Length 0.2890 mm, Height 0.0514 mm, Area2 0.0105 mm, Perimeter 0.6465 mm, Equivalent diameter 0.1159 mm
+- **Cell-m2**: Length 0.5180 mm, Height 0.1282 mm, Area2 0.0522 mm, Perimeter 1.2480 mm, Equivalent diameter 0.2577 mm
+- **Cell-cu1**: Length 0.2675 mm, Height 0.1240 mm, Area2 0.0245 mm, Perimeter 0.7007 mm, Equivalent diameter 0.1765 mm
+- **Cell-Rs**: Length 0.6240 mm, Height 0.1251 mm, Area2 0.0614 mm, Perimeter 1.4156 mm, Equivalent diameter 0.2795 mm
+- **Pterostigma**: Length 0.3700 mm, Height 0.0515 mm, Area2 0.0073 mm, Perimeter 0.8073 mm, Equivalent diameter 0.0962 mm
+
+Diagnosis:
+
+*longicauda* is characterized by its pale yellow forewing with pale brown veins and distinct brown patches, sparse spinule coverage in transverse rows, and narrow spinule-free strips along the veins. The forewing is widest in the middle, and the pterostigma is absent.
+
+---
+
+Species Description for *dimorpha_female*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *dimorpha_female* is broad and short with a width-to-length ratio of about 0.55, and it is oblong oval in shape. The forewing is pale brown with brown veins and sometimes indistinct brownish areas along the veins. The membrane is moderately covered with spinules that are randomly distributed, with broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is relatively broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, and the apical margin is broadly and evenly rounded. The forewing membrane and veins are covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2274 mm, Height 0.5455 mm, Area2 0.5129 mm, Perimeter 3.0961 mm, Equivalent diameter 0.8081 mm
+- **Cell-m1**: Length 0.2865 mm, Height 0.1719 mm, Area2 0.0300 mm, Perimeter 0.7656 mm, Equivalent diameter 0.1955 mm
+- **Cell-cu2**: Length 0.6611 mm, Height 0.1846 mm, Area2 0.0887 mm, Perimeter 1.5524 mm, Equivalent diameter 0.3361 mm
+- **Cell-r2**: Length 0.9404 mm, Height 0.1723 mm, Area2 0.1039 mm, Perimeter 2.1677 mm, Equivalent diameter 0.3637 mm
+- **Cell-a**: Length 0.5069 mm, Height 0.0467 mm, Area2 0.0141 mm, Perimeter 1.0776 mm, Equivalent diameter 0.1341 mm
+- **Cell-m2**: Length 0.6027 mm, Height 0.1792 mm, Area2 0.0762 mm, Perimeter 1.4753 mm, Equivalent diameter 0.3115 mm
+- **Cell-cu1**: Length 0.3320 mm, Height 0.1338 mm, Area2 0.0330 mm, Perimeter 0.8215 mm, Equivalent diameter 0.2049 mm
+- **Cell-Rs**: Length 0.6927 mm, Height 0.1326 mm, Area2 0.0727 mm, Perimeter 1.5304 mm, Equivalent diameter 0.3043 mm
+- **Pterostigma**: Length 0.4751 mm, Height 0.0626 mm, Area2 0.0166 mm, Perimeter 1.0274 mm, Equivalent diameter 0.1453 mm
+
+Diagnosis:
+
+*dimorpha_female* can be identified by its pale brown forewing with brown veins, moderate spinule coverage that is randomly distributed, and broad spinule-free strips along the veins. The forewing is widest in the middle, and the pterostigma is absent.
+
+---
+
+Species Description for vinculipennis:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *vinculipennis* is characterized by a broad, ovoid shape and is short compared to its width-to-length ratio. It features a pale to dark brown vein pattern with a pale brown membrane and distinct brown patches. The forewing membrane is moderately covered with spinules arranged in two hexagonal rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma, which is absent. The forewing is widest in the middle and has a broadly and evenly rounded apical margin. The veins are covered with short, densely spaced setae, while the membrane is without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2341 mm, Height 0.4995 mm, Area2 0.4703 mm, Perimeter 3.1009 mm, Equivalent diameter 0.7738 mm
+- **Cell-cu2**: Length 0.6165 mm, Height 0.2031 mm, Area2 0.0954 mm, Perimeter 1.4580 mm, Equivalent diameter 0.3485 mm
+- **Cell-r2**: Length 0.9062 mm, Height 0.1537 mm, Area2 0.0967 mm, Perimeter 2.0656 mm, Equivalent diameter 0.3508 mm
+- **Cell-a**: Length 0.2802 mm, Height 0.0409 mm, Area2 0.0083 mm, Perimeter 0.6266 mm, Equivalent diameter 0.1029 mm
+- **Cell-m1**: Length 0.3141 mm, Height 0.1494 mm, Area2 0.0300 mm, Perimeter 0.7949 mm, Equivalent diameter 0.1953 mm
+- **Cell-m2**: Length 0.5576 mm, Height 0.1425 mm, Area2 0.0581 mm, Perimeter 1.4032 mm, Equivalent diameter 0.2721 mm
+- **Cell-cu1**: Length 0.2899 mm, Height 0.1363 mm, Area2 0.0317 mm, Perimeter 0.7610 mm, Equivalent diameter 0.2009 mm
+- **Cell-Rs**: Length 0.6105 mm, Height 0.1237 mm, Area2 0.0616 mm, Perimeter 1.3740 mm, Equivalent diameter 0.2801 mm
+- **Pterostigma**: Length 0.3874 mm, Height 0.0440 mm, Area2 0.0095 mm, Perimeter 0.8446 mm, Equivalent diameter 0.1099 mm
+
+Diagnosis:
+
+*vinculipennis* can be distinguished by its broad, ovoid forewing with a pale to dark brown vein pattern and a pale brown membrane with distinct brown patches. The absence of a pterostigma and the presence of short, densely spaced setae on the veins are also characteristic features.
+
+---
+
+Species Description for chilensis:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *chilensis* is broad and oblong oval, with a hyaline appearance and pale brown veins and membrane. It is relatively short, with a width-to-length ratio of approximately 0.5. The forewing membrane is moderately covered with spinules in two hexagonal rows, with broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma, which is absent. The forewing is widest in the apical third and has a broadly and evenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2385 mm, Height 0.4774 mm, Area2 0.4422 mm, Perimeter 3.0514 mm, Equivalent diameter 0.7504 mm
+- **Cell-m1**: Length 0.2787 mm, Height 0.1382 mm, Area2 0.0260 mm, Perimeter 0.7095 mm, Equivalent diameter 0.1818 mm
+- **Cell-cu2**: Length 0.6596 mm, Height 0.1741 mm, Area2 0.0891 mm, Perimeter 1.5093 mm, Equivalent diameter 0.3369 mm
+- **Cell-r2**: Length 0.9465 mm, Height 0.1515 mm, Area2 0.1068 mm, Perimeter 2.1463 mm, Equivalent diameter 0.3687 mm
+- **Cell-a**: Length 0.2463 mm, Height 0.0432 mm, Area2 0.0072 mm, Perimeter 0.5502 mm, Equivalent diameter 0.0958 mm
+- **Cell-m2**: Length 0.5526 mm, Height 0.1358 mm, Area2 0.0539 mm, Perimeter 1.3111 mm, Equivalent diameter 0.2621 mm
+- **Cell-cu1**: Length 0.3040 mm, Height 0.1000 mm, Area2 0.0239 mm, Perimeter 0.7304 mm, Equivalent diameter 0.1745 mm
+- **Cell-Rs**: Length 0.6330 mm, Height 0.1126 mm, Area2 0.0593 mm, Perimeter 1.4134 mm, Equivalent diameter 0.2748 mm
+- **Pterostigma**: Length 0.4309 mm, Height 0.0302 mm, Area2 0.0061 mm, Perimeter 0.9151 mm, Equivalent diameter 0.0884 mm
+
+Diagnosis:
+
+*chilensis* is identifiable by its broad, oblong oval forewing with a hyaline appearance and pale brown veins. The absence of setae on the forewing membrane and veins, along with broad spinule-free strips, are distinguishing characteristics.
+
+---
+
+Species Description for globosa_female:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *globosa_female* is broad and oblong oval, with a pale yellow color and pale brown veins. It is short compared to its width-to-length ratio. The forewing membrane is moderately covered in spinules arranged in two hexagonal rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma, which is absent. The forewing is widest in the middle and has a broadly and evenly rounded apical margin. The forewing membrane and veins are bare, without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2273 mm, Height 0.5025 mm, Area2 0.4770 mm, Perimeter 3.0491 mm, Equivalent diameter 0.7793 mm
+- **Cell-m2**: Length 0.5751 mm, Height 0.1427 mm, Area2 0.0600 mm, Perimeter 1.3743 mm, Equivalent diameter 0.2764 mm
+- **Cell-r2**: Length 0.9158 mm, Height 0.1814 mm, Area2 0.0968 mm, Perimeter 2.1581 mm, Equivalent diameter 0.3512 mm
+- **Cell-cu2**: Length 0.6097 mm, Height 0.1886 mm, Area2 0.0868 mm, Perimeter 1.4389 mm, Equivalent diameter 0.3324 mm
+- **Cell-cu1**: Length 0.3129 mm, Height 0.1237 mm, Area2 0.0292 mm, Perimeter 0.7763 mm, Equivalent diameter 0.1927 mm
+- **Cell-a**: Length 0.2993 mm, Height 0.0610 mm, Area2 0.0122 mm, Perimeter 0.6801 mm, Equivalent diameter 0.1247 mm
+- **Cell-m1**: Length 0.3417 mm, Height 0.1436 mm, Area2 0.0310 mm, Perimeter 0.8596 mm, Equivalent diameter 0.1988 mm
+- **Pterostigma**: Length 0.4278 mm, Height 0.0463 mm, Area2 0.0159 mm, Perimeter 0.9148 mm, Equivalent diameter 0.1424 mm
+- **Cell-Rs**: Length 0.6245 mm, Height 0.1487 mm, Area2 0.0644 mm, Perimeter 1.4167 mm, Equivalent diameter 0.2864 mm
+
+Diagnosis:
+
+*globosa_female* can be recognized by its pale yellow forewing with pale brown veins and the absence of setae on both the forewing membrane and veins. The narrow spinule-free strips along the veins are also a notable feature.
+
+---
+
+Species Description for adelpha_male:**
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *adelpha_male* is characterized by a broad and long ovoid shape, with a pale background and a broad brown band extending from the middle of the costa to the apex and along the termen to the tornus, adorned with scattered pale dots. The veins are brown, with dark brown pigmentation present along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The forewing membrane is densely covered with spinules arranged in two hexagonal rows, leaving broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2258 mm, Height 0.5175 mm, Area2 0.4970 mm, Perimeter 3.0700 mm, Equivalent diameter 0.7955 mm
+- **Cell-m1**: Length 0.2531 mm, Height 0.1707 mm, Area2 0.0278 mm, Perimeter 0.7081 mm, Equivalent diameter 0.1881 mm
+- **Cell-r2**: Length 0.8934 mm, Height 0.1979 mm, Area2 0.0996 mm, Perimeter 2.1122 mm, Equivalent diameter 0.3562 mm
+- **Cell-cu2**: Length 0.6234 mm, Height 0.2054 mm, Area2 0.0935 mm, Perimeter 1.4884 mm, Equivalent diameter 0.3451 mm
+- **Cell-a**: Length 0.3160 mm, Height 0.0650 mm, Area2 0.0140 mm, Perimeter 0.7137 mm, Equivalent diameter 0.1337 mm
+- **Cell-m2**: Length 0.5596 mm, Height 0.1624 mm, Area2 0.0634 mm, Perimeter 1.3570 mm, Equivalent diameter 0.2842 mm
+- **Cell-cu1**: Length 0.3065 mm, Height 0.1414 mm, Area2 0.0341 mm, Perimeter 0.8232 mm, Equivalent diameter 0.2083 mm
+- **Cell-Rs**: Length 0.6114 mm, Height 0.1525 mm, Area2 0.0629 mm, Perimeter 1.3922 mm, Equivalent diameter 0.2830 mm
+- **Pterostigma**: Length 0.4091 mm, Height 0.0425 mm, Area2 0.0145 mm, Perimeter 0.8717 mm, Equivalent diameter 0.1358 mm
+
+Diagnosis:
+
+*adelpha_male* is distinguished by its broad, long ovoid forewing with a pale background and a prominent brown band, along with densely distributed spinules forming two hexagonal rows, and the absence of a pterostigma cell.
+
+---
+
+**Species Description for capsici:**
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *capsici* is broad and short with an ovoid shape, featuring a distinct color pattern with a pale brownish band from the middle of the costa to the tornus, and a pale brownish area from the base of the costa to the middle of the wing, with scattered pale brown dots in the submedian area. The veins are brown with dark brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The forewing membrane is densely covered with spinules in two hexagonal rows, with broad spinule-free strips along the cell veins dm and r4+5. The apical two-thirds of vein C+Sc is strongly convex, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. The forewing is widest in the middle, with a broadly and unevenly rounded apical margin. The forewing membrane has short setae densely scattered along veins and sparsely between them.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.1141 mm, Height 0.4849 mm, Area2 0.4165 mm, Perimeter 2.8071 mm, Equivalent diameter 0.7282 mm
+- **Cell-cu2**: Length 0.5759 mm, Height 0.1812 mm, Area2 0.0796 mm, Perimeter 1.3767 mm, Equivalent diameter 0.3184 mm
+- **Cell-a**: Length 0.2858 mm, Height 0.0453 mm, Area2 0.0086 mm, Perimeter 0.6397 mm, Equivalent diameter 0.1044 mm
+- **Cell-m1**: Length 0.2728 mm, Height 0.1771 mm, Area2 0.0282 mm, Perimeter 0.7659 mm, Equivalent diameter 0.1894 mm
+- **Cell-r2**: Length 0.8257 mm, Height 0.1843 mm, Area2 0.0845 mm, Perimeter 1.9955 mm, Equivalent diameter 0.3280 mm
+- **Cell-cu1**: Length 0.2637 mm, Height 0.1277 mm, Area2 0.0268 mm, Perimeter 0.7079 mm, Equivalent diameter 0.1847 mm
+- **Cell-m2**: Length 0.5319 mm, Height 0.1298 mm, Area2 0.0537 mm, Perimeter 1.3107 mm, Equivalent diameter 0.2614 mm
+- **Cell-Rs**: Length 0.5574 mm, Height 0.1325 mm, Area2 0.0512 mm, Perimeter 1.2544 mm, Equivalent diameter 0.2554 mm
+- **Pterostigma**: Length 0.4149 mm, Height 0.0424 mm, Area2 0.0112 mm, Perimeter 0.8824 mm, Equivalent diameter 0.1195 mm
+
+Diagnosis:
+
+*capsici* is identified by its broad, short ovoid forewing with a distinct pale brownish pattern and densely distributed spinules in two hexagonal rows, with broad spinule-free strips along specific veins.
+
+---
+
+**Species Description for pallida:**
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *pallida* is broad and long with an oblong oval shape, featuring a pale yellow color with pale yellow veins. The forewing membrane is densely covered with spinules arranged in transverse rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2292 mm, Height 0.4625 mm, Area2 0.4268 mm, Perimeter 3.0166 mm, Equivalent diameter 0.7371 mm
+- **Cell-cu2**: Length 0.5970 mm, Height 0.1880 mm, Area2 0.0775 mm, Perimeter 1.4385 mm, Equivalent diameter 0.3142 mm
+- **Cell-m1**: Length 0.2525 mm, Height 0.1476 mm, Area2 0.0251 mm, Perimeter 0.6745 mm, Equivalent diameter 0.1786 mm
+- **Cell-m2**: Length 0.5459 mm, Height 0.1363 mm, Area2 0.0575 mm, Perimeter 1.3420 mm, Equivalent diameter 0.2706 mm
+- **Cell-r2**: Length 0.8936 mm, Height 0.1627 mm, Area2 0.0960 mm, Perimeter 2.0872 mm, Equivalent diameter 0.3496 mm
+- **Cell-cu1**: Length 0.3152 mm, Height 0.1177 mm, Area2 0.0301 mm, Perimeter 0.8035 mm, Equivalent diameter 0.1956 mm
+- **Cell-a**: Length 0.2898 mm, Height 0.0473 mm, Area2 0.0090 mm, Perimeter 0.6380 mm, Equivalent diameter 0.1068 mm
+- **Cell-Rs**: Length 0.6299 mm, Height 0.1051 mm, Area2 0.0518 mm, Perimeter 1.3834 mm, Equivalent diameter 0.2568 mm
+- **Pterostigma**: Length 0.4509 mm, Height 0.0538 mm, Area2 0.0142 mm, Perimeter 0.9830 mm, Equivalent diameter 0.1344 mm
+
+Diagnosis:
+
+*pallida* is recognized by its broad, long oblong oval forewing with a pale yellow coloration, densely covered spinules in transverse rows, and the absence of setae on the forewing membrane and veins.
+
+---
+
+**Species Description for *mendozae*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *mendozae* is broad and short with a high width-to-length ratio, characterized by an oblong oval shape. The entire forewing exhibits a pale yellowish-brown color pattern with densely covered spinules, forming broad spinule-free strips along all veins. The veins are yellow to dark yellow with dark brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is nearly straight, and the forewing is widest in the middle with a broadly and evenly rounded apical margin. The forewing membrane is covered with pale setae, which are long and densely to sparsely distributed, while the veins have similar setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2238 mm, Height 0.4725 mm, Area2 0.4445 mm, Perimeter 3.0093 mm, Equivalent diameter 0.7523 mm
+- **Cell-m2**: Length 0.5753 mm, Height 0.1422 mm, Area2 0.0593 mm, Perimeter 1.3413 mm, Equivalent diameter 0.2749 mm
+- **Cell-cu2**: Length 0.6198 mm, Height 0.1895 mm, Area2 0.0893 mm, Perimeter 1.4623 mm, Equivalent diameter 0.3373 mm
+- **Cell-a**: Length 0.2698 mm, Height 0.0557 mm, Area2 0.0101 mm, Perimeter 0.6052 mm, Equivalent diameter 0.1135 mm
+- **Cell-cu1**: Length 0.3204 mm, Height 0.1162 mm, Area2 0.0285 mm, Perimeter 0.7738 mm, Equivalent diameter 0.1906 mm
+- **Cell-m1**: Length 0.3158 mm, Height 0.1377 mm, Area2 0.0301 mm, Perimeter 0.7963 mm, Equivalent diameter 0.1956 mm
+- **Cell-r2**: Length 0.9415 mm, Height 0.1549 mm, Area2 0.0900 mm, Perimeter 2.2295 mm, Equivalent diameter 0.3386 mm
+- **Cell-Rs**: Length 0.6627 mm, Height 0.1186 mm, Area2 0.0602 mm, Perimeter 1.4709 mm, Equivalent diameter 0.2769 mm
+- **Pterostigma**: Length 0.4914 mm, Height 0.0489 mm, Area2 0.0132 mm, Perimeter 1.0402 mm, Equivalent diameter 0.1296 mm
+
+Diagnosis:
+
+*mendozae* is distinguished by its pale yellowish-brown forewing with densely covered spinules and broad spinule-free strips along the veins. The presence of dark brown pigmentation along the apices of the pterostigma and specific veins further differentiates it from other species.
+
+---
+
+Species Description for *lycii_female*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *lycii_female* is broad and short with an oblong oval shape. It is pale brown with dark brown dots scattered more densely along the veins and brownish smears in the middle and along the apical margin. The forewing membrane is densely covered with spinules forming two hexagonal rows, with narrow spinule-free strips along all veins. The veins are brown with dark brown pigmentation along the apices of the pterostigma and specific veins. The apical two-thirds of vein C+Sc is nearly straight, and the forewing is widest in the middle with a broadly and evenly rounded apical margin. The forewing membrane has dense, short setae, while the veins have relatively long setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.1327 mm, Height 0.5179 mm, Area2 0.4661 mm, Perimeter 2.8772 mm, Equivalent diameter 0.7703 mm
+- **Cell-r2**: Length 0.7491 mm, Height 0.1850 mm, Area2 0.0811 mm, Perimeter 1.7900 mm, Equivalent diameter 0.3189 mm
+- **Cell-m2**: Length 0.5380 mm, Height 0.1344 mm, Area2 0.0583 mm, Perimeter 1.3308 mm, Equivalent diameter 0.2725 mm
+- **Cell-m1**: Length 0.2673 mm, Height 0.1466 mm, Area2 0.0278 mm, Perimeter 0.7180 mm, Equivalent diameter 0.1882 mm
+- **Cell-cu2**: Length 0.5526 mm, Height 0.2177 mm, Area2 0.0978 mm, Perimeter 1.3567 mm, Equivalent diameter 0.3528 mm
+- **Cell-a**: Length 0.2845 mm, Height 0.0465 mm, Area2 0.0098 mm, Perimeter 0.6441 mm, Equivalent diameter 0.1117 mm
+- **Pterostigma**: Length 0.4646 mm, Height 0.0427 mm, Area2 0.0133 mm, Perimeter 0.9772 mm, Equivalent diameter 0.1301 mm
+
+Diagnosis:
+
+*lycii_female* is characterized by its pale brown forewing with dark brown dots and brownish smears, along with a pattern of two hexagonal rows of spinules. The narrow spinule-free strips along the veins and the specific pigmentation pattern distinguish it from other species.
+
+---
+
+Species Description for *adela*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *adela* is broad and long with an oblong oval shape, featuring a pale brown color with pale yellow veins. The forewing membrane is densely covered with spinules forming transverse rows, with broad spinule-free strips along all veins. There is no color pigmentation present along the apices of the pterostigma and specific veins. The apical two-thirds of vein C+Sc is nearly straight, and the forewing is widest in the middle with a broadly and evenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2253 mm, Height 0.4662 mm, Area2 0.4426 mm, Perimeter 2.9889 mm, Equivalent diameter 0.7507 mm
+- **Cell-r2**: Length 0.9425 mm, Height 0.1538 mm, Area2 0.0962 mm, Perimeter 2.1386 mm, Equivalent diameter 0.3500 mm
+- **Cell-m1**: Length 0.2975 mm, Height 0.1264 mm, Area2 0.0260 mm, Perimeter 0.7502 mm, Equivalent diameter 0.1819 mm
+- **Cell-cu2**: Length 0.6457 mm, Height 0.1646 mm, Area2 0.0805 mm, Perimeter 1.4837 mm, Equivalent diameter 0.3202 mm
+- **Cell-m2**: Length 0.5639 mm, Height 0.1373 mm, Area2 0.0617 mm, Perimeter 1.3195 mm, Equivalent diameter 0.2803 mm
+- **Cell-Rs**: Length 0.6382 mm, Height 0.1225 mm, Area2 0.0602 mm, Perimeter 1.4238 mm, Equivalent diameter 0.2769 mm
+- **Pterostigma**: Length 0.4490 mm, Height 0.0476 mm, Area2 0.0124 mm, Perimeter 0.9580 mm, Equivalent diameter 0.1258 mm
+- **Cell-a**: Length 0.5008 mm, Height 0.0492 mm, Area2 0.0136 mm, Perimeter 1.0913 mm, Equivalent diameter 0.1317 mm
+
+Diagnosis:
+
+*adela* is identified by its pale brown forewing with pale yellow veins and the absence of pigmentation along the apices of the pterostigma and specific veins. The transverse rows of spinules and broad spinule-free strips along the veins are distinctive features.
+
+---
+
+Species Description for disparilis:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *disparilis* is broad and long with an ovoid shape, characterized by a pale yellow color pattern. The forewing membrane is densely covered with spinules that are randomly distributed, and broad spinule-free strips are present along all veins. The veins are pale yellow, and there is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex on the wing margin, and the vein is convex at the base. There is no costal break between vein C+Sc and the pterostigma, which is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin of the forewing. The forewing is widest in the middle, and the apical margin is broadly and evenly rounded. The forewing membrane and veins are bare, without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2331 mm, Height 0.5002 mm, Area2 0.4822 mm, Perimeter 3.0258 mm, Equivalent diameter 0.7836 mm
+- **Cell-cu2**: Length 0.6428 mm, Height 0.1850 mm, Area2 0.0935 mm, Perimeter 1.5013 mm, Equivalent diameter 0.3451 mm
+- **Cell-r2**: Length 0.9650 mm, Height 0.1600 mm, Area2 0.0939 mm, Perimeter 2.3150 mm, Equivalent diameter 0.3458 mm
+- **Cell-m1**: Length 0.3526 mm, Height 0.1510 mm, Area2 0.0358 mm, Perimeter 0.8941 mm, Equivalent diameter 0.2135 mm
+- **Cell-cu1**: Length 0.3210 mm, Height 0.1423 mm, Area2 0.0332 mm, Perimeter 0.8077 mm, Equivalent diameter 0.2055 mm
+- **Cell-m2**: Length 0.6252 mm, Height 0.1677 mm, Area2 0.0753 mm, Perimeter 1.5302 mm, Equivalent diameter 0.3096 mm
+- **Cell-Rs**: Length 0.6775 mm, Height 0.1139 mm, Area2 0.0605 mm, Perimeter 1.5305 mm, Equivalent diameter 0.2776 mm
+- **Cell-a**: Length 0.2894 mm, Height 0.0459 mm, Area2 0.0088 mm, Perimeter 0.6383 mm, Equivalent diameter 0.1057 mm
+- **Pterostigma**: Length 0.4590 mm, Height 0.0482 mm, Area2 0.0114 mm, Perimeter 0.9963 mm, Equivalent diameter 0.1203 mm
+
+Diagnosis:
+
+*disparilis* is distinguished by its broad, ovoid forewing with a pale yellow color pattern and densely covered spinules that are randomly distributed. The absence of a pterostigma and the strongly convex apical two-thirds of vein C+Sc are key identifying features.
+
+---
+
+Species Description for melaina:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *melaina* is broad and long with an oblong oval shape, featuring pale brown veins and membrane. The forewing membrane is sparsely covered with spinules, and broad spinule-free strips are present along all veins. The veins are pale yellow, and there is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is strongly convex on the wing margin, and the vein is convex at the base. There is no costal break between vein C+Sc and the pterostigma, which is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and short. The apex of vein Cu1a is strongly arced towards the posterior margin of the forewing. The forewing is widest in the middle, and the apical margin is broadly and evenly rounded. The forewing membrane and veins are bare, without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2085 mm, Height 0.5517 mm, Area2 0.5341 mm, Perimeter 3.1126 mm, Equivalent diameter 0.8247 mm
+- **Cell-r2**: Length 0.9525 mm, Height 0.1878 mm, Area2 0.1359 mm, Perimeter 2.2925 mm, Equivalent diameter 0.4159 mm
+- **Cell-m1**: Length 0.3095 mm, Height 0.1577 mm, Area2 0.0318 mm, Perimeter 0.7878 mm, Equivalent diameter 0.2011 mm
+- **Cell-m2**: Length 0.5875 mm, Height 0.1442 mm, Area2 0.0669 mm, Perimeter 1.4347 mm, Equivalent diameter 0.2918 mm
+- **Cell-a**: Length 0.2567 mm, Height 0.0419 mm, Area2 0.0080 mm, Perimeter 0.5848 mm, Equivalent diameter 0.1008 mm
+- **Cell-Rs**: Length 0.7082 mm, Height 0.1545 mm, Area2 0.0786 mm, Perimeter 1.6303 mm, Equivalent diameter 0.3164 mm
+- **Cell-cu2**: Length 0.5825 mm, Height 0.2035 mm, Area2 0.0909 mm, Perimeter 1.4462 mm, Equivalent diameter 0.3402 mm
+- **Cell-cu1**: Length 0.3029 mm, Height 0.1361 mm, Area2 0.0281 mm, Perimeter 0.7899 mm, Equivalent diameter 0.1890 mm
+- **Pterostigma**: Length 0.4841 mm, Height 0.0467 mm, Area2 0.0153 mm, Perimeter 1.0528 mm, Equivalent diameter 0.1396 mm
+
+Diagnosis:
+
+*melaina* is characterized by its broad, oblong oval forewing with pale brown veins and membrane. The sparse spinule coverage and the absence of a pterostigma are distinctive features.
+
+---
+
+Species Description for intermedia:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *intermedia* is broad and long with an oblong oval shape, featuring a pale yellow color without any pattern. The forewing membrane is densely covered with spinules that form a pattern in transverse rows, and narrow spinule-free strips are present along all veins. The veins are pale yellow, and there is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The apical two-thirds of vein C+Sc is nearly straight on the wing margin, and the vein is not convex at the base. There is no costal break between vein C+Sc and the pterostigma, which is absent. Vein Rs is relatively straight and slightly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin of the forewing. The forewing is widest in the middle, and the apical margin is broadly and evenly rounded. The forewing membrane and veins are bare, without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2237 mm, Height 0.4800 mm, Area2 0.4484 mm, Perimeter 3.0486 mm, Equivalent diameter 0.7556 mm
+- **Cell-r2**: Length 0.9332 mm, Height 0.1777 mm, Area2 0.0971 mm, Perimeter 2.1902 mm, Equivalent diameter 0.3515 mm
+- **Cell-m1**: Length 0.3246 mm, Height 0.1387 mm, Area2 0.0306 mm, Perimeter 0.8299 mm, Equivalent diameter 0.1974 mm
+- **Cell-m2**: Length 0.5763 mm, Height 0.1490 mm, Area2 0.0638 mm, Perimeter 1.3973 mm, Equivalent diameter 0.2851 mm
+- **Cell-cu2**: Length 0.5873 mm, Height 0.1886 mm, Area2 0.0843 mm, Perimeter 1.4052 mm, Equivalent diameter 0.3276 mm
+- **Cell-a**: Length 0.2252 mm, Height 0.0432 mm, Area2 0.0073 mm, Perimeter 0.5097 mm, Equivalent diameter 0.0964 mm
+- **Cell-cu1**: Length 0.3740 mm, Height 0.1362 mm, Area2 0.0356 mm, Perimeter 0.9119 mm, Equivalent diameter 0.2130 mm
+- **Cell-Rs**: Length 0.6703 mm, Height 0.1112 mm, Area2 0.0554 mm, Perimeter 1.4889 mm, Equivalent diameter 0.2655 mm
+- **Pterostigma**: Length 0.4313 mm, Height 0.0532 mm, Area2 0.0100 mm, Perimeter 0.9357 mm, Equivalent diameter 0.1127 mm
+
+Diagnosis:
+
+*intermedia* is identified by its pale yellow, oblong oval forewing with densely covered spinules in transverse rows. The nearly straight apical two-thirds of vein C+Sc and the absence of a pterostigma are notable features.
+
+---
+
+Species Description for *magellanica*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *magellanica* is broad and relatively long, with an oblong oval shape. It features a distinct pattern with dark brown veins and broad pale brown areas along the veins, with pale brown to brown areas scattered over the entire wing. The membrane is densely covered with spinules forming a pattern of transverse rows, and spinule-free strips are broad along all veins. The apical two-thirds of vein C+Sc is strongly convex, with a costal break between vein C+Sc and the pterostigma. The pterostigma is absent. Vein Rs is relatively straight and slightly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is moderately arced towards the posterior margin. The forewing is widest in the middle and has a broadly and evenly rounded apical margin. The membrane and veins are covered with short, densely spaced setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.1426 mm, Height 0.5039 mm, Area2 0.4383 mm, Perimeter 2.8594 mm, Equivalent diameter 0.7470 mm
+- **Cell-r2**: Length 0.8502 mm, Height 0.1470 mm, Area2 0.0842 mm, Perimeter 2.0173 mm, Equivalent diameter 0.3274 mm
+- **Cell-m2**: Length 0.5749 mm, Height 0.1346 mm, Area2 0.0510 mm, Perimeter 1.3591 mm, Equivalent diameter 0.2547 mm
+- **Cell-cu1**: Length 0.2974 mm, Height 0.1138 mm, Area2 0.0256 mm, Perimeter 0.7368 mm, Equivalent diameter 0.1805 mm
+- **Cell-cu2**: Length 0.6043 mm, Height 0.1863 mm, Area2 0.0814 mm, Perimeter 1.4193 mm, Equivalent diameter 0.3219 mm
+- **Cell-m1**: Length 0.3485 mm, Height 0.1194 mm, Area2 0.0256 mm, Perimeter 0.8371 mm, Equivalent diameter 0.1804 mm
+- **Cell-a**: Length 0.3945 mm, Height 0.0664 mm, Area2 0.0154 mm, Perimeter 0.8806 mm, Equivalent diameter 0.1402 mm
+- **Cell-Rs**: Length 0.6081 mm, Height 0.1456 mm, Area2 0.0696 mm, Perimeter 1.4021 mm, Equivalent diameter 0.2978 mm
+- **Pterostigma**: Length 0.3907 mm, Height 0.0600 mm, Area2 0.0136 mm, Perimeter 0.8603 mm, Equivalent diameter 0.1316 mm
+
+Diagnosis:
+
+*magellanica* is distinguished by its oblong oval forewing with a distinct pattern of dark brown veins and broad pale brown areas, densely covered with spinules in transverse rows, and broad spinule-free strips along the veins.
+
+---
+
+Species Description for *longirostro*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *longirostro* is broad and short, with an ovoid shape and a pale yellowish-brown color pattern. The membrane is densely covered with spinules forming a pattern of two hexagonal rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, with no costal break between vein C+Sc and the pterostigma. The pterostigma is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is narrow and long, while cell Cu1 is broad and short. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle and has a broadly and unevenly rounded apical margin. The membrane is covered with short, densely spaced setae, and the veins are covered with long, dense setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.1916 mm, Height 0.4927 mm, Area2 0.4465 mm, Perimeter 2.9930 mm, Equivalent diameter 0.7540 mm
+- **Cell-cu2**: Length 0.6174 mm, Height 0.1850 mm, Area2 0.0884 mm, Perimeter 1.4531 mm, Equivalent diameter 0.3355 mm
+- **Cell-r2**: Length 0.8864 mm, Height 0.1638 mm, Area2 0.1006 mm, Perimeter 2.1111 mm, Equivalent diameter 0.3579 mm
+- **Cell-m1**: Length 0.2804 mm, Height 0.1570 mm, Area2 0.0271 mm, Perimeter 0.7498 mm, Equivalent diameter 0.1858 mm
+- **Cell-m2**: Length 0.5143 mm, Height 0.1495 mm, Area2 0.0582 mm, Perimeter 1.2618 mm, Equivalent diameter 0.2723 mm
+- **Cell-a**: Length 0.2046 mm, Height 0.0408 mm, Area2 0.0057 mm, Perimeter 0.4600 mm, Equivalent diameter 0.0855 mm
+- **Cell-Rs**: Length 0.6359 mm, Height 0.1426 mm, Area2 0.0633 mm, Perimeter 1.4286 mm, Equivalent diameter 0.2839 mm
+- **Pterostigma**: Length 0.3785 mm, Height 0.0388 mm, Area2 0.0101 mm, Perimeter 0.8064 mm, Equivalent diameter 0.1132 mm
+- **Cell-cu1**: Length 0.2552 mm, Height 0.1225 mm, Area2 0.0251 mm, Perimeter 0.6713 mm, Equivalent diameter 0.1788 mm
+
+Diagnosis:
+
+*longirostro* is characterized by its ovoid forewing with a pale yellowish-brown color pattern, densely covered with spinules in two hexagonal rows, and narrow spinule-free strips along the veins.
+
+---
+
+Species Description for *viscosae*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *viscosae* is broad and long, with an oblong oval shape and a pale brown color with brown veins. The membrane is densely covered with spinules randomly distributed, with broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, with no costal break between vein C+Sc and the pterostigma. The pterostigma is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is narrow and long, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle and has a broadly and evenly rounded apical margin. The membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2040 mm, Height 0.5516 mm, Area2 0.5178 mm, Perimeter 3.1023 mm, Equivalent diameter 0.8119 mm
+- **Cell-m1**: Length 0.2838 mm, Height 0.1650 mm, Area2 0.0293 mm, Perimeter 0.7672 mm, Equivalent diameter 0.1930 mm
+- **Cell-r2**: Length 0.9015 mm, Height 0.1575 mm, Area2 0.1048 mm, Perimeter 2.0846 mm, Equivalent diameter 0.3654 mm
+- **Cell-m2**: Length 0.6004 mm, Height 0.1427 mm, Area2 0.0674 mm, Perimeter 1.4247 mm, Equivalent diameter 0.2929 mm
+- **Cell-a**: Length 0.2762 mm, Height 0.0534 mm, Area2 0.0105 mm, Perimeter 0.6231 mm, Equivalent diameter 0.1158 mm
+- **Cell-cu2**: Length 0.6203 mm, Height 0.1942 mm, Area2 0.0916 mm, Perimeter 1.4940 mm, Equivalent diameter 0.3415 mm
+- **Pterostigma**: Length 0.4392 mm, Height 0.0525 mm, Area2 0.0159 mm, Perimeter 0.9498 mm, Equivalent diameter 0.1421 mm
+- **Cell-Rs**: Length 0.6986 mm, Height 0.1363 mm, Area2 0.0797 mm, Perimeter 1.5973 mm, Equivalent diameter 0.3185 mm
+- **Cell-cu1**: Length 0.3356 mm, Height 0.1125 mm, Area2 0.0292 mm, Perimeter 0.8206 mm, Equivalent diameter 0.1929 mm
+
+Diagnosis:
+
+*viscosae* is identified by its oblong oval forewing with a pale brown color and brown veins, densely covered with randomly distributed spinules, and broad spinule-free strips along the veins.
+
+---
+
+Species Description for caunda:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *caunda* is pale yellow with pale brown veins and a moderately covered spinule membrane. The forewing is ovoid, broad, and long, with a nearly straight apical two-thirds of vein C+Sc. The pterostigma is absent, and the apical margin is broadly and evenly rounded. Spinule-free strips are narrow along all veins. Vein Rs is relatively straight and slightly turns up apically, while vein Cu1a is strongly convex in the apical two-thirds and strongly arced towards the posterior margin. The forewing is widest in the apical two-thirds and lacks setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2127 mm, Height 0.4765 mm, Area2 0.4484 mm, Perimeter 3.0959 mm, Equivalent diameter 0.7556 mm
+- **Cell-cu2**: Length 0.6427 mm, Height 0.1888 mm, Area2 0.0933 mm, Perimeter 1.4894 mm, Equivalent diameter 0.3447 mm
+- **Cell-m2**: Length 0.5633 mm, Height 0.1463 mm, Area2 0.0606 mm, Perimeter 1.3519 mm, Equivalent diameter 0.2778 mm
+- **Cell-m1**: Length 0.3154 mm, Height 0.1526 mm, Area2 0.0319 mm, Perimeter 0.8093 mm, Equivalent diameter 0.2016 mm
+- **Cell-r2**: Length 0.9188 mm, Height 0.1600 mm, Area2 0.0929 mm, Perimeter 2.1719 mm, Equivalent diameter 0.3440 mm
+- **Cell-a**: Length 0.2784 mm, Height 0.0411 mm, Area2 0.0083 mm, Perimeter 0.6253 mm, Equivalent diameter 0.1029 mm
+- **Cell-cu1**: Length 0.2946 mm, Height 0.1125 mm, Area2 0.0254 mm, Perimeter 0.7233 mm, Equivalent diameter 0.1797 mm
+- **Cell-Rs**: Length 0.6177 mm, Height 0.1163 mm, Area2 0.0552 mm, Perimeter 1.3772 mm, Equivalent diameter 0.2652 mm
+- **Pterostigma**: Length 0.4373 mm, Height 0.0390 mm, Area2 0.0119 mm, Perimeter 0.9392 mm, Equivalent diameter 0.1233 mm
+
+Diagnosis:
+
+*caunda* is distinguished by its pale yellow forewing with pale brown veins, broad ovoid shape, and absence of a pterostigma. The nearly straight apical two-thirds of vein C+Sc and the broad, evenly rounded apical margin are key identifying features.
+
+---
+
+Species Description for globosa_male:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *globosa_male* is pale brown with yellowish-brown veins and moderately covered with spinules forming two hexagonal rows. The forewing is broad, short, and oblong oval, with a strongly convex apical two-thirds of vein C+Sc. The pterostigma is absent, and the apical margin is broadly and evenly rounded. Spinule-free strips are broad along all veins. Vein Rs is relatively straight and abruptly turns up apically, while vein Cu1a is strongly convex in the apical two-thirds and strongly arced towards the posterior margin. The forewing is widest in the middle and covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2280 mm, Height 0.4901 mm, Area2 0.4656 mm, Perimeter 3.0629 mm, Equivalent diameter 0.7700 mm
+- **Cell-r2**: Length 0.8940 mm, Height 0.1840 mm, Area2 0.0927 mm, Perimeter 2.0955 mm, Equivalent diameter 0.3436 mm
+- **Cell-m2**: Length 0.5923 mm, Height 0.1609 mm, Area2 0.0627 mm, Perimeter 1.4319 mm, Equivalent diameter 0.2827 mm
+- **Cell-cu2**: Length 0.6293 mm, Height 0.2037 mm, Area2 0.0928 mm, Perimeter 1.4927 mm, Equivalent diameter 0.3437 mm
+- **Cell-m1**: Length 0.3620 mm, Height 0.1644 mm, Area2 0.0357 mm, Perimeter 0.9055 mm, Equivalent diameter 0.2132 mm
+- **Cell-a**: Length 0.3050 mm, Height 0.0645 mm, Area2 0.0131 mm, Perimeter 0.6803 mm, Equivalent diameter 0.1293 mm
+- **Cell-Rs**: Length 0.6168 mm, Height 0.1375 mm, Area2 0.0599 mm, Perimeter 1.3858 mm, Equivalent diameter 0.2762 mm
+- **Cell-cu1**: Length 0.2863 mm, Height 0.1263 mm, Area2 0.0274 mm, Perimeter 0.7294 mm, Equivalent diameter 0.1867 mm
+- **Pterostigma**: Length 0.4498 mm, Height 0.0478 mm, Area2 0.0164 mm, Perimeter 0.9829 mm, Equivalent diameter 0.1445 mm
+
+Diagnosis:
+
+*globosa_male* is characterized by its pale brown forewing with yellowish-brown veins, broad oblong oval shape, and the presence of two hexagonal rows of spinules. The strongly convex apical two-thirds of vein C+Sc and the broad, evenly rounded apical margin are distinctive features.
+
+---
+
+Species Description for diosteae:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *diosteae* is brownish-yellow with brown veins and a distinct brown pattern, including a large spot in the middle of the costal margin, a large median band, and a large spot in the apical part. The forewing is broad, short, and oblong oval, with a strongly convex apical two-thirds of vein C+Sc. The pterostigma is absent, and the apical margin is broadly and unevenly rounded. Spinule-free strips are broad in cells r2+3 and r4+5, narrow in other cells. Vein Rs is relatively straight and abruptly turns up apically, while vein Cu1a is strongly convex in the apical two-thirds and strongly arced towards the posterior margin. The forewing is widest in the middle and covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2421 mm, Height 0.5062 mm, Area2 0.4838 mm, Perimeter 3.1588 mm, Equivalent diameter 0.7849 mm
+- **Cell-cu2**: Length 0.6578 mm, Height 0.1607 mm, Area2 0.0800 mm, Perimeter 1.5072 mm, Equivalent diameter 0.3191 mm
+- **Cell-r2**: Length 0.9580 mm, Height 0.1613 mm, Area2 0.1121 mm, Perimeter 2.1773 mm, Equivalent diameter 0.3777 mm
+- **Cell-cu1**: Length 0.2847 mm, Height 0.0900 mm, Area2 0.0189 mm, Perimeter 0.6711 mm, Equivalent diameter 0.1550 mm
+- **Cell-m1**: Length 0.3114 mm, Height 0.1188 mm, Area2 0.0234 mm, Perimeter 0.7508 mm, Equivalent diameter 0.1726 mm
+- **Cell-a**: Length 0.5611 mm, Height 0.0349 mm, Area2 0.0110 mm, Perimeter 1.1936 mm, Equivalent diameter 0.1184 mm
+- **Cell-m2**: Length 0.6885 mm, Height 0.1302 mm, Area2 0.0606 mm, Perimeter 1.5720 mm, Equivalent diameter 0.2777 mm
+- **Cell-Rs**: Length 0.6861 mm, Height 0.1437 mm, Area2 0.0793 mm, Perimeter 1.5570 mm, Equivalent diameter 0.3178 mm
+- **Pterostigma**: Length 0.3504 mm, Height 0.0286 mm, Area2 0.0051 mm, Perimeter 0.7383 mm, Equivalent diameter 0.0804 mm
+
+Diagnosis:
+
+*diosteae* is identified by its brownish-yellow forewing with distinct brown patterns and broad oblong oval shape. The strongly convex apical two-thirds of vein C+Sc and the broad, unevenly rounded apical margin are notable features.
+
+---
+
+Species Description for dimorpha_male:**
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *dimorpha_male* is characterized by a broad and long ovoid shape with a width-to-length ratio of about 0.5. The forewing displays pale brown veins and a membrane with a pale brown pattern, including a large patch along vein Cu1 and scattered dots in the apical half. The membrane is moderately covered with spinules arranged in two hexagonal rows, with narrow spinule-free strips along all veins. The apical margin is broadly and evenly rounded, and the forewing is widest in the middle. The veins are brown, with pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. The pterostigma is absent. Vein C+Sc is nearly straight in the apical two-thirds and not convex at the base, with no costal break between vein C+Sc and the pterostigma. Vein Rs is sinuate and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length and strongly arced towards the posterior margin of the forewing. Surface spinules are absent on the basal one-half of cell C+Sc. The forewing membrane has dense, short setae, absent in some pale areas, and veins with dense, short setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2311 mm, Height 0.5342 mm, Area2 0.5122 mm, Perimeter 3.1495 mm, Equivalent diameter 0.8076 mm
+- **Cell-m1**: Length 0.2676 mm, Height 0.1753 mm, Area2 0.0288 mm, Perimeter 0.7293 mm, Equivalent diameter 0.1915 mm
+- **Cell-r2**: Length 0.9335 mm, Height 0.1980 mm, Area2 0.1060 mm, Perimeter 2.1600 mm, Equivalent diameter 0.3674 mm
+- **Cell-cu2**: Length 0.6525 mm, Height 0.2117 mm, Area2 0.0992 mm, Perimeter 1.5159 mm, Equivalent diameter 0.3555 mm
+- **Cell-a**: Length 0.3028 mm, Height 0.0486 mm, Area2 0.0095 mm, Perimeter 0.6811 mm, Equivalent diameter 0.1102 mm
+- **Cell-m2**: Length 0.5720 mm, Height 0.1736 mm, Area2 0.0692 mm, Perimeter 1.4012 mm, Equivalent diameter 0.2968 mm
+- **Cell-cu1**: Length 0.2675 mm, Height 0.1237 mm, Area2 0.0254 mm, Perimeter 0.6933 mm, Equivalent diameter 0.1797 mm
+- **Cell-Rs**: Length 0.6166 mm, Height 0.1363 mm, Area2 0.0623 mm, Perimeter 1.3839 mm, Equivalent diameter 0.2817 mm
+- **Pterostigma**: Length 0.4441 mm, Height 0.0351 mm, Area2 0.0107 mm, Perimeter 0.9314 mm, Equivalent diameter 0.1167 mm
+
+Diagnosis:
+
+*dimorpha_male* can be identified by its broad and long ovoid forewing with pale brown veins and a distinctive pale brown pattern. The absence of a pterostigma and the presence of dense, short setae on the forewing membrane and veins further distinguish it from other species.
+
+---
+
+**Species Description for xantha:**
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *xantha* is broad and short with an oblong oval shape. It is uniformly pale yellow with pale yellow veins. The membrane is moderately covered with spinules that are randomly distributed, and broad spinule-free strips are present along all veins. The apical margin is broadly and evenly rounded, and the forewing is widest in the apical third. The pterostigma is absent, and there is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Vein C+Sc is nearly straight in the apical two-thirds and not convex at the base, with no costal break between vein C+Sc and the pterostigma. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and short. Vein Cu1a is strongly convex in the apical two-thirds and strongly arced towards the posterior margin of the forewing. Surface spinules are absent on the basal one-half of cell C+Sc. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2292 mm, Height 0.4763 mm, Area2 0.4566 mm, Perimeter 3.0527 mm, Equivalent diameter 0.7625 mm
+- **Cell-r2**: Length 0.9525 mm, Height 0.1638 mm, Area2 0.1002 mm, Perimeter 2.2366 mm, Equivalent diameter 0.3572 mm
+- **Cell-a**: Length 0.2914 mm, Height 0.0470 mm, Area2 0.0097 mm, Perimeter 0.6578 mm, Equivalent diameter 0.1113 mm
+- **Cell-cu2**: Length 0.6189 mm, Height 0.1825 mm, Area2 0.0864 mm, Perimeter 1.4552 mm, Equivalent diameter 0.3317 mm
+- **Cell-m1**: Length 0.3187 mm, Height 0.1489 mm, Area2 0.0312 mm, Perimeter 0.8093 mm, Equivalent diameter 0.1993 mm
+- **Cell-m2**: Length 0.5891 mm, Height 0.1489 mm, Area2 0.0629 mm, Perimeter 1.3973 mm, Equivalent diameter 0.2830 mm
+- **Cell-cu1**: Length 0.3412 mm, Height 0.1262 mm, Area2 0.0289 mm, Perimeter 0.8189 mm, Equivalent diameter 0.1920 mm
+- **Cell-Rs**: Length 0.6751 mm, Height 0.1263 mm, Area2 0.0646 mm, Perimeter 1.5202 mm, Equivalent diameter 0.2867 mm
+- **Pterostigma**: Length 0.4384 mm, Height 0.0403 mm, Area2 0.0103 mm, Perimeter 0.9402 mm, Equivalent diameter 0.1144 mm
+
+Diagnosis:
+
+*xantha* is distinguished by its pale yellow forewing and veins, broad and short oblong oval shape, and the absence of setae on the forewing membrane and veins. The random distribution of spinules and broad spinule-free strips along the veins are also characteristic features.
+
+---
+
+**Species Description for rutila:**
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *rutila* is broad and relatively short with an oblong oval shape. It is hyaline with pale brown veins and moderately covered with spinules that are randomly distributed. Broad spinule-free strips are present along all veins. The apical margin is broadly and evenly rounded, and the forewing is widest in the middle. The pterostigma is absent, and there is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Vein C+Sc is strongly convex in the apical two-thirds and convex at the base, with no costal break between vein C+Sc and the pterostigma. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. Vein Cu1a is strongly convex along its entire length and strongly arced towards the posterior margin of the forewing. Surface spinules are absent on the basal one-half of cell C+Sc. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2279 mm, Height 0.4678 mm, Area2 0.4397 mm, Perimeter 2.9845 mm, Equivalent diameter 0.7482 mm
+- **Cell-r2**: Length 0.9366 mm, Height 0.1553 mm, Area2 0.0953 mm, Perimeter 2.1682 mm, Equivalent diameter 0.3483 mm
+- **Cell-cu2**: Length 0.6350 mm, Height 0.1627 mm, Area2 0.0810 mm, Perimeter 1.4689 mm, Equivalent diameter 0.3211 mm
+- **Cell-m1**: Length 0.3714 mm, Height 0.1275 mm, Area2 0.0292 mm, Perimeter 0.8868 mm, Equivalent diameter 0.1927 mm
+- **Cell-m2**: Length 0.5988 mm, Height 0.1400 mm, Area2 0.0596 mm, Perimeter 1.3927 mm, Equivalent diameter 0.2755 mm
+- **Cell-a**: Length 0.2565 mm, Height 0.0474 mm, Area2 0.0081 mm, Perimeter 0.5803 mm, Equivalent diameter 0.1013 mm
+- **Cell-cu1**: Length 0.2988 mm, Height 0.1088 mm, Area2 0.0264 mm, Perimeter 0.7395 mm, Equivalent diameter 0.1833 mm
+- **Cell-Rs**: Length 0.6408 mm, Height 0.1126 mm, Area2 0.0628 mm, Perimeter 1.4428 mm, Equivalent diameter 0.2827 mm
+- **Pterostigma**: Length 0.4814 mm, Height 0.0464 mm, Area2 0.0123 mm, Perimeter 1.0299 mm, Equivalent diameter 0.1252 mm
+
+Diagnosis:
+
+*rutila* is identified by its hyaline forewing with pale brown veins, broad and relatively short oblong oval shape, and the absence of setae on the forewing membrane and veins. The strong convexity of vein C+Sc and the absence of a pterostigma are distinguishing features.
+
+---
+
+**Species Description for *lycii_male*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *lycii_male* is broad and short with a high width-to-length ratio, and an oblong oval shape. It exhibits a pale to dark brown color pattern with dark brown veins and scattered dark brown dots, complemented by a white area along the costal margin and in the middle of the wing. The forewing membrane is densely covered in spinules, which do not form a pattern, and broad spinule-free strips are present along all veins and cross veins. The apical two-thirds of vein C+Sc is nearly straight, and the vein is convex at the base. The pterostigma cell is present, as broad as it is long, and broadest in the middle. Vein Rs is sinuate and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane has dense, short setae, and the veins have long setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.5802 mm, Height 0.6900 mm, Area2 0.9028 mm, Perimeter 3.9994 mm, Equivalent diameter 1.0722 mm
+- **Cell-m1**: Length 0.3625 mm, Height 0.2236 mm, Area2 0.0523 mm, Perimeter 0.9759 mm, Equivalent diameter 0.2581 mm
+- **Cell-r2**: Length 1.2420 mm, Height 0.3189 mm, Area2 0.1848 mm, Perimeter 3.1089 mm, Equivalent diameter 0.4851 mm
+- **Cell-m2**: Length 0.7558 mm, Height 0.2374 mm, Area2 0.1215 mm, Perimeter 1.9439 mm, Equivalent diameter 0.3933 mm
+- **Cell-cu1**: Length 0.3842 mm, Height 0.1776 mm, Area2 0.0559 mm, Perimeter 1.0124 mm, Equivalent diameter 0.2668 mm
+- **Cell-Rs**: Length 0.8558 mm, Height 0.1900 mm, Area2 0.1013 mm, Perimeter 1.9822 mm, Equivalent diameter 0.3592 mm
+- **Cell-cu2**: Length 0.7956 mm, Height 0.3107 mm, Area2 0.1920 mm, Perimeter 1.9705 mm, Equivalent diameter 0.4944 mm
+- **Cell-a**: Length 0.3952 mm, Height 0.0655 mm, Area2 0.0193 mm, Perimeter 0.9133 mm, Equivalent diameter 0.1567 mm
+- **Pterostigma**: Length 0.6964 mm, Height 0.0576 mm, Area2 0.0326 mm, Perimeter 1.4657 mm, Equivalent diameter 0.2037 mm
+
+Diagnosis:
+
+*lycii_male* is distinguished by its broad, short forewing with a high width-to-length ratio, dense spinules without a pattern, and a unique color pattern of pale to dark brown with white areas along the costal margin.
+
+---
+
+Species Description for *bicolorata*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *bicolorata* is broad and long with an oblong oval shape and a width-to-length ratio of about 0.4. It is pale yellow with pale yellow veins and moderately covered with spinules that form a pattern of transverse rows. Narrow spinule-free strips are present along all veins. The apical two-thirds of vein C+Sc is nearly straight, and there is no convexity at the base. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is narrow and short, while cell Cu1 is broad and short. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane is not covered with setae, but the veins have sparse, short setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2156 mm, Height 0.4932 mm, Area2 0.4664 mm, Perimeter 3.0501 mm, Equivalent diameter 0.7706 mm
+- **Cell-r2**: Length 0.9201 mm, Height 0.1571 mm, Area2 0.1099 mm, Perimeter 2.1347 mm, Equivalent diameter 0.3740 mm
+- **Cell-m1**: Length 0.2738 mm, Height 0.1107 mm, Area2 0.0194 mm, Perimeter 0.6606 mm, Equivalent diameter 0.1571 mm
+- **Cell-a**: Length 0.2689 mm, Height 0.0459 mm, Area2 0.0086 mm, Perimeter 0.5985 mm, Equivalent diameter 0.1047 mm
+- **Cell-cu2**: Length 0.6000 mm, Height 0.1797 mm, Area2 0.0816 mm, Perimeter 1.4213 mm, Equivalent diameter 0.3224 mm
+- **Cell-m2**: Length 0.5558 mm, Height 0.1324 mm, Area2 0.0559 mm, Perimeter 1.2830 mm, Equivalent diameter 0.2667 mm
+- **Cell-Rs**: Length 0.6969 mm, Height 0.1383 mm, Area2 0.0766 mm, Perimeter 1.6206 mm, Equivalent diameter 0.3123 mm
+- **Pterostigma**: Length 0.3887 mm, Height 0.0553 mm, Area2 0.0124 mm, Perimeter 0.8429 mm, Equivalent diameter 0.1258 mm
+
+Diagnosis:
+
+*bicolorata* is characterized by its pale yellow forewing with transverse spinule patterns and narrow spinule-free strips, distinguishing it from other species with different color patterns and spinule arrangements.
+
+---
+
+Species Description for *sebastiani*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *sebastiani* is narrow and long with an oblong oval shape, featuring a distinct brown pattern with yellow veins. The forewing membrane is densely covered with spinules forming a pattern of two hexagonal rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, and the vein is convex at the base. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is moderately arced towards the posterior margin. The forewing is widest in the middle, with a broadly and unevenly rounded apical margin. The forewing veins are covered with short, densely distributed setae, and the membrane has short setae densely scattered all over the surface.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2326 mm, Height 0.4427 mm, Area2 0.4146 mm, Perimeter 2.9903 mm, Equivalent diameter 0.7266 mm
+- **Cell-cu2**: Length 0.5593 mm, Height 0.1432 mm, Area2 0.0625 mm, Perimeter 1.2967 mm, Equivalent diameter 0.2821 mm
+- **Cell-a**: Length 0.3577 mm, Height 0.0480 mm, Area2 0.0112 mm, Perimeter 0.7856 mm, Equivalent diameter 0.1192 mm
+- **Cell-cu1**: Length 0.3487 mm, Height 0.0813 mm, Area2 0.0207 mm, Perimeter 0.7981 mm, Equivalent diameter 0.1625 mm
+- **Cell-r2**: Length 0.9415 mm, Height 0.0961 mm, Area2 0.0751 mm, Perimeter 2.0777 mm, Equivalent diameter 0.3092 mm
+- **Cell-m1**: Length 0.3970 mm, Height 0.0942 mm, Area2 0.0254 mm, Perimeter 0.9013 mm, Equivalent diameter 0.1798 mm
+- **Cell-m2**: Length 0.6288 mm, Height 0.1079 mm, Area2 0.0474 mm, Perimeter 1.3894 mm, Equivalent diameter 0.2457 mm
+- **Cell-Rs**: Length 0.6819 mm, Height 0.1192 mm, Area2 0.0654 mm, Perimeter 1.5393 mm, Equivalent diameter 0.2885 mm
+
+Diagnosis:
+
+*sebastiani* is identified by its narrow, long forewing with a distinct brown pattern and two hexagonal rows of spinules, setting it apart from species with different spinule patterns and forewing shapes.
+
+---
+
+Species Description for *adunca*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *adunca* is broad and short with an oblong oval shape, pale with distinct brown veins and pale brown patches along the margin. The membrane is densely covered in randomly distributed spinules, with broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, while vein Rs is sinuate and slightly turns up apically. Cell M1 is broad and short, and cell Cu1 is broad and short with a strongly arced apex of vein Cu1a. The forewing is widest in the apical third and has a broadly and evenly rounded apical margin. The forewing membrane and veins are bare, without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 3.7888 mm, Height 1.4836 mm, Area2 4.2841 mm, Perimeter 9.4669 mm, Equivalent diameter 2.3355 mm
+- **Cell-cu2**: Length 2.0384 mm, Height 0.6103 mm, Area2 0.9067 mm, Perimeter 4.8932 mm, Equivalent diameter 1.0745 mm
+- **Cell-r2**: Length 2.8356 mm, Height 0.5573 mm, Area2 0.8875 mm, Perimeter 7.0522 mm, Equivalent diameter 1.0630 mm
+- **Cell-m1**: Length 1.0026 mm, Height 0.4038 mm, Area2 0.2851 mm, Perimeter 2.4821 mm, Equivalent diameter 0.6025 mm
+- **Cell-m2**: Length 1.7072 mm, Height 0.4868 mm, Area2 0.5336 mm, Perimeter 4.4640 mm, Equivalent diameter 0.8242 mm
+- **Cell-Rs**: Length 1.9508 mm, Height 0.3510 mm, Area2 0.5036 mm, Perimeter 4.3496 mm, Equivalent diameter 0.8008 mm
+- **Pterostigma**: Length 1.4818 mm, Height 0.1658 mm, Area2 0.1526 mm, Perimeter 3.2710 mm, Equivalent diameter 0.4409 mm
+- **Cell-a**: Length 0.7290 mm, Height 0.1182 mm, Area2 0.0596 mm, Perimeter 1.6368 mm, Equivalent diameter 0.2755 mm
+
+Diagnosis:
+
+*adunca* can be distinguished by its pale forewing with distinct brown veins and pale brown patches, broad spinule-free strips along all veins, and a strongly convex apical two-thirds of vein C+Sc.
+
+---
+
+Species Description for *theresae*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *theresae* is broad and short with an oblong oval shape, featuring a brown color pattern with a whitish background. The membrane is densely covered in spinules arranged in transverse rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and vein Rs is slightly sinuate, abruptly turning up apically. Cell M1 is broad and short, and cell Cu1 is broad and short with a strongly arced apex of vein Cu1a. The forewing is widest in the middle and has a broadly and evenly rounded apical margin. The forewing membrane and veins are covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2317 mm, Height 0.4714 mm, Area2 0.4598 mm, Perimeter 3.0677 mm, Equivalent diameter 0.7652 mm
+- **Cell-cu2**: Length 0.5925 mm, Height 0.1694 mm, Area2 0.0759 mm, Perimeter 1.3915 mm, Equivalent diameter 0.3108 mm
+- **Cell-m2**: Length 0.6054 mm, Height 0.1377 mm, Area2 0.0647 mm, Perimeter 1.4591 mm, Equivalent diameter 0.2870 mm
+- **Cell-m1**: Length 0.3079 mm, Height 0.1665 mm, Area2 0.0335 mm, Perimeter 0.8037 mm, Equivalent diameter 0.2065 mm
+- **Cell-a**: Length 0.2408 mm, Height 0.0443 mm, Area2 0.0073 mm, Perimeter 0.5363 mm, Equivalent diameter 0.0966 mm
+- **Cell-r2**: Length 0.9591 mm, Height 0.2081 mm, Area2 0.1104 mm, Perimeter 2.3245 mm, Equivalent diameter 0.3750 mm
+- **Cell-cu1**: Length 0.3164 mm, Height 0.1102 mm, Area2 0.0290 mm, Perimeter 0.7789 mm, Equivalent diameter 0.1922 mm
+- **Cell-Rs**: Length 0.6830 mm, Height 0.1187 mm, Area2 0.0656 mm, Perimeter 1.5089 mm, Equivalent diameter 0.2890 mm
+- **Pterostigma**: Length 0.4128 mm, Height 0.0302 mm, Area2 0.0080 mm, Perimeter 0.8676 mm, Equivalent diameter 0.1010 mm
+
+Diagnosis:
+
+*theresae* is characterized by its brown forewing with a whitish background, transverse rows of spinules, and short, densely distributed setae covering the forewing membrane and veins.
+
+---
+
+Species Description for *brevigenis*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *brevigenis* is broad and short with an oblong oval shape, hyaline with pale brown veins. The membrane is densely covered with spinules in two hexagonal rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, and vein Rs is relatively straight, abruptly turning up apically. Cell M1 is broad and short, and cell Cu1 is broad and long with a strongly arced apex of vein Cu1a. The forewing is widest in the apical two-thirds and has a broadly and unevenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2192 mm, Height 0.5190 mm, Area2 0.4655 mm, Perimeter 3.1262 mm, Equivalent diameter 0.7699 mm
+- **Cell-cu2**: Length 0.6188 mm, Height 0.1816 mm, Area2 0.0881 mm, Perimeter 1.4499 mm, Equivalent diameter 0.3350 mm
+- **Cell-r2**: Length 0.9365 mm, Height 0.1586 mm, Area2 0.0947 mm, Perimeter 2.2241 mm, Equivalent diameter 0.3473 mm
+- **Cell-m1**: Length 0.3329 mm, Height 0.1488 mm, Area2 0.0361 mm, Perimeter 0.8725 mm, Equivalent diameter 0.2145 mm
+- **Cell-m2**: Length 0.5941 mm, Height 0.1773 mm, Area2 0.0709 mm, Perimeter 1.4575 mm, Equivalent diameter 0.3005 mm
+- **Cell-a**: Length 0.2189 mm, Height 0.0353 mm, Area2 0.0049 mm, Perimeter 0.4844 mm, Equivalent diameter 0.0789 mm
+- **Cell-Rs**: Length 0.6576 mm, Height 0.1311 mm, Area2 0.0614 mm, Perimeter 1.4900 mm, Equivalent diameter 0.2796 mm
+- **Cell-cu1**: Length 0.2974 mm, Height 0.1365 mm, Area2 0.0303 mm, Perimeter 0.7678 mm, Equivalent diameter 0.1963 mm
+- **Pterostigma**: Length 0.4675 mm, Height 0.0545 mm, Area2 0.0130 mm, Perimeter 1.0393 mm, Equivalent diameter 0.1287 mm
+
+Diagnosis:
+
+*brevigenis* is identified by its hyaline forewing with pale brown veins, two hexagonal rows of spinules, and the absence of setae on the forewing membrane and veins.
+
+---
+
+Species Description for *similis*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *similis* is broad and long with a width-to-length ratio of 0.39–0.43, and an oblong oval shape. The entire forewing is pale yellow with pale brown veins, densely covered with randomly distributed spinules, and broad spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, with a costal break between vein C+Sc and the absent pterostigma. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are not covered by setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2218 mm, Height 0.4625 mm, Area2 0.4284 mm, Perimeter 3.0338 mm, Equivalent diameter 0.7385 mm
+- **Cell-cu2**: Length 0.6336 mm, Height 0.1808 mm, Area2 0.0876 mm, Perimeter 1.4840 mm, Equivalent diameter 0.3339 mm
+- **Cell-r2**: Length 0.8904 mm, Height 0.1425 mm, Area2 0.0806 mm, Perimeter 2.0573 mm, Equivalent diameter 0.3203 mm
+- **Cell-m1**: Length 0.3300 mm, Height 0.1432 mm, Area2 0.0304 mm, Perimeter 0.8237 mm, Equivalent diameter 0.1969 mm
+- **Cell-a**: Length 0.2570 mm, Height 0.0419 mm, Area2 0.0077 mm, Perimeter 0.5726 mm, Equivalent diameter 0.0989 mm
+- **Cell-m2**: Length 0.5306 mm, Height 0.1286 mm, Area2 0.0527 mm, Perimeter 1.2845 mm, Equivalent diameter 0.2591 mm
+- **Cell-Rs**: Length 0.6189 mm, Height 0.1225 mm, Area2 0.0598 mm, Perimeter 1.3714 mm, Equivalent diameter 0.2759 mm
+- **Cell-cu1**: Length 0.3213 mm, Height 0.1200 mm, Area2 0.0263 mm, Perimeter 0.7753 mm, Equivalent diameter 0.1831 mm
+- **Pterostigma**: Length 0.3872 mm, Height 0.0465 mm, Area2 0.0092 mm, Perimeter 0.8396 mm, Equivalent diameter 0.1085 mm
+
+Diagnosis:
+
+*Similis* is distinguished by its pale yellow forewing with pale brown veins, densely covered with randomly distributed spinules, and broad spinule-free strips along all veins. The absence of a pterostigma and the strongly convex apical two-thirds of vein C+Sc are notable features.
+
+---
+
+Species Description for *punctulata*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *punctulata* is broad and short with a high width-to-length ratio, and an ovoid shape. The entire forewing has pale brown veins and a pale brown membrane, slightly infuscated along the veins with indistinct brown patches in cells r2, r4+5, m1, and m2. The membrane is sparsely covered with spinules in transverse rows, with narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is nearly straight, with no costal break between vein C+Sc and the absent pterostigma. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and short. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane is bare, while the veins are covered with short, dense setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2220 mm, Height 0.4800 mm, Area2 0.4426 mm, Perimeter 3.0781 mm, Equivalent diameter 0.7507 mm
+- **Cell-cu2**: Length 0.6050 mm, Height 0.1762 mm, Area2 0.0827 mm, Perimeter 1.4141 mm, Equivalent diameter 0.3245 mm
+- **Cell-m2**: Length 0.5562 mm, Height 0.1437 mm, Area2 0.0584 mm, Perimeter 1.3448 mm, Equivalent diameter 0.2727 mm
+- **Cell-r2**: Length 0.9351 mm, Height 0.1365 mm, Area2 0.0848 mm, Perimeter 2.2148 mm, Equivalent diameter 0.3286 mm
+- **Cell-Rs**: Length 0.6877 mm, Height 0.1161 mm, Area2 0.0628 mm, Perimeter 1.5568 mm, Equivalent diameter 0.2828 mm
+- **Cell-a**: Length 0.4942 mm, Height 0.0454 mm, Area2 0.0117 mm, Perimeter 1.0689 mm, Equivalent diameter 0.1220 mm
+- **Cell-m1**: Length 0.3893 mm, Height 0.1542 mm, Area2 0.0397 mm, Perimeter 0.9561 mm, Equivalent diameter 0.2248 mm
+- **Cell-cu1**: Length 0.2954 mm, Height 0.1151 mm, Area2 0.0254 mm, Perimeter 0.7293 mm, Equivalent diameter 0.1799 mm
+- **Pterostigma**: Length 0.4532 mm, Height 0.0476 mm, Area2 0.0112 mm, Perimeter 0.9758 mm, Equivalent diameter 0.1193 mm
+
+Diagnosis:
+
+*Punctulata* is characterized by its pale brown forewing with pale brown veins, sparsely covered with spinules in transverse rows, and narrow spinule-free strips along all veins. The absence of a pterostigma and the nearly straight apical two-thirds of vein C+Sc are key features.
+
+---
+
+Species Description for *nolanae_female*:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *nolanae_female* is broad and short with a width-to-length ratio of 0.63-0.67, and an oblong oval shape. The entire forewing has a pale brown color pattern, moderately covered with spinules in two hexagonal rows, and narrow spinule-free strips along all veins. The apical two-thirds of vein C+Sc is strongly convex, with no costal break between vein C+Sc and the absent pterostigma. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. The forewing is widest in the middle, with a broadly and evenly rounded apical margin. The forewing membrane and veins are covered with short, densely distributed setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2254 mm, Height 0.5768 mm, Area2 0.5438 mm, Perimeter 3.1953 mm, Equivalent diameter 0.8321 mm
+- **Cell-m1**: Length 0.2951 mm, Height 0.1573 mm, Area2 0.0301 mm, Perimeter 0.7740 mm, Equivalent diameter 0.1958 mm
+- **Cell-r2**: Length 0.8982 mm, Height 0.1955 mm, Area2 0.1153 mm, Perimeter 2.1280 mm, Equivalent diameter 0.3831 mm
+- **Cell-m2**: Length 0.5645 mm, Height 0.1428 mm, Area2 0.0614 mm, Perimeter 1.3612 mm, Equivalent diameter 0.2796 mm
+- **Cell-a**: Length 0.3039 mm, Height 0.0708 mm, Area2 0.0141 mm, Perimeter 0.6829 mm, Equivalent diameter 0.1340 mm
+- **Cell-Rs**: Length 0.6368 mm, Height 0.1725 mm, Area2 0.0747 mm, Perimeter 1.4482 mm, Equivalent diameter 0.3084 mm
+- **Pterostigma**: Length 0.4365 mm, Height 0.0662 mm, Area2 0.0173 mm, Perimeter 0.9566 mm, Equivalent diameter 0.1486 mm
+- **Cell-cu1**: Length 0.2816 mm, Height 0.1512 mm, Area2 0.0318 mm, Perimeter 0.7787 mm, Equivalent diameter 0.2013 mm
+- **Cell-cu2**: Length 0.6416 mm, Height 0.2187 mm, Area2 0.1043 mm, Perimeter 1.5805 mm, Equivalent diameter 0.3644 mm
+
+Diagnosis:
+
+*Nolanae_female* is identified by its pale brown forewing with pale yellow veins, moderately covered with spinules in two hexagonal rows, and narrow spinule-free strips along all veins. The strongly convex apical two-thirds of vein C+Sc and the presence of short, densely distributed setae are distinguishing features.
+
+---
+
+Species Description for marionae:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *marionae* is broad and short with a high width-to-length ratio, exhibiting an oblong oval shape. The forewing displays a distinct pattern of brown and hyaline areas with densely covered spinules forming two hexagonal rows. The veins are yellow with dark brown pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Spinule-free strips are broad along all veins. The apical two-thirds of vein C+Sc is strongly convex, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is present, short in length, and broadest in the apical 2/3rds. Vein Rs is sinuate and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. Surface spinules are absent on the basal one-half of cell C+Sc. The forewing is widest in the middle with a broadly and evenly rounded apical margin. The forewing membrane is covered with short setae, densely scattered along the veins and sparsely on the membrane.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2309 mm, Height 0.4762 mm, Area2 0.4546 mm, Perimeter 3.0491 mm, Equivalent diameter 0.7608 mm
+- **Cell-cu2**: Length 0.5843 mm, Height 0.1488 mm, Area2 0.0699 mm, Perimeter 1.3521 mm, Equivalent diameter 0.2982 mm
+- **Cell-m1**: Length 0.3067 mm, Height 0.1411 mm, Area2 0.0303 mm, Perimeter 0.7884 mm, Equivalent diameter 0.1964 mm
+- **Cell-m2**: Length 0.6634 mm, Height 0.1364 mm, Area2 0.0651 mm, Perimeter 1.5901 mm, Equivalent diameter 0.2880 mm
+- **Cell-r2**: Length 0.9706 mm, Height 0.1714 mm, Area2 0.0847 mm, Perimeter 2.3069 mm, Equivalent diameter 0.3284 mm
+- **Cell-cu1**: Length 0.3629 mm, Height 0.1102 mm, Area2 0.0334 mm, Perimeter 0.8766 mm, Equivalent diameter 0.2063 mm
+- **Cell-Rs**: Length 0.7074 mm, Height 0.0962 mm, Area2 0.0514 mm, Perimeter 1.5366 mm, Equivalent diameter 0.2558 mm
+- **Pterostigma**: Length 0.8022 mm, Height 0.2332 mm, Area2 0.2059 mm, Perimeter 1.9051 mm, Equivalent diameter 0.4026 mm
+
+Diagnosis:
+
+*marionae* is distinguished by its broad and short forewing with a distinct pattern of brown and hyaline areas, densely covered spinules forming two hexagonal rows, and the absence of a costal break between vein C+Sc and the pterostigma.
+
+Species Description for tetraglochin:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *tetraglochin* is broad and long with an oblong oval shape. It is pale yellow with pale yellow veins and densely covered spinules forming two hexagonal rows. There is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Broad spinule-free strips are present along all veins. The apical two-thirds of vein C+Sc is strongly convex, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and slightly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and short. The apex of vein Cu1a is strongly arced towards the posterior margin. Surface spinules are absent on the basal one-half of cell C+Sc. The forewing is widest in the middle with a broadly and evenly rounded apical margin. The forewing membrane and veins are without setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.2309 mm, Height 0.4762 mm, Area2 0.4546 mm, Perimeter 3.0491 mm, Equivalent diameter 0.7608 mm
+- **Cell-r2**: Length 0.7972 mm, Height 0.1277 mm, Area2 0.0732 mm, Perimeter 1.8144 mm, Equivalent diameter 0.3015 mm
+- **Cell-a**: Length 0.2710 mm, Height 0.0455 mm, Area2 0.0091 mm, Perimeter 0.6143 mm, Equivalent diameter 0.1078 mm
+- **Cell-m1**: Length 0.3371 mm, Height 0.1468 mm, Area2 0.0307 mm, Perimeter 0.8502 mm, Equivalent diameter 0.1976 mm
+- **Cell-m2**: Length 0.5749 mm, Height 0.1334 mm, Area2 0.0566 mm, Perimeter 1.3848 mm, Equivalent diameter 0.2684 mm
+- **Cell-cu2**: Length 0.5955 mm, Height 0.2033 mm, Area2 0.0909 mm, Perimeter 1.4386 mm, Equivalent diameter 0.3401 mm
+- **Cell-cu1**: Length 0.3176 mm, Height 0.1215 mm, Area2 0.0271 mm, Perimeter 0.7810 mm, Equivalent diameter 0.1858 mm
+- **Pterostigma**: Length 0.4563 mm, Height 0.0413 mm, Area2 0.0151 mm, Perimeter 0.9569 mm, Equivalent diameter 0.1389 mm
+
+Diagnosis:
+
+*tetraglochin* is characterized by its pale yellow forewing with pale yellow veins, absence of pigmentation along the apices of the pterostigma and veins, and the absence of setae on the forewing membrane and veins.
+
+Species Description for setosa:
+
+Material Examined:
+- **Locality**: Kapama Game Reserve; **Scientificname**: Sclerocarya birrea caffra; **Family**: Anacardiaceae; **Country**: South Africa; **Stateprovince**: Limpopo; **County**: Mopani District Municipality; **Locality**: Kapama Game Reserve; **Decimallatitude**: -24.403; **Decimallongitude**: 30.994; **Coordinateuncertaintyinmeters**: None; **Elevation**: 550; **Elevationaccuracy**: None; **Eventdate**: 2021-09-08; **Recordedby**: D. Burck
+
+Description:
+
+The forewing of *setosa* is broad and short with a low width-to-length ratio, exhibiting an oblong oval shape. It has a pale yellow to brown color pattern with veins concolorous with the membrane and distinct brown dots scattered all over the wing. The forewing is densely covered with spinules forming two hexagonal rows. There is no color pigmentation along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b. Narrow spinule-free strips are present along all veins. The apical two-thirds of vein C+Sc is moderately convex, and there is no costal break between vein C+Sc and the pterostigma. The pterostigma cell is absent. Vein Rs is relatively straight and abruptly turns up to the wing margin apically. Cell M1 is broad and short, while cell Cu1 is broad and long. The apex of vein Cu1a is strongly arced towards the posterior margin. Surface spinules are absent on the basal one-half of cell C+Sc. The forewing is widest in the middle with a broadly and evenly rounded apical margin. The forewing membrane has very sparse and short setae, while the veins have long setae.
+
+Morphological Measurements:
+- **Entire Forewing**: Length 1.1455 mm, Height 0.4789 mm, Area2 0.4114 mm, Perimeter 2.8780 mm, Equivalent diameter 0.7237 mm
+- **Cell-cu2**: Length 0.5902 mm, Height 0.1640 mm, Area2 0.0744 mm, Perimeter 1.3980 mm, Equivalent diameter 0.3077 mm
+- **Cell-r2**: Length 0.9062 mm, Height 0.1604 mm, Area2 0.0898 mm, Perimeter 2.0997 mm, Equivalent diameter 0.3381 mm
+- **Cell-a**: Length 0.2355 mm, Height 0.0414 mm, Area2 0.0064 mm, Perimeter 0.5241 mm, Equivalent diameter 0.0906 mm
+- **Cell-m1**: Length 0.3100 mm, Height 0.1324 mm, Area2 0.0282 mm, Perimeter 0.7758 mm, Equivalent diameter 0.1894 mm
+- **Cell-m2**: Length 0.5645 mm, Height 0.1364 mm, Area2 0.0563 mm, Perimeter 1.3146 mm, Equivalent diameter 0.2677 mm
+- **Cell-Rs**: Length 0.6382 mm, Height 0.1168 mm, Area2 0.0566 mm, Perimeter 1.4261 mm, Equivalent diameter 0.2685 mm
+- **Cell-cu1**: Length 0.3003 mm, Height 0.1113 mm, Area2 0.0244 mm, Perimeter 0.7318 mm, Equivalent diameter 0.1761 mm
+- **Pterostigma**: Length 0.4638 mm, Height 0.0529 mm, Area2 0.0147 mm, Perimeter 1.0138 mm, Equivalent diameter 0.1368 mm
+
+Diagnosis:
+
+*setosa* is identified by its pale yellow to brown forewing with distinct brown dots, narrow spinule-free strips along the veins, and the presence of long setae on the veins.
+
+Dichotomous Key:
+
+1a. Forewing pale yellow ........................................ go to 2  
+1b. Forewing not pale yellow .................................... go to 8  
+
+2a. Forewing with transverse row spinule pattern ............... *fabianae*  
+2b. Forewing with different spinule pattern .................... go to 3  
+
+3a. Forewing with randomly distributed spinules ................ *similis*  
+3b. Forewing with different spinule arrangement ................ go to 4  
+
+4a. Forewing with costal break .................................. *chorizanthis*  
+4b. Forewing without costal break .............................. go to 5  
+
+5a. Forewing with narrow spinule-free strips ................... *bicolorata*  
+5b. Forewing with broad spinule-free strips .................... go to 6  
+
+6a. Forewing with dark brown pigmentation along pterostigma .... *mendozae*  
+6b. Forewing without dark brown pigmentation ................... go to 7  
+
+7a. Forewing with distinct brown patches ....................... *longicauda*  
+7b. Forewing without distinct brown patches .................... *similis*  
+
+8a. Forewing pale brown ......................................... go to 9  
+8b. Forewing not pale brown ..................................... go to 15  
+
+9a. Forewing with pale brown veins .............................. go to 10  
+9b. Forewing with different vein coloration ..................... go to 12  
+
+10a. Forewing with hyaline membrane ............................. *nana*  
+10b. Forewing without hyaline membrane .......................... go to 11  
+
+11a. Forewing with transverse rows of spinules .................. *adela*  
+11b. Forewing with different spinule arrangement ................ *punctulata*  
+
+12a. Forewing with two hexagonal rows of spinules ............... go to 13  
+12b. Forewing with different spinule arrangement ................ *theresae*  
+
+13a. Forewing with short, densely distributed setae ............. *nolanae_female*  
+13b. Forewing without setae ..................................... *brevigenis*  
+
+14a. Forewing with broad spinule-free strips .................... *dimorpha_female*  
+14b. Forewing with narrow spinule-free strips ................... *lycii_female*  
+
+15a. Forewing oblong oval ....................................... go to 16  
+15b. Forewing not oblong oval ................................... go to 18  
+
+16a. Forewing with pale brown color ............................. *viscosae*  
+16b. Forewing with different color pattern ...................... go to 17  
+
+17a. Forewing with dark brown veins ............................. *magellanica*  
+17b. Forewing with pale yellowish-brown color ................... *longirostro*  
+
+18a. Forewing narrow and long ................................... *sebastiani*  
+18b. Forewing broad and short ................................... *lycii_male*  
+
+19a. Forewing with distinct brown veins and patches ............. *adunca*  
+19b. Forewing with different vein and patch pattern ............. *theresae*
