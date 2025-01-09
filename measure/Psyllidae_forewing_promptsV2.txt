@@ -1,0 +1,50 @@
+Is the general shape of the forewing broad or narrow, and is the forewing short or long compared to its width-to-length ratio?
+
+Is the general shape of the forewing oval, oblong oval, ovoid, or rhomboidal?
+
+What is the color pattern of the entire forewing?
+
+Is the entire forewing membrane densely covered in spinules, moderately, or sparsely?
+
+Do spinules form a pattern? If so, is the pattern in transverse rows, hexagonal, two hexagonal rows, or randomly distributed?
+
+What color are the veins in the forewing?
+
+Is there color pigmentation present along the apices of the pterostigma and veins Rs, M1+2, M3+4, Cu1a, and Cu1b? If present, what are the colors?
+
+Are spinule-free strips present along the cell veins? If so, which ones, and are the spinule-free strips broad or narrow?
+
+Is the shape of the apical two-thirds of vein C+Sc nearly straight, moderately convex, or strongly convex on the wing margin?
+
+Is vein C+Sc convex at base?
+
+Is there a costal break between vein C+Sc and the pterostigma if the pterostigma is present?
+
+Is the pterostigma cell present or absent?
+
+If the pterostigma cell is present, is it as broad as it is long or short in length, and is it broad or narrow in relative width?
+
+In which region of the pterostigma cell is it broadest; at the base or middle, or apical 2/3rds or apical 1/3rd?
+
+If the pterostigma cell is present, is the posterior vein of the pterostigma in the apical two-thirds relatively straight or moderately to broadly convex or is the posterior vein convex across its entire length?
+
+Vein Rs: Is it relatively straight or sinuate, and does it abruptly, moderately, or slightly turn up to the wing margin apically?
+
+Is cell M1 relatively broad or narrow in width, and is it long or short in length compared to the total forewing length?
+
+Vein Cu1a at the bottom of cell M2: Is it slightly, moderately, or strongly convex in the apical two-thirds or along the entire length of vein Cu1a?
+
+Is cell Cu1 broad or narrow in width, and is it short or long in length compared to the total forewing length?
+
+Is the apex of vein Cu1a strongly, moderately, or weakly arced towards the posterior margin of the forewing?
+
+Are the surface spinules absent or present on the basal one-third or one-half of cell C+Sc?
+
+In which part forewing is the widest: at base, or in the middle, or in apical two thirds, or in apical third?
+
+Is apical margin of forewing broadly rounded, or narrowly rounded, or triangular? If rounded, is apical margin evenly or unevenly rounded?
+
+Is forewing membrane and/or veins covered by setae? If yes, are these setae long or short, densely or rarely distributed?
+
+
+

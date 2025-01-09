@@ -1,0 +1,7 @@
+Dichotomous Key:
+
+1a. Forewing silver-colored with light gray patterns ............ *Species_X*
+1b. Forewing not silver-colored .................................. go to 2
+2a. Forewing with dark brown patterns ............................ *Species_Y*
+2b. Forewing with white patterns ................................. *Species_Z*
+
