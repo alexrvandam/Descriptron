@@ -176,6 +176,86 @@ The long term goal of this project is to combine LLM ViTs with instance segmenta
 # Installation Recommended Way (Linux, Mac, Windows)
 The initial model is available through GoogleDrive found here:
 
+# (1)
+Download miniconda or conda if you don't already have it installed
+https://docs.anaconda.com/miniconda/install/#
+
+Follow the instructions for your computer (linux, windows, and mac are available).
+
+# (2) open terminal or cmd prompt
+git clone https://github.com/alexrvandam/Descriptron.git
+
+cd Descriptron
+
+# (3) load the environments
+## make sure you have python activated
+which python
+conda env list
+## fire up the environments
+conda init
+## close and re-start your terminal or cmd prompt then do
+## on bash kernal
+source ~/.bashrc
+## on zsh kernal
+source ~/.zshrc
+## next activate your base environment and make sure you knwo what it is, a good idea is to take notes here
+conda activate base
+which python
+conda env list
+## a '*' should be next to yoru base environment
+## this will be the base conda or miniconda you will be adding the environments around
+## then do
+## if you have not already
+cd Descriptron
+cd environments_to_ship
+## next build the environments
+conda env create -f samm_env.yml
+conda env create -f detectron2_env_env.yml
+conda env create -f measure_env_env.yml
+conda env create -f metric3d_env.yml
+conda env create -f gpt4_env.yml
+
+### then activate each one at a time and install requirements
+conda activate samm
+pip install -r samm_requirements.txt
+### probably there will be errors, most likely FAIR/META will have moved SAM2 and Detectron2, if that happens you can get them from the GoolgleDrive folder under Linux Heavy Duty or download them yourself from FAIR/META
+conda deactivate
+conda activate detectron2_env
+pip install -r detectron2_env_requirements.txt
+### again you may have to git install Detectron2 manually 
+conda deactivate
+cond activate measure_env
+pip install -r measure_env_requirements.txt
+##
+conda deactivate
+conda activate metric3d
+pip install metric3d_env_requirements.txt
+conda deactivate
+conda activate gpt4
+pip install gpt4_env_requirements.txt
+conda deactivate
+conda activate samm
+
+#### ok now the samm environment should be activated
+## now the early August version of sam2 was taken down in the middle of coding this project, so luckily you can download it from the link here
+
+https://drive.google.com/drive/folders/1Cd4b2Sn-0nhSTU_JYzQXxFA8i91e_jnp?usp=sharing
+
+## copy the segment-anything2 folder to your desktop and one at at time copy the folders to this segment-anything2 folder, 
+## once completed you should have 
+
+Descriptron/segment-anything2/gui
+
+## if that is correct then navigate the to gui folder or run the lauchv4.sh script if you know how to change your conda path and the simply right click and run as script if you have changed your conda path correctly as well as the script path
+## OR if you have made it this far it might just be better to
+
+cd  Descriptron/segment-anything2/gui
+### or what ever relative file path gets you into the gui folder you need to run the script from there
+### then simply
+
+conda run -n samm python descriptron-label-204.py
+
+### that should do it the GUI should run
 
 # Linux Heavy Duty Way
 If you are on a linux machine and you have conda-pack (conda install -c conda-forge conda-pack) you can unpack my environments with all the downloads in place, you will then have to modify the 
