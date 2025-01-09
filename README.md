@@ -204,10 +204,12 @@ which python
 conda env list
 ## a '*' should be next to yoru base environment
 ## this will be the base conda or miniconda you will be adding the environments around
-## then do
-## if you have not already
+## then if you have not already
+
 cd Descriptron
+
 cd environments_to_ship
+
 ## next build the environments
 conda env create -f samm_env.yml
 conda env create -f detectron2_env_env.yml
