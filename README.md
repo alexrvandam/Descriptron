@@ -249,8 +249,10 @@ https://drive.google.com/drive/folders/1Cd4b2Sn-0nhSTU_JYzQXxFA8i91e_jnp?usp=sha
 ## once completed you should have 
 
 Descriptron/segment-anything-2/gui
-## or if you run this command from the gui folcer 
-Descriptron/segment-anything-2/gui$ ls -1 -d */
+## or if you run this command from the gui folder 
+# Descriptron/segment-anything-2/gui$
+ls -1 -d */
+# you should see
 detectron2/
 idefics/
 measure/
