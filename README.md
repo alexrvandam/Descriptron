@@ -175,9 +175,8 @@ The long term goal of this project is to combine LLM ViTs with instance segmenta
 
 # Installation Recommended Way (Linux, Mac, Windows)
 
-# (1)
 ```bash
-## Downlad miniconda or conda if you don't already have it installed
+# (1) Downlad miniconda or conda if you don't already have it installed
 https://docs.anaconda.com/miniconda/install/#
 
 ## Follow the instructions for your computer (linux, windows, and mac are available).
