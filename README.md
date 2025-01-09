@@ -178,7 +178,7 @@ The initial model is available through GoogleDrive found here:
 
 
 # Linux Heavy Duty Way
-If you are on a linux machine and you have conda-pack you can unpack my environments with all the downloads in place, you will then have to modify the 
+If you are on a linux machine and you have conda-pack (conda install -c conda-forge conda-pack) you can unpack my environments with all the downloads in place, you will then have to modify the 
 launch_guiv4.sh script to match your conda path. It is about 80GB unpacked
 
 https://drive.google.com/drive/folders/1Cd4b2Sn-0nhSTU_JYzQXxFA8i91e_jnp?usp=sharing
