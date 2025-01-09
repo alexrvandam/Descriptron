@@ -173,7 +173,7 @@ This work here helps move towards solving automated semi-landmarking of 2D data 
 
 The long term goal of this project is to combine LLM ViTs with instance segmentation and image depth data to produce fine grained descriptions and concomitant semi-supervised and unsupervised clustering for putative novel species binning and description.
 
-# Installation Recommended Way (Linux, Mac, Windows)
+# Installation Recommended Way (Linux, Mac) Windows coming soon.
 
 ```bash
 # (1) Downlad miniconda or conda if you don't already have it installed
