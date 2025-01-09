@@ -77,6 +77,92 @@ You may add Your own copyright statement to Your modifications and may provide a
 
 END OF TERMS AND CONDITIONS
 
+And for Metric3D
+
+BSD 2-Clause License
+
+Copyright (c) 2024, Wei Yin and Mu Hu
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+#################
+
+So if you use Descriptron you must cite Descriptron and aslo cite SAM2, Detectron2, Metric3D, and EasyOCR, commercial use is prohibited by the above licensces
+
+@software{Van_Dam_Descriptron_2024,
+  author = {Van Dam, Alex R.},
+  title = {Descriptron},
+  version = {main},
+  url = {https://github.com/alexrvandam/Descriptron},
+  date = {2024-12-31},
+  note = {Accessed: 2024-12-31}
+}
+
+@misc{Metric3D,
+  author =       {Yin, Wei and Hu, Mu},
+  title =        {{Metric3D}: A Toolbox for Zero-shot Metric Depth Estimation},
+  howpublished = {\url{https://github.com/YvanYin/Metric3D}},
+  year =         {2024}
+}
+
+@article{hu2024metric3d,
+  title={Metric3D v2: A Versatile Monocular Geometric Foundation Model for Zero-shot Metric Depth and Surface Normal Estimation},
+  author={Hu, Mu and Yin, Wei and Zhang, Chi and Cai, Zhipeng and Long, Xiaoxiao and Chen, Hao and Wang, Kaixuan and Yu, Gang and Shen, Chunhua and Shen, Shaojie},
+  journal={arXiv preprint arXiv:2404.15506},
+  year={2024}
+}
+
+@article{yin2023metric,
+  title={Metric3D: Towards Zero-shot Metric 3D Prediction from A Single Image},
+  author={Wei Yin, Chi Zhang, Hao Chen, Zhipeng Cai, Gang Yu, Kaixuan Wang, Xiaozhi Chen, Chunhua Shen},
+  booktitle={ICCV},
+  year={2023}
+}
+
+@misc{wu2019detectron2,
+  author =       {Yuxin Wu and Alexander Kirillov and Francisco Massa and
+                  Wan-Yen Lo and Ross Girshick},
+  title =        {Detectron2},
+  howpublished = {\url{https://github.com/facebookresearch/detectron2}},
+  year =         {2019}
+}
+
+@misc{easyocr,
+  author       = {JaidedAI},
+  title        = {EasyOCR: Ready-to-use OCR with 80+ supported languages},
+  howpublished = {\url{https://github.com/JaidedAI/EasyOCR}},
+  year         = {2020},
+  note         = {Accessed: 2025-01-09}
+}
+
+@article{ravi2024sam2,
+  title={SAM 2: Segment Anything in Images and Videos},
+  author={Ravi, Nikhila and Gabeur, Valentin and Hu, Yuan-Ting and Hu, Ronghang and Ryali, Chaitanya and Ma, Tengyu and Khedr, Haitham and Rädle, Roman and Rolland, Chloe and Gustafson, Laura and others},
+  journal={arXiv preprint arXiv:2408.00714},
+  year={2024},
+  url={https://arxiv.org/abs/2408.00714}
+}
+
 
 
 
