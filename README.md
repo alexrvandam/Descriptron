@@ -174,10 +174,10 @@ This work here helps move towards solving automated semi-landmarking of 2D data 
 The long term goal of this project is to combine LLM ViTs with instance segmentation and image depth data to produce fine grained descriptions and concomitant semi-supervised and unsupervised clustering for putative novel species binning and description.
 
 # Installation Recommended Way (Linux, Mac, Windows)
-The initial model is available through GoogleDrive found here:
 
 # (1)
-Download miniconda or conda if you don't already have it installed
+```bash
+## Downlad miniconda or conda if you don't already have it installed
 https://docs.anaconda.com/miniconda/install/#
 
 Follow the instructions for your computer (linux, windows, and mac are available).
@@ -258,6 +258,7 @@ cd  Descriptron/segment-anything2/gui
 conda run -n samm python descriptron-label-204.py
 
 ### that should do it the GUI should run
+```
 
 # Linux Heavy Duty Way
 If you are on a linux machine and you have conda-pack (conda install -c conda-forge conda-pack) you can unpack my environments with all the downloads in place, you will then have to modify the 
