@@ -219,7 +219,8 @@ conda env create -f gpt4_env.yml
 ### then activate each one at a time and install requirements
 conda activate samm
 pip install -r samm_requirements.txt
-### probably there will be errors, most likely FAIR/META will have moved SAM2 and Detectron2, if that happens you can get them from the GoolgleDrive folder under Linux Heavy Duty or download them yourself from FAIR/META
+### probably there will be errors, most likely FAIR/META will have moved SAM2 and Detectron2, if that happens you can get
+### them from the GoolgleDrive folder under Linux Heavy Duty or download them yourself from FAIR/META
 conda deactivate
 conda activate detectron2_env
 pip install -r detectron2_env_requirements.txt
@@ -243,10 +244,18 @@ conda activate samm
 https://drive.google.com/drive/folders/1Cd4b2Sn-0nhSTU_JYzQXxFA8i91e_jnp?usp=sharing
 
 ## copy the segment-anything-2 folder to your desktop and one at at time copy the folders to this segment-anything-2 folder,
-## you will also need to copy the Metric3d files and folders into the metric3d folder they should all be under one folder Descriptron/segment-anything-2/gui/metric3d/Metric3d/*
+## you will also need to copy the Metric3d files and folders into the metric3d folder
+## they should all be under one folder Descriptron/segment-anything-2/gui/metric3d/Metric3d/*
 ## once completed you should have 
 
 Descriptron/segment-anything-2/gui
+## or if you run this command from the gui folcer 
+Descriptron/segment-anything-2/gui$ ls -1 -d */
+detectron2/
+idefics/
+measure/
+metric3d/
+
 
 ## if that is correct then navigate the to gui folder or run the lauchv4.sh script if you know how to change your conda path and the simply right click and run as script if you have changed your conda path correctly as well as the script path
 ## OR if you have made it this far it might just be better to
