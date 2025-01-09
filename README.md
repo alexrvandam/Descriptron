@@ -219,8 +219,8 @@ conda env create -f gpt4_env.yml
 ### then activate each one at a time and install requirements
 conda activate samm
 pip install -r samm_requirements.txt
-### probably there will be errors, most likely FAIR/META will have moved SAM2 and Detectron2, if that happens you can get
-### them from the GoolgleDrive folder under Linux Heavy Duty or download them yourself from FAIR/META
+### probably there will be errors, most likely FAIR/META will have moved SAM2 and Detectron2, if that happens
+### you can get them from the GoolgleDrive folder under Linux Heavy Duty or download them yourself from FAIR/META
 conda deactivate
 conda activate detectron2_env
 pip install -r detectron2_env_requirements.txt
@@ -259,7 +259,8 @@ measure/
 metric3d/
 
 
-## if that is correct then navigate the to gui folder or run the lauchv4.sh script if you know how to change your conda path and the simply right click and run as script if you have changed your conda path correctly as well as the script path
+## if that is correct then navigate the to gui folder or run the lauchv4.sh script if you know how to change your conda path and
+## then simply right click and run as script if you have changed your conda path correctly as well as the script path
 ## OR if you have made it this far it might just be better to
 
 cd  Descriptron/segment-anything-2/gui
