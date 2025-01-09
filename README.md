@@ -173,8 +173,20 @@ This work here helps move towards solving automated semi-landmarking of 2D data 
 
 The long term goal of this project is to combine LLM ViTs with instance segmentation and image depth data to produce fine grained descriptions and concomitant semi-supervised and unsupervised clustering for putative novel species binning and description.
 
-# Installation
+# Installation Recommended Way (Linux, Mac, Windows)
 The initial model is available through GoogleDrive found here:
+
+
+# Linux Heavy Duty Way
+If you are on a linux machine and you have conda-pack you can unpack my environments with all the downloads in place, you will then have to modify the 
+launch_guiv4.sh script to match your conda path. It is about 80GB unpacked
+
+https://drive.google.com/drive/folders/1Cd4b2Sn-0nhSTU_JYzQXxFA8i91e_jnp?usp=sharing
+
+
+# The Linux Last Resort Hard Way
+copy my folder, it is my project folder that is frozen with everyting in it you will need to have a file path that has /home/localuser/ in #
+order to get it to run otherwise it will not unpack do to symbolic links it is about 140GB
 
 https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
 
