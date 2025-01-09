@@ -180,7 +180,7 @@ The long term goal of this project is to combine LLM ViTs with instance segmenta
 ## Downlad miniconda or conda if you don't already have it installed
 https://docs.anaconda.com/miniconda/install/#
 
-Follow the instructions for your computer (linux, windows, and mac are available).
+## Follow the instructions for your computer (linux, windows, and mac are available).
 
 # (2) open terminal or cmd prompt
 git clone https://github.com/alexrvandam/Descriptron.git
