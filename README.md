@@ -242,15 +242,16 @@ conda activate samm
 
 https://drive.google.com/drive/folders/1Cd4b2Sn-0nhSTU_JYzQXxFA8i91e_jnp?usp=sharing
 
-## copy the segment-anything2 folder to your desktop and one at at time copy the folders to this segment-anything2 folder, 
+## copy the segment-anything-2 folder to your desktop and one at at time copy the folders to this segment-anything-2 folder,
+## you will also need to copy the Metric3d files and folders into the metric3d folder they should all be under one folder Descriptron/segment-anything-2/gui/metric3d/Metric3d/*
 ## once completed you should have 
 
-Descriptron/segment-anything2/gui
+Descriptron/segment-anything-2/gui
 
 ## if that is correct then navigate the to gui folder or run the lauchv4.sh script if you know how to change your conda path and the simply right click and run as script if you have changed your conda path correctly as well as the script path
 ## OR if you have made it this far it might just be better to
 
-cd  Descriptron/segment-anything2/gui
+cd  Descriptron/segment-anything-2/gui
 ### or what ever relative file path gets you into the gui folder you need to run the script from there
 ### then simply
 
