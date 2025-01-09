@@ -1,0 +1,7 @@
+name: metric3d
+channels:
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - python=3.9.2
+prefix: /home/localuser/Desktop/Descriptron/conda/envs/metric3d
