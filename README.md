@@ -267,7 +267,7 @@ cd  Descriptron/segment-anything-2/gui
 ### or what ever relative file path gets you into the gui folder you need to run the script from there
 ### then simply
 
-conda run -n samm python descriptron-label-204.py
+conda run -n samm python descriptron-label-206.py
 
 ### that should do it the GUI should run
 ```
