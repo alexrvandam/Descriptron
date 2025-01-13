@@ -299,6 +299,10 @@ https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
 
 
 # Citation for now a Bibtex of this page and BioRxiv Preprint
+
+#Preprint link
+https://www.biorxiv.org/content/10.1101/2025.01.07.631758v1
+
 @software{Van_Dam_Descriptron_2024,
   author = {Van Dam, Alex R.},
   title = {Descriptron},
