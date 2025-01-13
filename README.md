@@ -118,6 +118,18 @@ So if you use Descriptron you must cite Descriptron and aslo cite SAM2, Detectro
   note = {Accessed: 2024-12-31}
 }
 
+@article {Van Dam2025.01.07.631758,
+	author = {Van Dam, Alex and Serbina, Liliya Starhova},
+	title = {Descriptron: Testing Artificial Intelligence for Automating Taxonomic Species Descriptions with a User-friendly Software Package},
+	elocation-id = {2025.01.07.631758},
+	year = {2025},
+	doi = {10.1101/2025.01.07.631758},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758},
+	eprint = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758.full.pdf},
+	journal = {bioRxiv}
+}
+
 @misc{Metric3D,
   author =       {Yin, Wei and Hu, Mu},
   title =        {{Metric3D}: A Toolbox for Zero-shot Metric Depth Estimation},
@@ -286,7 +298,7 @@ order to get it to run otherwise it will not unpack do to symbolic links it is a
 https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
 
 
-# Citation for now a Bibtex of this page
+# Citation for now a Bibtex of this page and BioRxiv Preprint
 @software{Van_Dam_Descriptron_2024,
   author = {Van Dam, Alex R.},
   title = {Descriptron},
@@ -296,3 +308,15 @@ https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
   note = {Accessed: 2024-12-31}
 }
 
+@article {Van Dam2025.01.07.631758,
+	author = {Van Dam, Alex and Serbina, Liliya Starhova},
+	title = {Descriptron: Testing Artificial Intelligence for Automating Taxonomic Species Descriptions with a User-friendly Software Package},
+	elocation-id = {2025.01.07.631758},
+	year = {2025},
+	doi = {10.1101/2025.01.07.631758},
+	publisher = {Cold Spring Harbor Laboratory},
+	abstract = {Recent advances in Computer Vision, Convolutional Neural Networks (CNNs), Vision Transformers (ViTs) and Large Language Models (LLMs) suggest that it may be possible to approach mimicking the ability to decode knowledge about morphology and taxonomy to describe species in an automated way. Here we test for the first time a current state-of-the-art Vision Language Model (VLM) to approximate taxonomic species descriptions in an automated manner. The test utilizes a new graphical user interface, Descriptron, that collects data about biological images and transmits this highly specialized knowledge to a VLM to decode the taxonomic knowledge encoded in labeled biological images with text. Our results indicate that current state-of-the-art VLM (GPT-4o) can produce automated species descriptions that with error correction approximate taxonomists ability to describe morphological features of species and organize them in taxonomic keys. However, the results are not without significant errors and the VLM requires the input of the taxonomists knowledge to prevent widespread hallucinations by the VLM. We find here that the taxonomist is clearly needed to both teach and closely supervise the VLM. However, the time saved by utilizing Descriptron is also significant. Taxonomists remain essential for teaching and closely supervising the VLM. The time saved by utilizing Descriptron are nevertheless already very significant. The Descriptron program and supporting example prompt files are free to use under an Apache2 License available from: https://github.com/alexrvandam/Descriptron.Competing Interest StatementThe authors have declared no competing interest.},
+	URL = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758},
+	eprint = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758.full.pdf},
+	journal = {bioRxiv}
+}
