@@ -125,8 +125,8 @@ So if you use Descriptron you must cite Descriptron and aslo cite SAM2, Detectro
 	year = {2025},
 	doi = {10.1101/2025.01.07.631758},
 	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758},
-	eprint = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758.full.pdf},
+	URL = {https://www.biorxiv.org/content/10.1101/2025.01.07.631758v1},
+	eprint = {https://www.biorxiv.org/content/early/2025/01/10/2025.01.07.631758v1.full.pdf},
 	journal = {bioRxiv}
 }
 
