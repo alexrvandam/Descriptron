@@ -1,4 +1,7 @@
 # Descriptron
+
+![marmot](https://github.com/alexrvandam/Descriptron/blob/main/marmot.jpg)
+
 A pipeline and code hub for dark taxa mophology using CNNs/ViTs, classic computer vision, that talks to VLMs (GPT-4o). 
 It helps taxonomists automate taxonomic species descriptions. It can also be used to automate 2D measurements and
 geometric morphometrics, and experimental 3D measurements. Additionally workflows allow for quantification of color#
