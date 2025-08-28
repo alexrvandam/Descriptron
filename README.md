@@ -5,10 +5,6 @@ It helps taxonomists automate taxonomic species descriptions. It can also be use
 geometric morphometrics, and experimental 3D measurements. Additionally workflows allow for quantification of color#
 and color pattern. It also quantifies taxonomic species descriptions using joint image and text embeddings.
 
-Have a look at this short video if you prefer a narrated explanation. 
-
-https://youtu.be/5KRt8pD7MbY
-
 
 Descriptron Version
 v0.1.0
