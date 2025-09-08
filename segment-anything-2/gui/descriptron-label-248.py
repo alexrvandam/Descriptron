@@ -4151,7 +4151,7 @@ def run_color_segmentation_script():
         
         # Construct the path to the script using a relative path for portability
         script_dir = Path(__file__).parent  # Directory where the GUI script is located
-        color_segmentation_script = script_dir / 'measure' / 'FHS_and_CLAHE_V6.py'  # Update with your actual script name and path
+        color_segmentation_script = script_dir / 'measure' / 'FHS_and_CLAHE_V17.py'  # Update with your actual script name and path from v6 to v17
         
         # Ensure the script exists
         if not color_segmentation_script.is_file():
