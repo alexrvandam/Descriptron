@@ -285,7 +285,7 @@ conda run -n samm python descriptron-label-206.py
 
 ### that should do it the GUI should run
 ```
-# A second option is a Docker install if you have Docker
+# A second option is a Docker install 
 Docker GoogleDrive Link: 
 https://drive.google.com/file/d/14otNbo-xpn9PwGKH21I2CsZCsNg9ebO7/view?usp=sharing 
 
