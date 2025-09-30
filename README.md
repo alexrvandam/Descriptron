@@ -334,8 +334,25 @@ https://drive.google.com/drive/folders/1MqcgrG3fYxsUIJ9ROnFx8jhLNSkp9f4D
 
 # Citation for now a Bibtex of this page and BioRxiv Preprint
 
-#Preprint link
+#Preprint link that serves as a introduction to AI and Computer Vision for taxonomists (yes it is 50+ pages on purpose).
 https://www.biorxiv.org/content/10.1101/2025.01.07.631758v1
+
+#Or the official peer-reviewed manuscript that describes the utility of Descriptron and specific optimal GPT settings which are critical
+ Van Dam, A.R. & Štarhová Serbina, L. (2025) Descriptron: Artificial intelligence for automating taxonomic species descriptions with a user-friendly software package. Systematic Entomology, e70005. Available from: https://doi.org/10.1111/syen.70005
+
+@article{https://doi.org/10.1111/syen.70005,
+author = {Van Dam, Alex R. and Štarhová Serbina, Liliya},
+title = {Descriptron: Artificial intelligence for automating taxonomic species descriptions with a user-friendly software package},
+journal = {Systematic Entomology},
+volume = {n/a},
+number = {n/a},
+pages = {e70005},
+keywords = {AI, artificial intelligence, automation, taxonomic species descriptions},
+doi = {https://doi.org/10.1111/syen.70005},
+url = {https://resjournals.onlinelibrary.wiley.com/doi/abs/10.1111/syen.70005},
+eprint = {https://resjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/syen.70005},
+abstract = {Abstract Recent advances in Computer Vision, Convolutional Neural Networks (CNNs), Vision Transformers (ViTs) and Large Language Models (LLMs) suggest it may be possible to mimic the ability to decode knowledge about morphology and taxonomy to describe species in an automated way. Here, for the first time, we test a state-of-the-art Vision Language Model (VLM) that combines ViTs and LLMs to approximate taxonomic species descriptions automatically. The test uses a new graphical user interface, Descriptron, which gathers data about biological images and transmits this specialised knowledge to a VLM (GPT-4o) to decode morphological features. Our results indicate that GPT-4o can produce draft taxonomic species descriptions using taxonomist-defined morphological features, although the model still requires supervision to avoid erroneous text predictions. Despite that, the time saved using Descriptron is already significant. The Descriptron programme, with example prompts, is free under an Apache2 License from GitHub; https://github.com/alexrvandam/Descriptron.}
+}
 
 @software{Van_Dam_Descriptron_2024,
   author = {Van Dam, Alex R.},
