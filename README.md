@@ -285,6 +285,38 @@ conda run -n samm python descriptron-label-206.py
 
 ### that should do it the GUI should run
 ```
+# A second option is a Docker install if you have Docker
+Docker GoogleDrive Link: 
+https://drive.google.com/file/d/14otNbo-xpn9PwGKH21I2CsZCsNg9ebO7/view?usp=sharing 
+
+1. Copy the file over (scp, SFTP, external drive, drag and drop etc.) 
+
+2. Load it into their local Docker engine: 
+```bash
+gunzip -c descriptron_04-07-25.tar.gz | docker load 
+```
+or: 
+```bash
+docker load < descriptron_04-07-25.tar.gz # Docker auto-detects gzip 
+```
+3. Verify 
+```bash
+docker images | grep myorg/all-envs 
+```
+4. GPU and CPU note 
+
+The image itself is “CPU-only plus CUDA libraries”. 
+ 
+On Linux hosts with NVIDIA GPUs you also need the nvidia-container-toolkit (or Docker Desktop + “GPU support” toggle) and then run: 
+
+GPU machine 
+```bash
+docker run --gpus all -it --rm myorg/all-envs:latest 
+```
+CPU-only machine 
+```
+docker run -it --rm myorg/all-envs:latest 
+```
 
 # Linux Heavy Duty Way
 If you are on a linux machine and you have conda-pack (conda install -c conda-forge conda-pack) you can unpack my environments with all the downloads in place, you will then have to modify the 
