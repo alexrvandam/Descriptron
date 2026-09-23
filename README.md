@@ -291,7 +291,8 @@ environment), tests and details: [packages/descriptron-mcp/README.md](packages/d
 
 ## Licence
 
-Apache License 2.0. Some bundled or downloaded components carry their own terms:
+Apache License 2.0 ([LICENSE](LICENSE)). Any redistribution of Descriptron, or of
+software derived from it, must include the [NOTICE](NOTICE) file. Some bundled or downloaded components carry their own terms:
 Detectron2 (Apache-2.0), SAM2 (Apache-2.0), Metric3D (BSD-2-Clause), EasyOCR
 (Apache-2.0). **Model weights are licensed separately from code** — DINOv3 and
 some Florence-2 checkpoints are gated and carry their own conditions, which you
@@ -302,8 +303,43 @@ restrict commercial use; some model weights may.
 
 ## Citation
 
-Please cite Descriptron and the components you used. See `CITATION.cff` for the
-machine-readable entry and the BibTeX below for the dependencies.
+If you use Descriptron, or any software derived from it (including
+descriptron-core, descriptron-vision, descriptron-gui and descriptron-mcp), in
+work that is published, presented or distributed, cite:
 
-Cite the **Zenodo DOI of the release you ran**, not this page: a DOI pins the
-exact version your results came from.
+1. **The software (Descriptron v2):**
+   Van Dam, A. R. Descriptron (version used). GitHub repository.
+   https://github.com/alexrvandam/Descriptron
+2. **The first Descriptron paper:**
+   Van Dam, A. R. & Štarhová Serbina, L. (2026). Descriptron: Artificial
+   intelligence for automating taxonomic species descriptions with a
+   user-friendly software package. *Systematic Entomology*, 51(1), e70005.
+   https://doi.org/10.1111/syen.70005
+3. **The Descriptron v2 paper,** once it is published. Its reference will be
+   added here.
+
+```bibtex
+@misc{vandam_descriptron_software,
+  author       = {Van Dam, Alex R.},
+  title        = {Descriptron},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/alexrvandam/Descriptron}
+}
+
+@article{vandam2026descriptron,
+  author  = {Van Dam, Alex R. and Štarhová Serbina, Liliya},
+  title   = {Descriptron: Artificial intelligence for automating taxonomic species
+             descriptions with a user-friendly software package},
+  journal = {Systematic Entomology},
+  volume  = {51},
+  number  = {1},
+  pages   = {e70005},
+  year    = {2026},
+  doi     = {10.1111/syen.70005}
+}
+```
+
+The same information is in [CITATION.cff](CITATION.cff) (GitHub's "Cite this
+repository" button) and in [NOTICE](NOTICE). Please also cite the tools
+Descriptron builds on that you used (SAM2, DINOv3, Detectron2 and others; see
+*Licence* above).
