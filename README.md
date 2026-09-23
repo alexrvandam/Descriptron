@@ -258,6 +258,12 @@ distribution installs it, **and what it writes**.
 | Model-proposed binary characters | 9 | 5,390 | proposed characters, congruence tables, heat-map atlases |
 | Names, types and outputs | 7 | 4,017 | treatment .docx, TaxPub XML, DwC-A, SDD, JSON-LD, collaborator workbooks |
 
+<p align="center">
+  <a href="docs/FigS1_script_inventory.png"><img src="docs/FigS1_script_inventory.png" alt="Inventory of the 67 Descriptron programs by pipeline stage: line counts, model use, pip distribution and outputs" width="100%"></a>
+  <br>
+  <sub>All 67 programs by stage, with their size, whether they call a model, the pip distribution that installs them, and what they write. Click for full resolution.</sub>
+</p>
+
 The output column in the figure is **read from the source**, not written by hand:
 a program is listed as writing a figure when its code calls `savefig`, a table
 when it calls `to_csv`, and so on. The figure therefore cannot drift from the
