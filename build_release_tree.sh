@@ -101,7 +101,7 @@ if [ -d "$MCP_SRC" ]; then
 fi
 rm -rf "$DST"/packages/*/dist "$DST"/packages/*/src/*/tools "$DST"/packages/*/src/*/data
 find "$DST/packages" -name '*.egg-info' -type d -exec rm -rf {} + 2>/dev/null || true
-cp "$SRC/docker/"{Dockerfile,descriptron,README.md,build_descriptron.sh} "$DST/docker/"
+cp "$SRC/docker/"{Dockerfile,descriptron,README.md,build_descriptron.sh,Dockerfile.mcp,build_mcp_layer.sh} "$DST/docker/"
 cp "$SRC/docker/"requirements-*.txt "$SRC/docker/"constraints-*.txt "$DST/docker/"
 cp "$SRC/environments/"*.yml "$SRC/environments/"*.txt "$DST/environments/" 2>/dev/null || true
 cp "$SRC/README.md" "$DST/" 2>/dev/null || true

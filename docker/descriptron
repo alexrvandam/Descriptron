@@ -39,6 +39,7 @@ descriptron <command> [args...]
   measure             measurements from COCO                  [measure_env]
   pipeline            the full BioRAG v2 pipeline             [measure_env]
   depth               metric depth (only if built in)         [metric3d]
+  mcp                 MCP server for Claude and other clients (own venv)
   shell [env]         an interactive shell (default: measure_env)
   envs                list the environments in this image
   help                this message
@@ -100,6 +101,14 @@ case "$cmd" in
   depth)
     need_env metric3d
     exec $CONDA_RUN metric3d python "$GUI/metric3d/measure_metric3d_v16.py" "$@" ;;
+  mcp)
+    # started by an MCP client with `docker run -i`; stdin/stdout ARE the protocol,
+    # so exec the server directly rather than through conda run
+    if [ ! -x /opt/descriptron-mcp/bin/descriptron-mcp ]; then
+      echo "This image was built without the MCP server (docker/Dockerfile.mcp adds it)." >&2
+      exit 2
+    fi
+    exec /opt/descriptron-mcp/bin/descriptron-mcp "$@" ;;
   shell)
     env_name="${1:-measure_env}"; shift || true
     need_env "$env_name"

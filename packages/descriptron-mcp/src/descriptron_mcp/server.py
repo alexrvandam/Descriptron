@@ -42,6 +42,12 @@ Use list_programs to see the programs and program_help before running one; run
 short programs with run_program and anything long (pipelines, SAM2-PAL, DINOLand,
 detector training) with start_job, then poll job_status.
 
+Programs that can call a language model take --llm-backend (default claude-code,
+which needs the Claude Code CLI and is absent in the Docker image). Pass
+--llm-backend none unless the user asks for a model: the key tree, matrix, audits
+and delimitation are computed without one (a model only rewords key couplets), and
+you can write any prose yourself from species_evidence.
+
 When writing a species treatment yourself: get the numbers from species_evidence,
 never from memory; put each number next to the structure it measures; keep
 statistical results in Remarks; then call audit_treatment and fix ONLY the

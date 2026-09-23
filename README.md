@@ -249,6 +249,19 @@ For the GPU programs (torchvision detectors, SAM2-PAL, DINOLand), also install
 `descriptron_vision-2.0.0-py3-none-any.whl` from the
 [v2.0.0 release page](https://github.com/alexrvandam/Descriptron/releases/tag/v2.0.0).
 
+**With Docker instead** (no Python setup; includes the GPU programs):
+
+```bash
+claude mcp add descriptron -- docker run -i --rm --gpus all \
+  --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
+  ghcr.io/alexrvandam/descriptron:2.0.1 mcp
+```
+
+`-v "$HOME:$HOME"` makes your files appear inside the container at the same
+paths Claude uses; add another `-v /path:/path` for data elsewhere (e.g. an
+external drive). `--user` makes the files it writes yours rather than root's.
+Background jobs stop when the Claude session ends, because the container does.
+
 ### Connect it
 
 **Claude Code**

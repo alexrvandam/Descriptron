@@ -40,8 +40,11 @@ def _payload(result):
 async def _session_run(fn):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
-    params = StdioServerParameters(command=sys.executable, args=["-m", "descriptron_mcp"],
-                                   env=dict(os.environ))
+    # DESCRIPTRON_TEST_SERVER_CMD (a JSON list) launches the server some other way,
+    # e.g. ["docker", "run", "-i", "--rm", ..., "<image>", "mcp"] to test the container
+    cmd = json.loads(os.environ.get("DESCRIPTRON_TEST_SERVER_CMD", "null")) or \
+        [sys.executable, "-m", "descriptron_mcp"]
+    params = StdioServerParameters(command=cmd[0], args=cmd[1:], env=dict(os.environ))
     async with stdio_client(params) as (r, w):
         async with ClientSession(r, w) as s:
             await s.initialize()
@@ -104,7 +107,7 @@ def test_end_to_end():
         j = _payload(await call("start_job", name="biorag_key_builder_v1",
                                 args=["--matrix_dir", str(matrix), "--output_dir",
                                       str(Path(os.environ.get("DESCRIPTRON_MCP_STATE", "/tmp")) / "e2e_key"),
-                                      "--no-loo"]))
+                                      "--no-loo", "--llm-backend", "none"]))
         for _ in range(120):
             st = _payload(await call("job_status", job_id=j["job_id"]))
             if st["state"] != "running":

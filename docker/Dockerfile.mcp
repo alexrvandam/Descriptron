@@ -1,0 +1,42 @@
+# =============================================================================
+# Dockerfile.mcp — add the Descriptron MCP server to an existing image
+# =============================================================================
+# A thin layer on top of the released image: nothing below it is rebuilt, and a
+# push uploads only this layer. Built by docker/build_mcp_layer.sh, which stages
+# the build context (the wheels, the MCP source and the entry script).
+#
+# The server gets its OWN virtual environment (/opt/descriptron-mcp) so the MCP
+# library's web dependencies can never change measure_env or samm. Its program
+# list comes from the descriptron-core / -vision wheels installed in that venv —
+# exactly the live programs, not every historical script under gui/. The
+# programs themselves run in the image's existing environments.
+#
+# Users connect with:
+#   claude mcp add descriptron -- docker run -i --rm --gpus all \
+#     --user "$(id -u):$(id -g)" -v "$HOME:$HOME" ghcr.io/alexrvandam/descriptron:2.0.1 mcp
+# =============================================================================
+ARG BASE=ghcr.io/alexrvandam/descriptron:2.0.0
+FROM ${BASE}
+
+COPY wheels/ /tmp/mcp-build/wheels/
+COPY descriptron-mcp/ /tmp/mcp-build/descriptron-mcp/
+COPY descriptron /usr/local/bin/descriptron
+
+RUN /opt/conda/envs/samm/bin/python -m venv /opt/descriptron-mcp \
+ && /opt/descriptron-mcp/bin/pip install --no-cache-dir --upgrade pip \
+ && /opt/descriptron-mcp/bin/pip install --no-cache-dir "mcp>=1.2" "pillow>=9" \
+ && /opt/descriptron-mcp/bin/pip install --no-cache-dir --no-deps /tmp/mcp-build/wheels/*.whl \
+ && /opt/descriptron-mcp/bin/pip install --no-cache-dir --no-deps /tmp/mcp-build/descriptron-mcp \
+ && rm -rf /tmp/mcp-build \
+ && chmod 755 /usr/local/bin/descriptron \
+ && chmod -R a+rX /opt/descriptron-mcp
+
+# the programs run in the environments the image already has; every cache goes
+# to /tmp so the server also works with --user (a non-root uid has no writable HOME)
+ENV DESCRIPTRON_CORE_PYTHON=/opt/conda/envs/measure_env/bin/python \
+    DESCRIPTRON_VISION_PYTHON=/opt/conda/envs/samm/bin/python \
+    DESCRIPTRON_MCP_STATE=/tmp/descriptron-mcp-state \
+    MPLCONFIGDIR=/tmp/matplotlib \
+    NUMBA_CACHE_DIR=/tmp/numba \
+    XDG_CACHE_HOME=/tmp/cache \
+    HF_HOME=/tmp/huggingface
