@@ -3,7 +3,7 @@
 # build_mcp_layer.sh — build the image with the MCP server on top of a release
 # =============================================================================
 #   docker/build_mcp_layer.sh [TAG] [BASE]
-#     TAG   default ghcr.io/alexrvandam/descriptron:2.0.1
+#     TAG   default ghcr.io/alexrvandam/descriptron:2.0.2
 #     BASE  default ghcr.io/alexrvandam/descriptron:2.0.0
 #
 # Paths can be overridden: PACKAGES_DIR (built wheels in */dist), MCP_SRC.
@@ -11,7 +11,7 @@
 # =============================================================================
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-TAG="${1:-ghcr.io/alexrvandam/descriptron:2.0.1}"
+TAG="${1:-ghcr.io/alexrvandam/descriptron:2.0.2}"
 BASE="${2:-ghcr.io/alexrvandam/descriptron:2.0.0}"
 PACKAGES_DIR="${PACKAGES_DIR:-$HERE/../packages}"
 MCP_SRC="${MCP_SRC:-$HOME/Desktop/descriptron-mcp}"

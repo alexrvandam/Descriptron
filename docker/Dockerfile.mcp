@@ -21,7 +21,7 @@
 #
 # Users connect with:
 #   claude mcp add descriptron -- docker run -i --rm --gpus all \
-#     --user "$(id -u):$(id -g)" -v "$HOME:$HOME" ghcr.io/alexrvandam/descriptron:2.0.1 mcp
+#     --user "$(id -u):$(id -g)" -v "$HOME:$HOME" ghcr.io/alexrvandam/descriptron:2.0.2 mcp
 # =============================================================================
 ARG BASE=ghcr.io/alexrvandam/descriptron:2.0.0
 FROM ${BASE}
