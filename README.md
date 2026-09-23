@@ -241,7 +241,7 @@ the group) are a separate input: a plain-text, .docx or .csv file given with
 
 ## What the programs produce
 
-67 programs, 51,107 lines. `docs/FigS1_script_inventory.png` draws all of them,
+Descriptron-v2 contains 67 programs, 51,107 lines. `docs/FigS1_script_inventory.png` draws all of them,
 and `docs/FigS1_script_inventory.tsv` is the same information as a table: for
 every program, its stage, line count, whether it calls a model, which pip
 distribution installs it, **and what it writes**.
