@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-core"
-version = "2.0.1"
+version = "2.0.2"
 description = "Evidence-tiered species descriptions, keys and audits from phenomic matrices"
 readme = "README.md"
 requires-python = ">=3.9"
