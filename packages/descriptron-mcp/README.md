@@ -49,6 +49,8 @@ claude mcp add descriptron -- docker run -i --rm --gpus all \
   ghcr.io/alexrvandam/descriptron:2.0.1 mcp
 ```
 
+Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start
+with it, and everything except the GPU programs works the same.
 `-v "$HOME:$HOME"` makes your files appear inside the container at the same
 paths Claude uses; add another `-v /path:/path` for data elsewhere (e.g. an
 external drive). `--user` makes the files it writes yours rather than root's.
