@@ -7,12 +7,6 @@
   &nbsp;<a href="#mcp-server"><img src="docs/claude_code_crab.png" alt="Works with Claude Code (MCP server)" height="40" align="middle"></a>
 </p>
 
-<p align="center">
-  <img src="docs/weevil_instance_segmentation.jpg" alt="A weevil in lateral view with every structure automatically segmented as a labelled, coloured mask" width="640">
-  <br>
-  <sub>Automated instance segmentation of a weevil in lateral view: each structure is a labelled mask with the model's confidence.</sub>
-</p>
-
 **Morphology-driven species descriptions, keys and delimitation for dark taxa.**
 
 Descriptron takes photographs or micro-CT slices of specimens and produces the
@@ -29,6 +23,12 @@ every claim in the output is checked against the data it came from.
 > retrieved first and foremost from **the measured data matrix**, which is the
 > primary retrieval and the basis of every analysis; **the literature**
 > (BioSysLit and your own PDFs) is a secondary, optional source.
+
+<p align="center">
+  <img src="docs/weevil_instance_segmentation.jpg" alt="A weevil in lateral view with every structure automatically segmented as a labelled, coloured mask" width="640">
+  <br>
+  <sub>Automated instance segmentation of a weevil in lateral view: each structure is a labelled mask with the model's confidence.</sub>
+</p>
 
 ---
 
