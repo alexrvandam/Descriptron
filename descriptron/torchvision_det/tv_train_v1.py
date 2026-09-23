@@ -159,7 +159,9 @@ def train(args):
     optim = torch.optim.SGD(params, lr=lr, momentum=RECIPE["momentum"],
                             weight_decay=RECIPE["weight_decay"])
     sched, warmup_iters, steps = make_scheduler(optim, args.total_iters)
-    scaler = torch.cuda.amp.GradScaler(enabled=args.amp and device.type == "cuda")
+    # torch.amp.* rather than torch.cuda.amp.*: the latter is deprecated from 2.4
+    # and emits a FutureWarning on 2.14
+    scaler = torch.amp.GradScaler("cuda", enabled=args.amp and device.type == "cuda")
 
     meta = dict(task=args.task, arch=args.arch, dataset_name=args.dataset_name,
                 num_classes=ds.num_classes, num_keypoints=ds.num_keypoints,
@@ -197,7 +199,7 @@ def train(args):
             if not any(len(t["boxes"]) for t in targets):
                 it += 1
                 continue
-            with torch.cuda.amp.autocast(enabled=scaler.is_enabled()):
+            with torch.amp.autocast("cuda", enabled=scaler.is_enabled()):
                 loss_dict = model(images, targets)
                 loss = sum(loss_dict.values())
             if not torch.isfinite(loss):

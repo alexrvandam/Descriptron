@@ -298,7 +298,9 @@ def main():
         mod = importlib.import_module(SUBCOMMAND_MODULES[sys.argv[1]])
         sys.argv = [f"{sys.argv[0]} {sys.argv[1]}"] + sys.argv[2:]
         return mod.main()
-    pre = argparse.ArgumentParser(add_help=False)
+    # allow_abbrev=False: otherwise the v1 option --taxon (index, retrieve, describe) is
+    # taken as an abbreviation of --taxon-profile and swallowed here
+    pre = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
     pre.add_argument("--llm-backend", default="api", choices=["api", "claude-code"])
     pre.add_argument("--claude-bin", default=None)
     pre.add_argument("--cc-model", default=None)

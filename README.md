@@ -21,6 +21,7 @@ every claim in the output is checked against the data it came from.
 - [What v2 adds](#what-v2-adds)
 - [Installing](#installing) — pip · Docker · conda
 - [The workflow](#the-workflow)
+- [Literature retrieval (the RAG in BioRAG)](#literature-retrieval-the-rag-in-biorag)
 - [What the programs produce](#what-the-programs-produce)
 - [Reproducing an analysis](#reproducing-an-analysis)
 - [Provenance and auditing](#provenance-and-auditing)
@@ -75,11 +76,13 @@ pip install descriptron
 ```
 
 Writing treatments is the only step that calls a language model:
-`pip install "descriptron-core[llm]"`.
+`pip install "descriptron-core[llm]"`. Literature retrieval from BioSysLit and
+your own PDFs: `pip install "descriptron-core[rag]"` (see
+[Literature retrieval](#literature-retrieval-the-rag-in-biorag)).
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
-docker pull ghcr.io/alexrvandam/descriptron:2.0.0
+docker pull ghcr.io/alexrvandam/descriptron:2.0.1
 
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
@@ -143,6 +146,54 @@ them for you. Every step that calls a model takes the same flags
 (`--llm-backend claude-code | api | none`, `--api-base-url`, `--api-key-env`), so
 a subscription, an API key, another provider, or **no model at all** are
 interchangeable.
+
+---
+
+## Literature retrieval (the RAG in BioRAG)
+
+Before the model describes each structure from the images, BioRAG can give it
+passages from **published treatments of the group**: the terminology taxonomists
+use, and the characters they have found informative. The retrieved text is
+reference only. The prompt tells the model not to copy a character state unless
+it is visible in the image, and **every number still comes from the measured
+matrix**, never from the literature.
+
+Two sources, which can be combined in one index:
+
+- **BioSysLit**: the Zenodo community of published taxonomic treatments,
+  searched by taxon name.
+- **Your own PDFs**: revisions, original descriptions, your own drafts. A PDF
+  needs a text layer. Scanned papers have none and contribute nothing, so run OCR
+  first (for example `ocrmypdf scan.pdf searchable.pdf`). To use descriptions you
+  wrote yourself, save them as PDF (Word: *Save as PDF*).
+
+```bash
+pip install "descriptron-core[rag]"
+
+# 1. build the index once: BioSysLit records for the taxon + a folder of PDFs
+descriptron biosyslit_rag_retrieval_v2 index \
+    --taxon Diaphorina --family Liviidae --max-records 100 \
+    --pdf-dir literature/ --output diaphorina_index.json
+
+# 2. check what it retrieves
+descriptron biosyslit_rag_retrieval_v2 retrieve \
+    --index diaphorina_index.json --taxon Diaphorina --family Liviidae --k 5
+
+# 3. use it: pass the index to the image-based descriptions ...
+descriptron biosyslit_rag_retrieval_v2 describe-biorag --index diaphorina_index.json ...
+#    ... or give the whole pipeline a folder of PDFs
+descriptron run_full_pipeline_v2 --pdf_dir literature/ ...
+```
+
+Retrieval is by keyword and metadata by default (taxon, family, section type),
+which needs nothing beyond `[rag]`. For retrieval by meaning, build the index
+with `--embeddings`; this needs `pip install "descriptron-core[rag-embeddings]"`
+(sentence-transformers and FAISS, which bring in PyTorch). The index is a plain
+JSON file: build it once per group and reuse it.
+
+The taxonomist's own questions (which characters to examine and what matters in
+the group) are a separate input: a plain-text, .docx or .csv file given with
+`--user_prompts`, or named as `questions_file` in the taxon profile.
 
 ---
 
@@ -239,15 +290,15 @@ Python 3.10 or newer is needed for the server.
 python -m venv descriptron-mcp-env
 source descriptron-mcp-env/bin/activate        # Windows: descriptron-mcp-env\Scripts\activate
 
-pip install https://github.com/alexrvandam/Descriptron/releases/download/v2.0.0/descriptron_core-2.0.0-py3-none-any.whl
+pip install https://github.com/alexrvandam/Descriptron/releases/download/v2.0.1/descriptron_core-2.0.1-py3-none-any.whl
 pip install "git+https://github.com/alexrvandam/Descriptron#subdirectory=packages/descriptron-mcp"
 
 descriptron-mcp --check                        # lists the programs it found
 ```
 
 For the GPU programs (torchvision detectors, SAM2-PAL, DINOLand), also install
-`descriptron_vision-2.0.0-py3-none-any.whl` from the
-[v2.0.0 release page](https://github.com/alexrvandam/Descriptron/releases/tag/v2.0.0).
+`descriptron_vision-2.0.1-py3-none-any.whl` from the
+[v2.0.1 release page](https://github.com/alexrvandam/Descriptron/releases/tag/v2.0.1).
 
 **With Docker instead** (no Python setup; includes the GPU programs):
 

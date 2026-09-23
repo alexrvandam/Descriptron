@@ -12,7 +12,7 @@ authors:
 repository-code: "https://github.com/alexrvandam/Descriptron"
 url: "https://github.com/alexrvandam/Descriptron"
 license: Apache-2.0
-version: "2.0.0"
+version: "2.0.1"
 date-released: "2026-09-23"
 abstract: >-
   Descriptron v2 turns images of specimens (photographs or micro-CT slices) into
@@ -22,7 +22,8 @@ abstract: >-
   descriptions of version 1 with an evidence-tiered pipeline, BioRAG, in which the
   character matrix, the key, the delimitation and the audits are computed from the
   specimens, and a language model is used only to write prose from numbers it may
-  not change. Each treatment is audited independently of the model that wrote it:
+  not change. The model can first be given passages from published treatments of
+  the group (BioSysLit on Zenodo and the user's own PDFs). Each treatment is audited independently of the model that wrote it:
   every statistic is recomputed from the specimen matrix, every number is
   attributed to a single feature, and every comparison is re-derived. Mask and
   landmark prediction include SAM2-PAL palindrome propagation, DINOLand (DINOv3

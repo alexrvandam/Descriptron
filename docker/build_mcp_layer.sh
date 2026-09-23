@@ -15,9 +15,15 @@ TAG="${1:-ghcr.io/alexrvandam/descriptron:2.0.1}"
 BASE="${2:-ghcr.io/alexrvandam/descriptron:2.0.0}"
 PACKAGES_DIR="${PACKAGES_DIR:-$HERE/../packages}"
 MCP_SRC="${MCP_SRC:-$HOME/Desktop/descriptron-mcp}"
+GUI_DIR="${GUI_DIR:-$HERE/../segment-anything-2/gui}"
+# programs changed since the base image, relative to gui/ (space-separated)
+OVERLAY="${OVERLAY:-measure/biosyslit_rag_retrieval_v2.py}"
 
 CTX="$(mktemp -d)"; trap 'rm -rf "$CTX"' EXIT
-mkdir -p "$CTX/wheels" "$CTX/descriptron-mcp"
+mkdir -p "$CTX/wheels" "$CTX/descriptron-mcp" "$CTX/overlay"
+for rel in $OVERLAY; do
+  mkdir -p "$CTX/overlay/$(dirname "$rel")"; cp "$GUI_DIR/$rel" "$CTX/overlay/$rel"; echo "  overlay: $rel"
+done
 for pkg in descriptron-core descriptron-vision; do
   whl=$(ls -t "$PACKAGES_DIR/$pkg/dist/"*.whl 2>/dev/null | head -1)
   [ -n "$whl" ] || { echo "no wheel in $PACKAGES_DIR/$pkg/dist — build it first" >&2; exit 1; }

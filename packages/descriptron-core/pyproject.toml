@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-core"
-version = "2.0.0"
+version = "2.0.1"
 description = "Evidence-tiered species descriptions, keys and audits from phenomic matrices"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -51,6 +51,11 @@ dependencies = [
 # Only needed to *write* treatments. The audit, key, matrix, novelty scoring and
 # delimitation are all deterministic and need no model at all.
 llm = ["anthropic>=0.40"]
+# literature retrieval (the RAG in BioRAG): BioSysLit treatments from Zenodo and your
+# own PDFs. Keyword retrieval needs only the first two; sentence-embedding retrieval
+# (`index --embeddings`) also needs sentence-transformers + faiss-cpu, which pull in torch.
+rag = ["requests>=2.28", "pdfplumber>=0.10"]
+rag-embeddings = ["requests>=2.28", "pdfplumber>=0.10", "sentence-transformers>=2.2", "faiss-cpu>=1.7"]
 dev = ["pytest>=7", "build>=1", "twine>=5"]
 
 [project.scripts]

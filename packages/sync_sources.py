@@ -36,6 +36,11 @@ TARGETS = {
 
 # things the inventory does not list but the packages need
 EXTRA_VISION = ["torchvision_det"]                    # whole directory
+# modules a core program imports that the inventory files elsewhere or does not list:
+# biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
+# because it CAN use Florence-2, which it loads lazily), and that imports
+# descriptron_rosetta. Without these the literature RAG dies on import in core.
+EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py"]
 EXTRA_GUI = ["marmot.jpg", "icons"]
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 
@@ -96,6 +101,15 @@ def main():
             n = len(list(dst.rglob("*.py")))
             counts["descriptron-vision"] += n
             print(f"  + {extra}/ ({n} modules) -> descriptron-vision")
+
+    core_tools = HERE / "descriptron-core" / "src" / "descriptron_core" / "tools"
+    for extra in EXTRA_CORE:
+        src = gui / extra
+        if src.is_file():
+            shutil.copy2(src, core_tools / src.name)
+            print(f"  + {src.name} -> descriptron-core (imported by core programs)")
+        else:
+            print(f"  ! missing: {extra}")
 
     # Prompts, taxon profiles, ontology releases and schemas.
     #
