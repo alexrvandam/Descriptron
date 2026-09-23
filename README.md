@@ -1,5 +1,7 @@
 # Descriptron v2 with BioRAG
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22918056.svg)](https://doi.org/10.5281/zenodo.22918056)
+
 **Morphology-driven species descriptions, keys and delimitation for dark taxa.**
 
 Descriptron takes photographs or micro-CT slices of specimens and produces the
@@ -400,9 +402,11 @@ If you use Descriptron, or any software derived from it (including
 descriptron-core, descriptron-vision, descriptron-gui and descriptron-mcp), in
 work that is published, presented or distributed, cite:
 
-1. **The software (Descriptron v2):**
-   Van Dam, A. R. Descriptron (version used). GitHub repository.
-   https://github.com/alexrvandam/Descriptron
+1. **The software (Descriptron v2)**, by the DOI of the version you used:
+   Van Dam, A. R. (2026). Descriptron: morphology-driven species descriptions,
+   keys and delimitation for dark taxa (Version 2.0.1). Zenodo.
+   https://doi.org/10.5281/zenodo.22918056
+   (all versions: https://doi.org/10.5281/zenodo.17077224)
 2. **The first Descriptron paper:**
    Van Dam, A. R. & Štarhová Serbina, L. (2026). Descriptron: Artificial
    intelligence for automating taxonomic species descriptions with a
@@ -412,11 +416,15 @@ work that is published, presented or distributed, cite:
    added here.
 
 ```bibtex
-@misc{vandam_descriptron_software,
-  author       = {Van Dam, Alex R.},
-  title        = {Descriptron},
-  howpublished = {GitHub repository},
-  url          = {https://github.com/alexrvandam/Descriptron}
+@software{vandam_2026_descriptron_v201,
+  author    = {Van Dam, Alex R.},
+  title     = {Descriptron: morphology-driven species descriptions, keys and
+               delimitation for dark taxa},
+  version   = {v2.0.1},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22918056},
+  url       = {https://doi.org/10.5281/zenodo.22918056}
 }
 
 @article{vandam2026descriptron,

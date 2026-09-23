@@ -9,6 +9,14 @@ authors:
   - family-names: "Van Dam"
     given-names: "Alex R."
     orcid: "https://orcid.org/0000-0002-1966-0338"
+doi: "10.5281/zenodo.22918056"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22918056"
+    description: "This version (v2.0.1). Cite this for the exact code you ran."
+  - type: doi
+    value: "10.5281/zenodo.17077224"
+    description: "All versions of Descriptron; always resolves to the latest."
 repository-code: "https://github.com/alexrvandam/Descriptron"
 url: "https://github.com/alexrvandam/Descriptron"
 license: Apache-2.0
