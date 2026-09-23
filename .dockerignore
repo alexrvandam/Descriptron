@@ -1,0 +1,46 @@
+# Without this the build context is ~150 GB: the repository root carries the
+# conda installation (116 GB), a 10 GB tarball, demo imagery and years of run
+# outputs. Docker would send all of it to the daemon before the first layer.
+# Strategy: exclude everything, then re-include only what the Dockerfile COPYs.
+
+**
+
+!docker/**
+!environments/**
+!segment-anything-2/gui/**
+
+# ...then take the bulk back out of gui/. Only code, prompts and small assets
+# belong in an image; data lives on a mounted volume.
+segment-anything-2/gui/Demo/**
+segment-anything-2/gui/outputs/**
+segment-anything-2/gui/outputs_final/**
+segment-anything-2/gui/unlabeled_masks/**
+segment-anything-2/gui/envs/**
+segment-anything-2/gui/metric3d/**
+segment-anything-2/gui/measure/_Mickey_/**
+segment-anything-2/gui/measure/custom_outputs/**
+segment-anything-2/gui/measure/outputs/**
+segment-anything-2/gui/measure/results_*/**
+segment-anything-2/gui/DINOSAR_v2/**
+
+# generated, heavy or irrelevant everywhere
+**/__pycache__/**
+**/*.pyc
+**/.git/**
+**/*.tar.gz
+**/*.zip
+**/*.log
+**/*.bak*
+**/*.whl
+**/*.pth
+**/*.pt
+**/*.pkl
+**/*.npz
+**/*.npy
+**/*.tif
+**/*.tiff
+
+# ...except the few small assets the GUI genuinely needs at runtime
+!segment-anything-2/gui/marmot.jpg
+!segment-anything-2/gui/icons/**
+!segment-anything-2/gui/measure/biorag_prompts/**

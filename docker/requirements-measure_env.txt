@@ -1,0 +1,31 @@
+# Derived from the imports of the 62 analysis programs, not from a pip freeze.
+# The exported environments/*_requirements.txt files are pip-only, so everything
+# conda installed - numpy included - is absent from them. Installing from those
+# alone produces an environment that cannot import numpy.
+numpy>=1.23
+pandas>=1.5
+scipy>=1.9
+matplotlib>=3.6
+scikit-learn>=1.2
+scikit-image>=0.20
+opencv-python-headless>=4.7
+pillow>=9
+pycocotools>=2.0.6
+seaborn>=0.12
+statsmodels>=0.14
+scikit-posthocs>=0.7
+umap-learn>=0.5
+networkx>=3
+pyefd>=1.6
+biopython>=1.81
+PyYAML>=6
+lxml>=4.9
+openpyxl>=3.1
+python-docx>=1.0
+anthropic>=0.40
+# Florence-2 scale-bar reading and the measurement script's OCR fallback
+transformers>=4.38
+timm>=0.9
+einops>=0.7
+easyocr>=1.7
+tqdm>=4.65

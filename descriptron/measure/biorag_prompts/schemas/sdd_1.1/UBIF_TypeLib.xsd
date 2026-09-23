@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:u="http://rs.tdwg.org/UBIF/2006/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://rs.tdwg.org/UBIF/2006/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="Unified Biosciences Information Framework (UBIF) 1.1 rev. 4">
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Unified Biosciences Information Framework (UBIF) XML schema. This part provides a type library of fundamental simple and complex types. See the main UBIF.xsd file for complete information, copyright and licensing.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Copyright © 2006 TDWG (Taxonomic Databases Working Group, www.tdwg.org). See the file UBIF_(c).xsd for authorship and licensing information.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Note: if multiple namespaces shall be used, all of which make use of this library, it would be possible to remove both xmlns="http://rs.tdwg.org/UBIF/2006/" and targetNamespace="http://rs.tdwg.org/UBIF/2006/" from xs:schema. In this 'chameleon pattern' (http://www-106.ibm.com/developerworks/library/x-flexschema/ or http://www.xfront.com/ZeroOneOrManyNamespaces.html), the included type libraries acquire the target namespace of the including schema. However, when testing this pattern in 2003-2004, several validators had problems handling this; for the time being UBIF and related schemata like SDD use only a single namespace.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Imported or included schemata: ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">The following import of xml namespace allows use of xml:lang directly. That schema defines an attribute lang of type="xs:language". The enumerated language values of this type are extensible using "x-" plus identifier. For the case of language-neutral elements (scientific taxon names) the value 'x-neutral' is recommended. To express unknown or mixed language, the special values 'mul' (multiple/mixed) and 'und' (undetermined/unknown) already exist (see http://wiki.tdwg.org/twiki/bin/view/UBIF/ExtendLanguageWithNeutralAndUnknown). Note: the import uses a local schema version, to ensure validation at times when not connected to the internet. The original schemaLocation is "http://www.w3.org/2001/xml.xsd".</xs:documentation>
+  </xs:annotation>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="w3c-schemata/xml.xsd"/>
+  <xs:include schemaLocation="UBIF_EnumLib.xsd"/>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Basic type library: ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Basic generic types:</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="LongString">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Normalized string required to contain at least 1 character, currently also limited length 64000 character to reduce implementation costs for some applications. Requiring a minimum length of 1 removes the "xml string anomaly", i. e. required element/attributes may have no content - which differs from behavior of number/date types.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:normalizedString">
+      <xs:minLength value="1" fixed="true"/>
+      <xs:maxLength value="64000"/>
+      <xs:whiteSpace value="collapse"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ShortString">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Normalized string of limited length (currently 1..255 character). The main reason to declare a limited length string types is to reduce implementation cost on some systems. Most database management systems (dbms) limit string length, either per field or per sum of fields in a record. Although probably all dbms also support long strings, these usually have different properties (slower, occasionally not sortable or indexable). Thus designers of logical or physical database models needs information about expected string length for data they intend to import. This cost usually occurs only to consuming applications where it is not acceptable to simply ignore part of the information.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="LongString">
+      <xs:maxLength value="255" fixed="true"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ZeroToOne">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Double precision numeric value in the range of [0..1], for probabilities, etc.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:double">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ColorRGB">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Colors defined as RGB (red-green-blue) values combined as hex-encoded into a string, like in html. Example: #EE88FF. Colors may also be expressed as HSV (hue-saturation-luminance), but this is convertible to RGB. RGB is preferred because it is used in HTML.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="ShortString">
+      <xs:pattern value="#([0-9]|[a-f]|[A-F]){6}">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Html also allows a shortend version with only 3 hexadecimal values. A pattern supporting both would be: #(([0-9]|[a-f]|[A-F]){3}|([0-9]|[a-f]|[A-F]){6})</xs:documentation>
+        </xs:annotation>
+      </xs:pattern>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Derived string types with restricting patterns:</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="NumericFormatPattern">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">String containing a format pattern of the type used in the xslt format-number function</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="ShortString">
+      <xs:pattern value="([#,])*([0,])*([.](0)*(#)*)?(%)?"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- The resource media type carries currently only semantics, no syntax or regular expression pattern:</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="ResourceMediaType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Resource media type (MIME, "text/html", "image/png", etc.). Compare www.w3.org/TR/xml-media-type.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="ShortString"/>
+  </xs:simpleType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== The following Range, Date, and Coordinate types describe frequently recurring simple type combinations in a element with attributes</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Elements defining value ranges:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="ValueRangeOrVerbatim">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A value range as upper/lower value, optional, plus additional/alternative verbatim text.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="lower" type="xs:double" use="optional"/>
+    <xs:attribute name="upper" type="xs:double" use="optional"/>
+    <xs:attribute name="verbatim" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">An uninterpreted textual representation of the range as close as possible to the original (digital/printed/handwritten) information source.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="ValueRange">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Restricted to required upper/ower value (no verbatim)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="ValueRangeOrVerbatim">
+        <xs:attribute name="lower" type="xs:double" use="required"/>
+        <xs:attribute name="upper" type="xs:double" use="required"/>
+        <xs:attribute name="verbatim" type="ShortString" use="prohibited"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ZeroToOneRange">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Required lower and upper attributes in the range 0-1. Used, e. g., for probabilities or values commonly expressed as percent</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="ValueRangeOrVerbatim">
+        <xs:attribute name="verbatim" type="u:ShortString" use="prohibited"/>
+        <xs:attribute name="lower" type="ZeroToOne" use="required"/>
+        <xs:attribute name="upper" type="ZeroToOne" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ZeroToOneEstimateRange">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Optional lower/upper estimate attributes in the range 0-1, with default values. Used, e. g., for certainty and frequency; the default values 0 and 1, resp., indicate that no estimate was possible.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="lowerestimate" type="ZeroToOne" use="optional" default="0"/>
+    <xs:attribute name="upperestimate" type="ZeroToOne" use="optional" default="1"/>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Types for composite gregorian calendar date/time (points in time where parts may be missing; following the seven property model described, e. g., in xml Schema 1.1 (http://www.w3.org/TR/2004/WD-xmlschema11-2-20040716/#theSevenPropertyModel). Instead of gYear, gMonth, gDay integer types with constraining facets are used for two reasons: a) each of them may have a timezone, which may lead to inconsistent data with multiple timezones; b) the lexical representation seems to be occasionally poorly implemented (e.g. where '31', or '---5' are accepted, whereas valid examples are '---31', '---05', and '---05+02:00'). In addition to the seven property model additional text attributes for either unsharp additions or complete verbatim dates are added. Note that incomplete dates in most cases are calendar specific and incomplete non-gregorian dates can not be expressed. Furthermore, for complete dates it may be unclear whether a reformed or unreformed date has been used (e.g. in Russia in the 19th century).</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="CompositeDate">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Date separated into attributes so that any part of the date may be missing
+[ATTR: year = four digit year;
+month = two digit month of year;
+day = two digit day of month;
+verbatim = unparsed textual date representation;
+supplement = text additional or modifying the exact dates, e. g., 'end of summer', 'first half or year', 'first decade of month', '1888-1892';
+timezone = expressed as integer according to the xml schema seven parameter model]</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="year" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">The four digit year in the Gregorian calendar (in Western cultures usually without a suffix or with 'AD/Anno Domini', 'CE/Common Era'; negative years with 'BC/Before Christ', 'BCE/Before Common Era'). Whether a year 0 is used or not differs between a true Gregorian calendar and recent astronomic usage, xml schema is likely to change its position, see xml schema draft 1.1. Thus database designers should not use 0 as a missing value representation for year.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="month" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxInclusive value="12"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="day" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">two digit day</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxInclusive value="31"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="literal" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">A free-form textual representation of the date.  In contrast to 'verbatim' this claims no special status and may contain any amount of interpretation. This may either be equivalent to the numeric data components, or contain additional information like 'end of summer', 'first half or year', 'first decade (of month)', '1888-1892'.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="verbatim" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">An uninterpreted textual representation of the original date information (date range, 'summer', perhaps unreformed Russian dates, etc.); as close as possible to the  earliest available (digital/printed/ handwritten) information source.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="timezone" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Timezone expressed in minutes. In the seven property model (http://www.w3.org/TR/2004/WD-xmlschema11-2-20040716/#theSevenPropertyModel) the timezone has a range of +/- 14 hours (14 * 60 = 840 minutes).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="-840"/>
+          <xs:maxInclusive value="840"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="CompositeDateTime">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Date + Time separated into attributes so that any part of the date may be missing. Note: adding a single time attribute of type xs:time would be simpler, but a duplication of the timezone information would be possible.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CompositeDate">
+        <xs:attribute name="hour" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:integer">
+              <xs:minInclusive value="0"/>
+              <xs:maxInclusive value="24">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">'24' may only occur if both minute and second are zero (http://www.w3.org/TR/2004/WD-xmlschema11-2-20040716/#theSevenPropertyModel).
+</xs:documentation>
+                </xs:annotation>
+              </xs:maxInclusive>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="minute" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:integer">
+              <xs:minInclusive value="0"/>
+              <xs:maxInclusive value="59"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="second" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:double">
+              <xs:minInclusive value="0"/>
+              <xs:maxInclusive value="60">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">The normal range should be 0-59, but 60 may occur for UTC leap-seconds (http://www.w3.org/TR/2004/WD-xmlschema11-2-20040716/#theSevenPropertyModel). An additional validator may choose to validate this. The simplest validation would attempt to convert those Composite date instance that containing all seven elements to a xs:dateTime value.</xs:documentation>
+                </xs:annotation>
+              </xs:maxInclusive>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Types for geographical coordinates:</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="DecimalLatitude">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Latitude of geographical coordinates in signed decimal degrees (i.e. 30° 30' S would be expressed as -30.5). The value range is -90 to 90°, South latitude being negative, North latitude being positive.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:double">
+      <xs:minInclusive value="-90"/>
+      <xs:maxInclusive value="90"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DecimalLongitude">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Longitude of geographical coordinates in signed decimal degrees (i.e. 30° 30' W would be expressed as -30.5). The value range is -180 to 180°, West longitude being negative, East longitude being positive.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:double">
+      <xs:minInclusive value="-180"/>
+      <xs:maxInclusive value="180"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="GeographicalCoordinates">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">ATTR: latitude, longitude (in decimal degrees), geodeticdatum (esp. if different from a Greenwich-based datum).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="latitude" type="DecimalLatitude" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Latitude of geographical coordinates in signed decimal degrees (i.e. 30° 30' S would be expressed as -30.5). The value range is -90 to 90°, South of the equator being negative, North of equator being positive.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="longitude" type="DecimalLongitude" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Longitude of geographical coordinates in decimal degrees (i.e. 30° 30' would be expressed as 30.5). Longitude is expressed from -180 to 180°, West longitude being negative, East longitude being positive.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="literal" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">A free-form string, either in addition to or instead of code (a mapping to the controlled vocabulary may be unavailable or considered ambiguous). In contrast to 'verbatim' this claims no special status and may contain any amount of interpretation.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="verbatim" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">An uninterpreted textual representation of the coordinate data (latitude/longitude, UTM, TRS, etc.), as close as possible to the earliest available (digital/printed/handwritten) information source.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="geodeticdatum" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Where knowledge of the geodetic datum is readily available it should be passed on. However, in most situations investigating all unknown geodetic data would not be cost-effective. Many geodetic datum systems result in differences only up to a 100 m, some up to several hundred meters. For many purposes in biodiversity sciences are acceptable. The 'World Geodetic System 1984 (WGS-84)' is the most commonly used geodetic datum. It is used, e. g., by the 'Global Positioning System (GPS)'. Other important systems are used (e. g., ITRF, ETRS89, NZGD2000, OSGB36, ED50, see also http://www.ncgia.ucsb.edu/education/curricula/giscc/units/u015/tables/table03.html or http://www.colorado.edu/geography/gcraft/notes/datum/edlist.html). The differences between WGS-84 and International Terrestrial Reference Frame (ITRF) are in the centimeter range worldwide, and ETRF 89 and NAD 83 are identical to WGS84 for Europe and North America, respectively. -- An exception to what has been said above are historical coordinates, which for many countries up to ca. 1900 (and even much later for France) may be based on a prime meridian other than Greenwich/Airy (e. g., the NTF datum uses Paris as its prime meridian, 2.33723° east of Greenwich).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Complex types closely related to enumerations (these may alternative be placed in UBIF_TypeLib)</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractStringOrCode" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Three attributes provide options to express a value constrained (enumerated/extensible) vocabulary, simple free-form text (perhaps interpreted), or verbatim (uninterpreted original version). At least one attribute should be present; this can not be validated by the schema (external validation is required for this and for all types derived from this).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="code" type="xs:QName" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">A value from a controlled vocabulary (with or without extensibility) to support application interoperability. Instead of using xs:string, xs:anyURI might be more desirable, but this requires changing the base type of the enumerations.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="literal" type="u:ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">A free-form string, either in addition to or instead of code (a mapping to the controlled vocabulary may be unavailable or considered ambiguous). In contrast to 'verbatim' this claims no special status and may contain any amount of interpretation.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="verbatim" type="u:ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">An uninterpreted literal; in contrast to 'label' this claims to be as close as possible to the (digital/printed/ handwritten) information source.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="Sex">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Expressing sex as code (enumerated vocabulary) or free-form literal or verbatim text. At least one attribute should be present; this can not be validated by the schema (external validation).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="AbstractStringOrCode">
+        <xs:attribute name="code" type="SexStatusEnum" use="optional" default="UnknownSex"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TaxonomicRank">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Expressing taxon rank as code (enumerated vocabulary), simple free-form text (perhaps interpreted), or verbatim (uninterpreted original version). At least one attribute should be present; this can not be validated by the schema (external validation).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="AbstractStringOrCode">
+        <xs:attribute name="code" type="TaxonomicRankEnum" use="optional" default="any_rank"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RevisionStatus">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Expressing actual revision level relative to intended revision level as code (enumerated vocabulary: RevisionStatusEnum), optionally plus literal text (free-form comment).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="AbstractStringOrCode">
+        <xs:attribute name="code" type="RevisionStatusEnum" use="required"/>
+        <xs:attribute name="verbatim" type="u:ShortString" use="prohibited"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DataStatus">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Expressing reasons why data are missing (not coded) as enumerated vocabulary (DataStatusEnum) only (i.e. literal/verbatim text equivalents currently not supported!)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="AbstractStringOrCode">
+        <xs:attribute name="code" type="DataStatusEnum" use="required"/>
+        <xs:attribute name="literal" type="u:ShortString" use="prohibited"/>
+        <xs:attribute name="verbatim" type="u:ShortString" use="prohibited"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Complex types referring to UnivarStatMeasureEnum (used, e. g., by SDD):</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="UnivarAnyStatMeasure">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A univariate statistical measure (with or without 1 parameter)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="type" type="UnivarAnyStatMeasureEnum" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Refers to an enumerated value in the UBIF type, declaring which kind of statistical measure has been used.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="##other" processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="UnivarSimpleStatMeasure">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A univariate statistical measure (without parameter)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="UnivarAnyStatMeasure">
+        <xs:attribute name="type" type="UnivarSimpleStatMeasureEnum" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnivarParamStatMeasure">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A univariate statistical measure (without parameter)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:restriction base="UnivarAnyStatMeasure">
+        <xs:attribute name="type" type="UnivarParamStatMeasureEnum" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnivarSimpleStatMeasureData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A univariate statistical measure (without parameter) plus a numeric value</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="UnivarSimpleStatMeasure">
+        <xs:attribute name="value" type="xs:double" use="required">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Value of univariate statistical measure.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="significant" type="xs:positiveInteger" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Measurement precision expressed as number of significant figures in value. Examples: '1.300' has precision=4 '72000' may have a precision between 2 and 5 figures.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnivarParamStatMeasureData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A univariate statistical measure (with 1 parameter) plus a numeric value</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="UnivarParamStatMeasure">
+        <xs:attribute name="par" type="xs:double" use="required">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">This is a parameter value that further defines the univariate statistical measure. Example: for a percentile (ref='PercLower'), '0.10' would define the 10%-percentile.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:double" use="required">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Value of univariate statistical measure.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="significant" type="xs:positiveInteger" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Measurement precision expressed as number of significant figures in value. Examples: '1.300' has precision=4 '72000' may have a precision between 2 and 5 figures.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Other complex types</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="TelephoneNumber">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Telephone, fax, etc. number
+ATTR: number = should be provided in the ITU Recommendation E.164 international format ("+CountryCode AreaCode Number") (vCard:Tel.Number)
+ATTR: devicetype = voice, fax, mobile, pager, modem (identical with vCard:Tel.Voice etc.; if several flags apply to a single phone number list the phone number multiple times!)
+ATTR: usagenote = free-form text for constraints on use e. g. "weekdays only" or "home number" (partly: vCard:Tel.Home/Work flags)
+ATTR: preferred = preferred number, may occur multiple times for different device types (vCard:Tel.Pref)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="number" type="ShortString" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Numbers should be provided in the ITU Recommendation E.164 international format ("+CountryCode AreaCode Number").</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="devicetype" type="TelephoneDeviceEnum" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Note that telephone device types are not necessarily exclusive (voice/fax, mobile/modem, etc.) and vCard 3.0 allows multiple for a single number. However, in UBIF this can be represented by adding a single number multiple times for each device type. This attribute should not have a default value voice, even though this is the most likely case. However, an exporting database may not have properly reported the type, or the type may be indicated only in the usage note.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="usagenote" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Free-form text for constraints on use e. g. "weekdays only" or "home number"
+(partly: vCard:Home/Work flags)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="preferred" type="xs:boolean" use="optional" default="false">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Elements with preferred = true indicate recommendation by the data provider. The consumer may have reasons to make a different choice.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Base type and derived types for all document internal cross reference.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">These types are used by id/ref attributes. The use of a type derivation allows to redefine the value type throughout the schema. Currently we decide to use document-wide IDs, but initial designs called only for within-object class identifiers (similar to database primary keys). Even with document-wide IDs, the standard version of the schema uses NCName as base type. Software designers using xslt may whish to change this to xs:ID and xs:IDREF in a local version of their schema to simplify the use of xslt (e.g. id() and idref() functions). However, using IDREF in the primary schema version would prevent using the schema for object or fragment interchange (the xs:IDREF values would always require a corresponding xs:ID value in the same document).</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="LocalInstanceID">
+    <xs:restriction base="xs:NCName"/>
+  </xs:simpleType>
+  <xs:simpleType name="LocalInstanceRef">
+    <xs:restriction base="xs:NCName"/>
+  </xs:simpleType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Language and audience attributes form the basis of text representations of labels and other types:</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Note: the use of attribute groups instead of globally defined and referred attributes is a work-around for namespace problems occurring with attribute definitions in included library schemata.</xs:documentation>
+  </xs:annotation>
+  <xs:attributeGroup name="language">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">The enumerated language values of this type are extensible using "x-" plus identifier. For the case of language-neutral elements (scientific taxon names) the value 'x-neutral' is recommended. To express unknown or mixed language, the special values 'mul' (multiple/mixed) and 'und' (undetermined/unknown) already exist (see http://wiki.tdwg.org/twiki/bin/view/UBIF/ExtendLanguageWithNeutralAndUnknown).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute ref="xml:lang" use="required"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="optional_language">
+    <xs:attribute ref="xml:lang" use="optional"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="multilingual">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">(multilingual support attributes)</xs:documentation>
+      <xs:documentation xml:lang="en-us">Required 'xml:lang' plus optional 'translatedfrom' and 'audience' attributes</xs:documentation>
+    </xs:annotation>
+    <xs:attribute ref="xml:lang" use="optional"/>
+    <xs:attribute name="translatedfrom" type="xs:language" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">For translations, the source language may be indicated.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="audience" type="LocalInstanceRef" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Optional information on expertise (pupil, student, expert), profess. background (farmer), etc. Values are recommended to correspond to the id of Audience objects (not validated). See further comments for background information.</xs:documentation>
+        <xs:documentation xml:lang="en-us">*Why introduce audience and not use a third-level language subtag?*
+xml:lang already expresses language and culture or region in tag and subtag ('en-CA'), but the use of further subtags to express audiences is problematic. RFC3066 supports 'en-CA-farmers' but does not define rules for how to add a level 3 subtag on "en" itself, 'en--farmers' being invalid according to rfc3066 production rules. Further, subtag length is restricted to 8 characters.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="##other">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">(provides extensibility through attributes from other namespaces)</xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:attributeGroup>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Audience is also available as an object type to define label and expertise level for audiences. However, audience values may be used even if no Audience object with a corresponding id can be found.)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">The reason for this is that all object labels, representations may already use audience in addition to language. To avoid circular dependencies or introducing special cases for audience objects, it was considered acceptable not to validate the correspondence using schema identity constraints (= referential integrity) here.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">(Note: If audience definitions are present, a missing attribute (and one explicitly containing the default set in this schema, e.g. "-") in multilingual or AudienceRef should be treated as pointing to the first audience with expertiselevel=0 (undefined).</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Complex types that add language/audience or 'preferred' attributes to the simple types LongString, ShortString, anyURI:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="LongStringL">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Long string (i. e. xs:string with minimum length=1) extended with *optional* language attribute</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="LongString">
+        <xs:attributeGroup ref="multilingual"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ShortStringL">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">ShortString (i. e. xs:string with limited length), extended with *optional* xml:lang attribute</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="ShortString">
+        <xs:attributeGroup ref="multilingual"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

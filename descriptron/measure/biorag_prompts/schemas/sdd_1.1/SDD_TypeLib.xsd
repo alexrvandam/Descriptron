@@ -1,0 +1,2329 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:u="http://rs.tdwg.org/UBIF/2006/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:html="http://www.w3.org/1999/xhtml" targetNamespace="http://rs.tdwg.org/UBIF/2006/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="Unified Biosciences Information Framework (UBIF) 1.1 and SDD 1.1 rev. 5"><!-- Update in rev. 5: Lead element (type:StoredKeyNode): MediaRef eletype changed from MediaObjectRef to MediaObjectRichRef, to allow roles to be expressed. -->
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">This file will be included into the UBIF/SDD integration schema 'SDD.xsd' (SDD uses the same namespace as UBIF).</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Copyright © 2006 TDWG (Taxonomic Databases Working Group, www.tdwg.org). See the file SDD_(c).xsd for authorship and licensing information.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Due to problems with key/keyrefs when using two namespaces (see documentation on the SDD WIKI: http://wiki.tdwg.org/twiki/bin/view/SDD/UBIFDesignRequirements), the SDD schema is based on the UBIF namespace, and thus uses include rather than import!</xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="UBIF_CoreExtensions.xsd"/>
+  <xs:include schemaLocation="SDD_EnumLib.xsd"/>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== UBIF insertion groups ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">The two SDD-groups are used inside the UBIF top-level Datasets/Dataset structure to define the object collections used by SDD</xs:documentation>
+  </xs:annotation>
+  <xs:group name="SDD-DescriptiveTerminology">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines the operational terminology (concepts, characters, states, etc.)
+in which descriptions are expressed.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">These terms 
+are defined 
+by biol. 
+specialist(s) 
+and used in 
+coded/nat. 
+lang. 
+descriptions 
+or identific.
+keys.</xs:documentation>
+      </xs:annotation>
+      <xs:element name="DescriptiveConcepts" type="DescriptiveConceptSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Descriptive concepts (properties, object parts, observation methods, etc.) define an optional ontology for descriptions. In contrast to characters, concepts can not be scored in descriptions. - Reusable states and char. dependencies are expressed here as well. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Characters" type="CharacterSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Depending on their type, characters define categorical states, quantitative measures, free-form text, etc. 
+Characters are realized (or operationalized) concepts that are used in descriptions. In software, characters define variables that hold data in taxon descriptions. Example: 'leg' may be a concept, 'leg number (as integer number)' a character, '6' the character data in a description.
+Characters are defined in an unordered flat list. These may be ordered or structured through CharacterTrees defined below.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CharacterTrees" type="CharacterTreeSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Character trees arrange concepts and characters. They may also be used to define flat char. subsets for filtering purposes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="SDD-DescriptiveData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Describes individuals (specimens) or classes (taxa) using the terms defined in the operational terminology (concepts, characters, states, etc.).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="NaturalLanguageDescriptions" type="NaturalLanguageDescriptionSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Authored or auto-generated free-form descriptions, which may be completely or partially marked-up with elements similar to those in coded descriptions.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CodedDescriptions" type="CodedDescriptionSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Largely language-independent descriptions controlled by Terminology. Both coded and nat. lang. may describe either abstract classes (taxa, diseases, etc.) or physical objects (individual specimens).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="IdentificationKeys" type="IdentificationKeySet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Dichotomous or polytomous (multifurcating)
+authored keys (incl. legacy data)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== For all first-class objects in SDD, collections of type set are defined. These form root-level collections in the Dataset object.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="DescriptiveConceptSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">(The element 
+sequence in 
+instance 
+documents 
+is not 
+informative!)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="DescriptiveConcept" type="DescriptiveConcept" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharacterSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">(Hint: Choice is 
+equivalent to class
+polymorphism,
+derived from same
+base type.)
+(Note: The 
+element 
+sequence in 
+instance 
+documents 
+is not 
+informative!)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="CategoricalCharacter" type="CategoricalCharacter"/>
+          <xs:element name="QuantitativeCharacter" type="QuantitativeCharacter"/>
+          <xs:element name="TextCharacter" type="TextCharacter"/>
+          <xs:element name="SequenceCharacter" type="MolecularSequenceCharacter"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharacterTreeSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="CharacterTree" type="CharacterTree" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NaturalLanguageDescriptionSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="NaturalLanguageDescription" type="NaturalLanguageDescription" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Note: If all coded markup except the Text content is removed, the original natural language text description can be recovered without changes (lossless).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CodedDescriptionSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="CodedDescription" type="CodedDescription" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Coded descriptions do have a label ('title', 'DELTA item name'). Where not available, the string value of the taxon name may be inserted here.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IdentificationKeySet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="IdentificationKey" type="StoredKey" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(Note: Identification keys may also be created dynamically based on data in terminology and descriptions. These keys are intended to represent only manually authored keys, whether from capturing legacy data or newly designed.)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== TERMINOLOGY START ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">DescriptiveConcepts, Characters and dependent objects (states, modifiers, statistical measures)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">1. a) DescriptiveConcept definitions. Note: relations between concepts may be defined in the operational character tree. Independent ontologies of concepts may be created through Link rel=Subclass etc. Another plan for the future is to allow defining concepts relations inside characters.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="DescriptiveConcept">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">DescriptiveConcepts may be basic
+properties (color, shape,
+texture), structural types
+(fruit types), methods
+(naked eye, hand lens,
+microscope) or other
+hierarchical generalizations that can be applied to characters
+(e. g., relative region: tip
+versus base of structure)
+
+Note that a number of ontological relations between concepts may be expressed using the general link structure of the base type (subclass, part of, etc.).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="VersionedAbstractObject">
+        <xs:sequence>
+          <xs:element name="Modifiers" type="ModifierSeq" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A set of modifier values of the same modifier concept. Examples: Certainty ('perhaps', 'probably', 'almost certainly'), frequency (usually, rarely, etc.), spatial (at base, at tip), seasonal (in spring, in winter), developmental (when young, senescent), manner, degree, intensity (strongly, weakly'), approximation (ca., roughly). Modifier concepts may be freely created. Some concepts, however, are expressed using a controlled vocabular in 'Modifier/ ModifierClass' to provide application interoperability.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ConceptStates" type="ConceptStateSeq" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A set of state definitions tied to the part (e. g., for fruit: capsule, berry, nutlet, ...), property (e. g., for color: red, green, ..., for shape: round, ovate, ...), method, etc. To be used in descriptions, concept states must be referenced using a StateReference in a specific character first.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DescriptiveConceptRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a concept node</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DescriptiveConceptRefSeq">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">(A sequence of references to a descriptive concepts)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:sequence>
+          <xs:element name="DescriptiveConcept" type="DescriptiveConceptRef" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Inner classes of DescriptiveConcept. ModifierSeq, ConceptStateSeq, and RecommendedMeasureSeq are second-class objects embedded in first class objects.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="DependencyRules">
+    <xs:sequence>
+      <xs:element name="OnlyApplicableIf" type="CharacterStateRefSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">If at least one state is defined in this rule, in a given description the characters below this concept node are inapplicable unless any of the listed controlling states is present.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="InapplicableIf" type="CharacterStateRefSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">If at least one state is defined in this rule, in a given description the characters below this concept node are inapplicable when any of the listed controlling states is present.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ModifierSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Sequence of 
+elements
+should be 
+preserved
+(may be 
+presentational
+or semantical,
+see attribute).</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Modifier" type="ModifierDef" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Modifiers modify categorical states or statistical measures in descriptions. In nat. language reports, modifiers from the same modifier concept are combined with 'or', modifiers from different group are concatenated (example: 'frequently weakly or strongly ...'). Modifier order within a concept may be semantic or presentational (see attribute). 
+
+Modifiers are defined for the entire project. To guide data entry, modifier sets may be recommended through Character tree node, InheritableDefinitions, RecommendedModifiers. 
+
+Note: In the case of frequency and certainty, in addition to referring to the categorical values defined here, exact quantitative values may be expressed in description data.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="ordered" type="xs:boolean" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">= 'Modifiers are ranked'. If true, the sequence of modifier elements in instance documents is semantically meaningful (as in: 'weakly, moderately, 'strongly'). If false the sequence is intended for display purposes only.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConceptStateSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:sequence>
+          <xs:element name="StateDefinition" type="ConceptStateDef" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The definition of concept states is identical to the local definition of states within a character. Using concept states simplifies the management of terminology and improves data analysis (states from different characters can be compared if they refer to identical concept states).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RecommendedMeasureSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:sequence>
+          <xs:element name="StatisticalMeasure" type="UnivarStatMeasureElaboration" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">In addition to listing measures, these elaborations provide for improved report generation (wording, value formatting). 
+
+Note: Statistical summary measures applicable to ordinal or nominal data (min, median, mode, etc.) are not supported; they can easily be calculated ad-hoc from the frequency distributions of categorical states which are supported.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">1. b) Character tree definitions, references (plus internal types)</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="CharacterTree">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines an entire character tree
+(which may be a tree or a single tree node containing a flat list)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="VersionedAbstractObject">
+        <xs:sequence>
+          <xs:element name="Scope" type="TaxonomicScopeSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Scope of character tree, currently only taxonomic scope is supported.</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="CharTreeScope_UniqueScopeRef">
+              <xs:selector xpath="u:*"/>
+              <xs:field xpath="@ref"/>
+            </xs:unique>
+          </xs:element>
+          <xs:element name="DesignedFor" type="CharTree_DesignedForSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Usage of concept tree that is intended by its designers; constrained to a controlled vocabulary to support application interoperability. Trees without a role are not normally visible to consumers of descriptive data. Regardless of its role, all trees are visible when designing the terminology.</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="CharacterTree_UniqueDesignedFor">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">For each tree, each enumerated Role value may be listed only once.</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath="u:Role"/>
+              <xs:field xpath="."/>
+            </xs:unique>
+          </xs:element>
+          <xs:element name="ShouldContainAllCharacters" type="xs:boolean" default="false" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">True if the intention of the designer of a concept tree is that all characters should be included in the tree. A terminology editing application may issues warnings about missing characters or directly offer inserting newly created characters in all such trees.</xs:documentation>
+              <xs:documentation xml:lang="en-us">Not validated by xml schema; subject to external validation!</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Nodes" type="CharTree_NodeSeq">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The tree structure is 
+presented as an 
+ordered list of nodes 
+together with edges 
+pointing to parent 
+nodes.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharTree_NodeRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a node in the character tree</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharTree_NodeSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">An ordered list of nodes with optional concepts (inner or terminal) plus character references (terminal only). Order is significant for elements with the same Parent node reference; order of elements with different parents may be ignored. Both width- and breadth-first must be supported.
+The node/parent structure is limited to trees by means of identity constraints (key/keyref).</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Node" type="CharTree_Node" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Nodes optionally pointing 
+to a descriptive concept.</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="CharTreeNode_NoSelfReference">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Ensures that Parent does not point to the id attribute of its own node. Note that cycles with a length of 2 still require external validation!</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath=". | u:Parent"/>
+              <xs:field xpath="@id | @ref"/>
+            </xs:unique>
+          </xs:element>
+          <xs:element name="CharNode" type="CharTree_Character" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Character references pointing to non-char. nodes in the tree. CharacterNodes are necessarily leaf nodes, because nothing can refer to them.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharTree_AbstractNode">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner nodes (or terminal nodes if no characters follow)</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Parent" type="CharTree_NodeRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ref. to an inner, non-character node (Nodes/Node) of the current char. tree. Omitting this is interpreted as a reference to the root of the tree.</xs:documentation>
+          <xs:documentation xml:lang="x-internal">Because every edge defines a new node, only few deviations from a true tree are possible. However, isolated cycles (node 1 with parent 2, node 2 with parent 1, not connected to root) can occur and require external validation to be prevented. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="NaturalLanguageGroup" minOccurs="0"/>
+      <xs:element name="DependencyRules" type="DependencyRules" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Dependency rules define whether in a given description a character may contain data or is expected to be inapplicable. This facilitates data validity checks and advises producers and consumers about expected presence of character data. The states listed in the following rules are controlling states, the controlled characters are all characters below this node. Rules for individual characters (rather than a set) can be defined in the terminal nodes. Rules are defined for a dataset, but evaluated within a given description. - This automatically applies to all characters below this node!</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="RecommendedModifiers" type="DescriptiveConceptRefSeq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The modifiers contained in the listed modifier concepts are considered applicable to all characters placed in the current branch of the concept tree. In descriptions, all modifiers are principally valid in all characters. However, editing tools may desire to offer only these recommended modifiers for new data.
+(External validation: Only concepts that do contain a list of modifiers in DescriptiveConcept/ Modifiers should be referenced here.) - This automatically applies to all characters below this node!</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="RecommendedMeasures" type="RecommendedMeasureSeq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">A set of univariate statistical measures (e. g., mean, min, max, s. d., sample size) considered applicable to all quantitative (sic!) characters placed in the current branch of the concept tree.
+In descriptions, all measures are valid in all quant. characters. However, editing tools may desire to offer only the recommended measures for new data. - This automatically applies to all characters below this node!</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="Extensions"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CharTree_Node">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner nodes (or terminal nodes if no characters follow).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharTree_AbstractNode">
+        <xs:sequence>
+          <xs:element name="DescriptiveConcept" type="DescriptiveConceptRef" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Reference to a general descriptive concept ("leaf", "leg", "microscopical", "length"). Omitting a concept will result in an unlabeled node.
+Note: Relations between concepts in the tree (part-of, kind-of, property-of) may be expressed inside DescriptiveConcept objects, using the generic Link element with rel=PartOf, SubclassOf, PropertyOf. This information may then be inherited in the char. tree.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attributeGroup ref="LocalInstanceID"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharTree_Character">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A character reference, creating a terminal tree node (this has no id attribute, so it can never be an inner node)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharTree_AbstractNode">
+        <xs:sequence>
+          <xs:element name="Character" type="CharacterRef">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Reference to a character, creating a terminal node ('leaf') in the tree.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Inner classes of CharacterTree and CharTree_Node:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="CharTree_DesignedForSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Role" type="CharacterTreeRoleEnum" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Important roles are InteractiveIdentification, NaturalLanguageReporting, or Filtering.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">2. --- Character definitions (characters = data recording and analysis variables, depending on observed part, property, and observation or measurement methodology)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">a) Abstract base type and derived types to be used in instance documents.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractCharacterDefinition" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines a character in the 
+terminology. Abstract base 
+type, one of the 
+extensions below must 
+be used in instance 
+documents</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="VersionedAbstractObject"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CategoricalCharacter">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharacterDefinition to be used in instance documents (non-abstract type).
+
+Categorical data include nominal and ordinal data (DELTA types UM/OM and NEXUS types). Other terms for categorical data in statistics are 'qualitative data' or 'attributes'. The term 'attribute' has been avoided in SDD because it has different definitions in statistics, programming, databases, DELTA, etc. Both 'qualitative' and 'attribute' are ambiguos as to whether ordinal/ ranked variables are in- or excluded.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterDefinition">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Extension of the 
+common character 
+properties with those
+specific to categorical 
+data (= 'states').</xs:documentation>
+          </xs:annotation>
+          <xs:element name="States" type="CharacterStateSeq">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Categorical values expressing either naturally discontinuous states (mostly related to counts) or categories defining a partioning of a continuous range. Examples: colors (blue, red) or shapes (round, ovate).
+
+Note: In DELTA, separate char. have to be defined for quant./cat. data, but either type can be used as a text char. without definition. SDD does supports free-form notes on quant./cat. data, but requires a separate char for text replacing rather than extending other data. In cases where a long list of categories is supplemented by a free-form text (like: 'other, please specify'), this may be inconvenient. Considering the analytical problems (descriptions sharing some 'unconstrained text state' require other comparison functions than normal states) this seemed to be the cleanest solution. The relationship between quant., cat. and unconstrained text data for one char. concept (like tree height) can be expressed in character trees.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Mappings" type="CategoricalCharMappingSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Mappings between categorical states (e. g., subovate may be mapped to ovate to simplify identification choices).</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="CategoricalStateMappings_UniqueFromPlusTo">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Ensures that the combination of From and To is unique in this scope (one set of mappings).</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath="u:Mapping"/>
+              <xs:field xpath="u:To/@ref"/>
+              <xs:field xpath="u:From/@ref"/>
+            </xs:unique>
+          </xs:element>
+          <xs:element name="Assumptions" type="CategoricalCharAssumptions" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Especially including a more detailed measurement scale.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="QuantitativeCharacter">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharacterDefinition to be used in instance documents (non-abstract type)
+
+Quantitative data include data like the DELTA types IN/RN. They are not supported by NEXUS.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterDefinition">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Extension of the 
+common character 
+properties with those
+specific to numerical
+measurements</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Assumptions" type="QuantitativeCharAssumptions" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Especially including a more detailed measurement scale.
+---
+Note: Unlike the states in categorical characters, the applicability of statistical measures to a character is not defined in the character. Any measure used in a description constitutes valid information. However, a list of recommended measures for sets of characters may be defined in concept nodes.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Mappings" type="QuantitativeCharMappingSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Mappings of numerical 
+ranges to categ. states.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="MeasurementUnit" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A measurement unit (mm, inch, kg, °C, m/s, etc.) or dimensionless scaling factor (such as '%') applying to all values of this character. If a Default/MeasurementUnitPrefix is defined (see below), this must be entered without a prefix (e. g., 'm' instead of 'mm').
+(Measurement units apply only to values plus those statistical measures not marked as IsDimensionless='true'.)</xs:documentation>
+              <xs:documentation xml:lang="x-internal">Note: "International Standard ISO 31 (Quantities and units), 1992 may be relevant here, but seems to be not available online. Printed version: ISO Standards Handbook: Quantities and units. 3rd ed., International Organization for Standardization, Geneva, 1993, 345 p., ISBN 92-67-10185-4, 182.00 CHF.
+
+A useful online resource is http://hem.fyristorg.com/ojarnef/fys/ metric-units-comp.txt</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Label" type="LabelText" maxOccurs="unbounded">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en-us">Language and culture-specific measurement unit label. Both role='abbrev' (e.g. 'l.', 'l', or 'L') and role='full' (en-us: 'liter', en-uk: 'litre') should be defined whenever possible. Note that UBIF text formatting applies (e. g., for 'ml/m<sup>2</sup>'). </xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="precedesValue" type="xs:boolean" default="false">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">True indicates that unit should be presented before the value (as in 'pH 7.0'). Default is false.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Default" type="QuantitativeCharDefaults" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">These data (like measurement unit prefix, significant figures, precision) declared here are the default if no other information is given in a specific description.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MolecularSequenceCharacter">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharacterDefinition to be used in instance documents (non-abstract type)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterDefinition">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Extension of the 
+common character 
+properties with those
+specific to sequences. 
+
+Currently only two
+kinds of molecular
+sequences are 
+supported. This type
+should not be misused
+for free-form text 
+strings!</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Assumptions" type="VersionExtension" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(Not yet used!)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="SequenceType" type="MolecularSequenceTypeEnum">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Currently limited to 'Nucleotide' and 'Protein', but future SDD versions may expand this after appropriate discussion. The special nucleotide type RNA/DNA are currently not considered necessary. The symbols U (RNA) and T (DNA) should be considered equal for the purpose of analysis.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="SymbolLength" type="xs:integer" default="1" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The number of letters in each symbol. Nucleotides are always codes with 1-letter symbols, but proteins may use 1 or 3-letter codes (A or Ala for alanine). In NEXUS SymbolLength is implicit in the Token command.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="GapSymbol" type="ShortString" default="-" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A string identifying the 'gap' symbol used in aligned sequences. The gap symbol must always be SymbolLength long. A gap is a place where no data exist, but where a position must be filled because it is assumed that sequence symbols were inserted or deleted during evolution.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="EnableAmbiguitySymbols" type="xs:boolean" default="true" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Support Ambiguity symbols such as R, Y, S, W for nucleotides, or B,Z for proteins in the sequence string.
+
+Information about some implicit current defaults relative to NEXUS 2 format:
+RespectCase is false; MatchChar is inapplicable to SDD (would prevent descriptions with sequence to be freely combinable); NEXUS data using MatchChar need to be expanded.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TextCharacter">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharacterDefinition to be used in instance documents (non-abstract type). In coded descriptions, these characters only support a Text element for unconstrained text.
+
+For applications not capable to analyze unconstrained natural language, text data can not be used in identification.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterDefinition">
+        <xs:group ref="SpecificExtension" minOccurs="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Note: The ColorRangeCharacter above is only an example of other derivations expected, like algorithmically described shapes, molecular sequences (genome/proteome), or molecular patterns (RFLP, AFLP, etc)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">b) inner classes, one-time use within character definitions above</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="CategoricalCharMapping">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within CategoricalCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="From" type="CharacterStateRef"/>
+      <xs:element name="To" type="CharacterStateRef">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Both To and From should point to a different character than the current (not validated). No explicit character reference is required, since state references are unique within a dataset.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="SpecificExtension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CategoricalCharMappingSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within CategoricalCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Mapping" type="CategoricalCharMapping" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Each mapping defines a source and a destination state. Both From and To may point multiple times to the same state, but the combination From + To must be unique. Both state must be defined in the current character (validated through identity constraint!)</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="CategoricalStateMapping_FromDifferentThanTo">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Ensures that From is different than To, a state should never point to itself. NOTE: Cyclical mappings are not easily validated in schema: 'Mapping From ref="s1"  To ref="s2"' Plus 'Mapping From ref="s2"  To ref="s1"' requires external validation!</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath="u:From | u:To"/>
+              <xs:field xpath="@ref"/>
+            </xs:unique>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CategoricalCharAssumptions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within CategoricalCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="MeasurementScale" type="CategoricalMeasurementScaleEnum" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">An optional specification of the kind of categorical character variable. The available measurement scales are 'nominal', and 'ordinal'. The distinction between linear ordering and other kinds of ordering is made separately!</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="NaturallyContinuous" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Any categorical variable can assume only a limited number of discrete values. Thus data recorded in a CategoricalCharacter are always discrete (= discontinous or meristic). However, the measured property may either be naturally discrete ('male/ female', 'aseptate/ uniseptate/ biseptate/muriform'), or it may be continuously varying and partioned into into discrete categories ('no/few/many hairs', 'orange to red'). Only in the latter case the between-operator can be used on neighboring states.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="SpecificExtension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="QuantitativeCharMapping">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within QuantitativeCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="From" type="ValueRangeWithClass">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">An inclusive range defined through two attributes ('lower', 'upper'), plus a 'valueclass' defining the preferred measure to base the mapping upon.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ToState" type="CharacterStateRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The categorical state corresponding
+to the range defined in From.
+If missing: From defines a partioning into range categories; range labels may then be automatically created from lower/upper values.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="SpecificExtension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="QuantitativeCharMappingSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within QuantitativeCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Mapping" type="QuantitativeCharMapping" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Each mapping defines a lower and an upper value to map numerical ranges to categorical states in the same character. The mechanism is related to DELTA Key States.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="QuantitativeCharAssumptions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within QuantitativeCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="MeasurementScale" type="QuantitativeMeasurementScaleEnum" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">An optional specification of the kind of numerical character variable. The numeric scales are 'interval', and 'ratio'. Interval differs from Ratio that the 0-value is an arbitrary point (e.g. in °C/°F) so that ratios should not be calculated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ValuesAreInteger" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">If true, an application may issue a warning if sample measurements are not integer. Note that most statistical measures are real values for integer data (min/max/TotalRange being exceptions).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Continuous" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Data are continous if theoretically any value is possible with a sufficiently fine measurement method. They are discrete if only certain values are possible and gaps between values exist. The value must be false for ValuesAreInteger= true. It may also be false for real numeric values (esp. for ratio data based on counts).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="PlausibleRange" type="ValueRange" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">An inclusive range defined through two attributes into which all measured values and most statistics (mean, extremes, ranges, etc.) should fall. Only dimensionless statistics (variance, sample size) are not to be tested against the plausibility range. This does not define a schema constraint; applications may ignore this, enforce it strictly, or issue warnings when violated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CircularDataRange" type="ValueRange" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Circular data are a special kind of MeasurementScale='interval'. If this data element is present, lower and upper define the values joining the circle. Example: '0, 360' for compass values, '0, 24' for hours of day. Compare Zar 1984: 422ff.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="SpecificExtension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="QuantitativeCharDefaults">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Inner class, used only within QuantitativeCharacter</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="MeasurementUnitPrefix" type="MeasurementUnitPrefixEnum" default="noprefix" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Default multiplication factor prefix. Specifying MeasurementUnit without a prefix and setting this enables overriding this default in individual values in summary ('MeasurementUnitPrefix' element) or sample data ('unitprefix' attribute).
+[Subject to external validation!]</xs:documentation>
+          <xs:documentation xml:lang="x-internal">External validation: if this is not set, no unitprefix attribute may be used in quantitative summary and sample data.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SignificantFigures" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The number of figures in normal (i.e. not dimensionless) measures assumed to be significant for all data in this character. (In individual values in summary or sample data this can be overridden in the 'significant' attribute.)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="DecimalPlaces" type="xs:positiveInteger" default="4" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The number of digits to the right of the decimal point. 3.142 is given to three decimal places, but has 4 significant figures. If both significant figures and decimal places are defined, significant figures override the decimal place definition.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="SpecificExtension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">c) State definitions within CategoricalCharacter. Abstract base type and derived types to be used in instance documents. </xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="CharacterLocalStateDef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Currently identical to AbstractVocabularyBase</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractVocabularyBase"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConceptStateDef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Currently identical to AbstractVocabularyBase</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractVocabularyBase"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharacterStateSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">(The element 
+sequence in 
+instance 
+documents 
+is informative!)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="StateDefinition" type="CharacterLocalStateDef">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Local definition of a state</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="StateReference" type="ConceptStateRef">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Reference to a concept state (as defined document-wide at a concept tree node); note that the ref-attribute serves here both as ref and as the equivalent of the StateDefinition/@id for the purpose of character data (i.e. states in descriptions) referencing the states within a character.
+
+Desirable external validation: The combined set of locally defined states and inherited concepts states should have unique labels.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">d) Character and state references</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="CharacterRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a character (e. g., from within concept trees or from descriptions). It consists only of a reference to a Character definition id.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharacterStateRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a character state (e. g., from descriptions). It consists only of a reference to a Character state definition id.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CharacterStateRefSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A collection of state references (CharacterStateRef type)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="State" type="CharacterStateRef" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConceptStateRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a project-wide definition of a categorical state at a concept node</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">e) Modifiers cover expressions of certainty, frequency, manner, degree, etc. that can be added to existing character value or state data in descriptions.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="ModifierDef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">State or character modifier definitions (certainty, frequency, spatial, temporal, etc.)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractVocabularyBase">
+        <xs:sequence>
+          <xs:element name="ModifierClass" type="ModifierClassEnum" default="OtherModifierClass" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Modifier class, used where interoperable specifications are desirable:
+1. Frequency or 2. Certainy (= ProportionRange defines frequency or certainty probabilites, resp.).
+3. Seasonal or 4. Diurnal (ProportionRange defines time in year or 24 h day, resp.).
+4. TreatAsMisinterpretation: The current modifier becomes one of a special class of misinterpretation modifiers. States to which such modifiers are added are known to be intentionally wrongly scored to accomodate known misunderstandings of the character under study. Example: dogwood bracts looking like petals, and petal scored as 'white (by misinterpretat.)'. - With regard to (not misinterpreted) data, both frequency and certainty may be interpreted as 0 to 0 = not occurring, certainly false.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ProportionRange" type="ZeroToOneEstimateRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">An estimate of a probability range for verbal modifiers. The values for upper/lower estimate of different modifiers may overlap. The default values are 0-1, indicating that no estimate was possible.
+
+(To do: specifications for spatial and temporal modifiers should be elaborated!)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Modifier reference (single, and group with multiple) to be used in coded descriptions:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="ModifierRefWithData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Actual modification of a statement. Refers to a modifier of any type (frequency, certainty, spatial, temporal, etc.).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef">
+        <xs:attribute name="lower" type="ZeroToOne" use="optional" default="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Lower value of a frequency or certainty range (values 0 to 1 inclusive). Note: to specify a single, exact value set both lower and upper attributes to this value!</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="upper" type="ZeroToOne" use="optional" default="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Upper value of a frequency or certainty range (values 0 to 1 inclusive). Note: to specify a single, exact value set both lower and upper attributes to this value!</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:group name="ModifierRefWithDataGroup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Multiple modifier references, optionally with data.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">(The element 
+sequence in 
+instance 
+documents 
+is informative!)</xs:documentation>
+      </xs:annotation>
+      <xs:element name="Modifier" type="ModifierRefWithData" minOccurs="0" maxOccurs="3">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">(Attrib. 'lower'/'upper' are intended for frequency/ certainty modifiers only.)
+The restriction to 0-3 modifiers is a pragmatic one; multiple modifiers on a state exist, but 3 modifiers is already extraordinary. This may reduce the implementation cost, especially for editing applications.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Modifier reference extended with Text element, used in natural language markup:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="ModifierMarkupRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Actual modification of a statement for markup of natural language descriptions (with Text inside). Refers to a modifier of any type (frequency, certainty, spatial, temporal, etc.).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="ModifierRefWithData">
+        <xs:sequence>
+          <xs:element name="Text" type="MarkupText"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">(Note on ModifierRef/ModifierRefMarkup: Although semantics for the lower/upper attributes are defined only for frequency and certainty modifiers, the schema allows are them in all statement modifications. Additional validation by other means than xml schema may be provided, and applications should use the lower/upper attributes only in modifiers of types than Certainty and Frequency. In other modifier types, the values may be discarded upon import. XML schema validation was attempted in SDD up to 1.0 beta 2, but this resulted in a complex system of multiple derived base types and was considered too complicated.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">f) Statistical measures: The base semantics and labels are already available through UBIF. At concepts node further elaboration may occur: a) wording and value formatting b) definition of recommended measure sets.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="UnivarStatMeasureElaboration">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"> A kind of local extension of the base definition of a statistical measure; used inside in concepts, adding, e. g., formatting information.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractVocabularyBase">
+        <xs:sequence>
+          <xs:choice>
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Properties describing machine-readable partial semantics for a statistical measure. Provided to support generic application code that continues to function if additional measures are defined.</xs:documentation>
+            </xs:annotation>
+            <xs:element name="Measure" type="UnivarSimpleStatMeasure">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Simple statistical measures not requiring a parameter (mean, variance, sample size).</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:sequence>
+              <xs:element name="PMeasure" type="UnivarParamStatMeasure">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">Statistical measures with a parameter value like confidence interval, percentile, etc.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="Parameter" type="xs:double">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">A default value for the parameter of the measure. Example: 0.95 for the upper limit and -0.95 for the lower limit of the 95% confidence interval.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:choice>
+          <xs:element name="FormatPattern" type="NumericFormatPattern" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Format rules as used in the xslt format-number function. # = significant digits; 0 (zero) = signif. digits or insignif. leading/trailing zeros; '.' = decimal point, ',' = group separator. Note that xslt itself is using en-US culture, adjusting decimal and group separator to local culture has to be specified externally. 
+Examples: "0.0#" formats 5 / 0.591 as 5.0 / 0.59. "#,###.#" formats 5000 / 0.59 as 5,000 / .6. (Rules for exponential formats or percent may be added in later versions of SDD!)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ValueRangeWithClass">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">ValueRange extended with a specification for the kind of value (broad enumerated statistical concepts).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="ValueRange">
+        <xs:attribute name="valueclass" type="UnivarStatMeasureClassEnum" use="optional" default="CentralMeasure">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">The type of statistical measure to which the mapping range (lower, upper value) refers. This may be a central value (mean, median), a range (quantile, confidence interval, etc.) or the extremes (minimum/ maximum). Currently only these three categories are defined.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== TERMINOLOGY END ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== TERMINOLOGY-BASED DATA ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">The following types are used in descriptions or identification key to code descriptive data by reference to characters, states, and modifiers defined in the Terminology.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">3. --- Character references in coded descriptions: SummaryData</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">a) abstract and non-abstract derived types used in coded descriptions</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Note: The non-abstract derived types are to be used in instance documents. The type names have been shortened to simplify instance documents, especially if an xsi:type would be used (Char xsi:type='CatSummaryData').</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractCharSummaryData" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Abstract base type. Used in CodedDescription/CodedData/Char to make statements for a single character in a class or specimen.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharacterRef">
+        <xs:sequence>
+          <xs:group ref="Extensions" minOccurs="0"/>
+          <xs:element name="BasedOnSample" type="SamplingEventRef" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">If origin='Calculated' and data are based on a specific sample that is present within the description, this sample (SampleData/Sample) may be identified here.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Ratings" type="RatingSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation source="http://www.diversitycampus.net/Projects/TDWG-SDD/docs/SDD_P_ID_Ratings.html" xml:lang="en-us">Meta information, rating the usefulness of characters for identification or other purposes. Intended to guide, e.g., a best-next character algorithm. This information is placed here because it depends on the taxonomic group and should be inherited down the taxonomic hierarchy.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="MediaObject" type="MediaObjectRef" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Media specific to the character and current object or taxon described.
+Example: microscopic image of spore shape.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Note" type="LongStringL" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Public notes or comments on the entire character statement, i. e. status values, states, measures (depending on type), etc. together. Multiple languages are supported. Applications may, e. g. report the text in brackets after all other data.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Status" type="DataStatusData" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Data status values like data 'unavailable' or 'inapplicable'. This may have a free-form Note, but no modifiers.
+Note: In specimen (unit/object) descriptions this may be treated as a strict alternative to categorical or numerical data and limited to 1 status value per character (external validation required). However, for classes/taxa (e. g., a genus) it is up to the aggregation/generalization process whether to create combined data and status values ("red, unknown, or not applicable") or not.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="origin" type="DataOriginEnum" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Provenance of values/states. The current data may be original data or may be cached information derived from other sources. The origin of the derivation may be a calculation, a mapping, an aggregation/generalization (class hierarchy, from below), or an inheritance (class hierarchy, from above).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CatSummaryData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharSummaryData to be used for categorical (char. state) data in instance documents (non-abstract type) </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharSummaryData">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Type-specific
+extension 
+of the base 
+character 
+data type.</xs:documentation>
+          </xs:annotation>
+          <xs:element name="State" type="StateData" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">States are 'scored' in a description by referring to a state defined in the current character.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="statemodel" type="StateCollectionModelEnum" use="optional" default="OrSet">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Distinguishes different types of state collections. 'AndSet' and 'OrSet' define state distributions that are not explicitly ordered in instance documents. Applications may reorder states using the state order defined in Terminology or state frequency values/ranking. For the corresponding 'AndSeq'/'OrSeq' the sequences of states in instance documents defines the preferred order of states (distinguishing, e. g., between 'round or elliptic' and 'elliptic or round'). WithSeq expresses a specially worded form of 'AndSeq'. With 'Between' the scored states form a range around the true value ('orange' to 'red').</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="QuantSummaryData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharSummaryData to be used for numerical (statistical measures) data in instance documents (non-abstract type) </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharSummaryData">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Type-specific
+extension 
+of the base 
+character 
+data type.</xs:documentation>
+          </xs:annotation>
+          <xs:group ref="ModifierRefWithDataGroup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Modification of all statistical measures collectively. Note: A character may occur multiple times in a description with different modifiers ('in winter/summer', 'at base/tip', etc.) or origins (e. g. from samples).</xs:documentation>
+            </xs:annotation>
+          </xs:group>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Summary statistics (univariate statistical measures) like distribution parameters, sample size, etc. Two alternative types (with/without parameter) may occur in any sequence. 
+
+(Hint: Choice is 
+equivalent to class
+polymorphism,
+derived from same
+base type.)
+
+(The element 
+sequence in 
+instance 
+documents 
+is not 
+informative 
+and processors 
+may reorder it.)</xs:documentation>
+            </xs:annotation>
+            <xs:element name="Measure" type="UnivarSimpleStatMeasureData">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Simple measures like mean, variance, or sample size.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="PMeasure" type="UnivarParamStatMeasureData">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Statistical measures like confidence interval or percentile, expressed using an additional parameter 'par'.
+---
+The 'type'-attributes in both types point directly to enumerations in UBIF (UnivarStatMeasureEnum / WithParam). An elaboration for measure definitions is supported at concept nodes, but optional.
+---
+Note: The 'significant' attribute overrides the information in Character/Default/SignificantFigures
+---
+Note: Individual measures have no separate Modifiers/Notes. However, a numerical character may occur multiple times in coded descriptions, e. g., to separately express width at base and at center.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:choice>
+          <xs:element name="MeasurementUnitPrefix" type="MeasurementUnitPrefixEnum" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Setting this overrides Character/ Default/MeasurementUnitPrefix. [Subject to external validation: this element should only be usable if a default prefix has been defined for the current character; else MeasurementUnit itself may already contain a scaling factor. Note: The measurement unit itself may not be changed in individual descriptions; it is not possible to use inch and cm in a character.</xs:documentation>
+              <xs:documentation xml:lang="en-us">External validation: if this is not set, not unitprefix attribute may be used in quantitative summary and sample data.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MolecularSequenceData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharSummaryData to be used for letter-sequence data (especially nucleotide and protein sequences) </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharSummaryData">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Type-specific
+extension 
+of the base 
+character 
+data type.</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Sequence" type="LongString">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A sequence of symbols expressed through letters in a string. A symbol may be expressed through one or multiple letters (e.g. A or Ala for the amino acid alanine), according to the character definition.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FreeFormTextData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from AbstractCharSummaryData to be used for unconstrained text ("Text-fields")</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharSummaryData">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Type-specific
+extension 
+of the base 
+character 
+data type.</xs:documentation>
+          </xs:annotation>
+          <xs:group ref="ModifierRefWithDataGroup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Modification of all statistical measures collectively. Note: A character may occur multiple times in a description with different modifiers ('in winter/summer', 'at base/tip', etc.) or origins (e. g. from samples).</xs:documentation>
+            </xs:annotation>
+          </xs:group>
+          <xs:element name="Content" type="LongStringL" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Free-form text</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">b) types used inside the CharSummaryData-derived types</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="StateData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A categorical state including frequency, state modifier, and Notes</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharacterStateRef">
+        <xs:sequence>
+          <xs:group ref="ModifierRefWithDataGroup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Modifiers modifying 
+single categorical 
+states</xs:documentation>
+            </xs:annotation>
+          </xs:group>
+          <xs:element name="Note" type="LongStringL" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Public notes or comments,
+for multiple languages.
+Applications may, e. g.,
+report the text in brackets
+after the character state.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DataStatusData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Similar to StateData, but for status values like 'inapplicable' or 'data unavailable'). This support free-form text notes, but no modifiers!</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="DataStatus">
+        <xs:sequence>
+          <xs:element name="Note" type="LongStringL" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Public notes or comments,
+for multiple languages.
+Applications may, e. g.,
+report the text in brackets
+after the status value wording.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">c) A collection of summary character data, containing a choice of derived character data types (polymorphic structure, choice options are equivalent to use of base type plus xsi:type).</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="SummaryDataSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A collection of character summary data elements (all of which are derived from CharSummaryData abstractType</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Unordered list.
+(Hint: Choice is 
+equivalent to class 
+polymorphism, all
+are derived from 
+same base type.)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Categorical" type="CatSummaryData"/>
+          <xs:element name="Quantitative" type="QuantSummaryData">
+            <xs:unique name="QuantSummaryData_UniqueMeasureType">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Within a given quantitative character data element, the same measure (e.g. mean, min, sample size) may not be used twice.</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath="u:PMeasure | u:Measure"/>
+              <xs:field xpath="@type"/>
+            </xs:unique>
+          </xs:element>
+          <xs:element name="Sequence" type="MolecularSequenceData"/>
+          <xs:element name="TextChar" type="FreeFormTextData"/>
+          <xs:element name="Text" type="FreeFormTextData"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">4. --- Character references in coded descriptions: SampleData</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">a) abstract and non-abstract derived types used in sample data</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractCharSampleData" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Abstract base type. Used in CodedDescription/SampleData/
+Sample/SamplingUnit.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharacterRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CatSampleData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from abstract CharSampleData to be used for categorical (char. state) data in instance documents (non-abstract type) </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharSampleData">
+        <xs:sequence>
+          <xs:element name="State" type="StateData" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">States are 'scored' in a description by referring to a state in the character definition. All notes and modifiers are applicable to this element.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="QuantSampleData">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Derived from abstract CharSampleData to be used for numerical data in instance documents (non-abstract type) in coded descriptions (Sample/ SamplingUnit). Attribute value (xs: double) is for directly measured/observed values. Not for statistical measures; these cannot occur in sampling units!</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharSampleData">
+        <xs:sequence>
+          <xs:element name="Note" type="LongStringL" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Public notes or comments,
+for multiple languages.
+Applications may, e. g.,
+report the text in brackets
+after the value.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:double" use="required">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">A single value of a single measurement for a character in a sampling unit. This may not be used for ranges, minimum, mean, etc., which cannot possibly occur on sampling units.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="significant" type="xs:positiveInteger" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Significant figures. 1.300 has 4 significant figures, 72000 may have 2, 3, or more significant figures.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="unitprefix" type="MeasurementUnitPrefixEnum" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Multiplication factor prefix overriding 
+the default defining for the character.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">5. --- Character references in coded descriptions: SampleData</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">a) abstract and non-abstract derived types used in natural language descriptions. Lacking multiple inheritance mechanisms in xml schema, these Markup versions have been derived independently. They are designed to be closely related to corresponding types in the coded description, however.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractCharacterMarkup" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Abstract base type. Used in NaturalLanguageDescriptions.
+
+Note: although Text and DataStatus scoring is common to all derived types, it can not be defined here. The markup of natural language should follow the original text sequence and type derivation would impose an xml schema sequence constraint.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharacterRef">
+        <xs:attribute name="parsed" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Signal whether parsing is finished for entire character with all child nodes.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CategoricalMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Extends the abstract CharacterMarkup for use with categorical (char. state) data</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterMarkup">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="Status" type="DataStatusMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Status values like 'inapplicable' or 'data unavailable'). This supports free-form text notes, but no modifiers!</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Modifier" type="ModifierMarkupRef"/>
+          <xs:element name="State" type="StateMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Character state data permitting Text elements within.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Note" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Comments or notes about a character that are not covered otherwise. When converting NLD to coded descriptions, this will become a character note.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Text" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Any text within a char. that has not yet been identified as one of the following elements.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="QuantitativeMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Extends the abstract CharacterMarkup for use with numerical (statistical measures) data as well as a list of sample measurement values.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterMarkup">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="Status" type="DataStatusMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Data status like '-' (= inapplicable) or '?' (= data unavailable). It may have an associated Note, but no modifiers.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Modifier" type="ModifierMarkupRef"/>
+          <xs:element name="Measure" type="MeasureMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A univariate statistical measures like mean, variance, or sample size.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="PMeasure" type="PMeasureMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A univariate statistical measures like confidence interval or percentile, expressed using an additional parameter.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Value" type="ValueMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The value is stored in an attribute of type double. The original text of the value may follow inside in the optional Text element. Note that the string in text will usually use a different number format than the English format required by xml.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Note" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Comments or notes about a character that are not covered otherwise. When converting NLD to coded descriptions, this will become a character note.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Text" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Any text within a char. that has not yet been identified as one of the following elements.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FreeFormTextMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us"># Extends the abstract CharacterMarkup to reference free-form text as equivalent to a "text character"</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractCharacterMarkup">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="Status" type="DataStatusMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Status values like 'inapplicable' or 'data unavailable'). This supports free-form text notes, but no modifiers!</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Note" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Comments or notes about a character that are not covered otherwise. When converting NLD to coded descriptions, this will become a character note.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Text" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Any text within a char. that has not yet been identified as one of the following elements.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">("ColorRangeMarkup" (color polygon measurement data) or "SequenceMarkup" (molecular or other sequences) are not supported at the moment, since the author do not expect to find them in natural language descriptions. If necessary, these types will be added.)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">b) The following NLD type refers to concept nodes and has no corresponding types in SummaryData/SampleData:</xs:documentation>
+  </xs:annotation>
+  <xs:group name="MarkupGroup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Used in ConceptMarkup 
+and root of NLD (without 
+a ref to concept). (Note: 
+Modeling through class 
+derivation alone would 
+require multiple 
+inheritance.)</xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">1. Group must 
+be unbounded 
+(not possible 
+on a choice
+after a group).
+
+2. The element 
+sequence in 
+instance 
+documents 
+is informative!</xs:documentation>
+      </xs:annotation>
+      <xs:element name="Text" type="MarkupText">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Text may refer to a text character (ref attribute present) or to parts not yet identified (ref attribute missing).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Concept" type="ConceptMarkup">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Markup of concepts above the character level, e. g., organism parts or methodological sections.
+Concepts may contain further concepts.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:choice>
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">(Hint: Choice is 
+equivalent to class
+polymorphism,
+derived from same
+base type.)</xs:documentation>
+        </xs:annotation>
+        <xs:element name="TextChar" type="FreeFormTextMarkup">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Free-form text in a description may correspond to a free-form text character.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Categorical" type="CategoricalMarkup">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">(Note: In most cases initially the states are recognized, but character markup
+can always be deduced from the associations between char. and states defined in the terminology.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Quantitative" type="QuantitativeMarkup"/>
+      </xs:choice>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="NaturalLanguageMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">The root of natural language markup is identical to ConceptMarkup, except that the concept ref attribute is prohibited.</xs:documentation>
+    </xs:annotation>
+    <xs:group ref="MarkupGroup" maxOccurs="unbounded"/>
+    <xs:attribute name="parsed" type="xs:boolean" use="optional" default="false">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">(Set to true when all 
+content parsing is finished)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="ConceptMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Used in NaturalLanguageDescriptions. Refers to concepts (i. e. nodes defined in concept trees)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="DescriptiveConceptRef">
+        <xs:group ref="MarkupGroup" maxOccurs="unbounded"/>
+        <xs:attribute name="parsed" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Signal whether parsing is finished for entire concept with all child nodes.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">c) types used inside the CharacterMarkup types</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="MarkupText">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Formatted text with some additional optional attributes, used for Text and Note elements inside the NaturalLanguageDescription container.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="LongStringL">
+        <xs:attribute name="parsed" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Markup of legacy text will often be incremental. This attribute may be set to true after markup of a text block is completed, signaling consumers that all information has been captured in SDD statements and the remaining legacy text need not be analyzed by natural language processing.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="newparagraph" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Where natural language descriptions consist of multiple paragraphs, this attribute can optionally mark the beginning of a new paragraph.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pagenumber" type="ShortString" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">If the description has a paginated (digital or printed) source, the page number (arabic, roman letters or numerals) may optionally be recorded. (Other publishing artifacts like header/footer text may be placed in attribute extensions from other namespaces.)</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="DataStatusMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Variant of DataStatusData to be used inside the NaturalLanguageDescription markup container.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="DataStatus">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="Note" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Additional information regarding the data status</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Text" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The text in the natural language description representing the status information itself</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StateMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Variant of StateData to be used inside the NaturalLanguageDescription markup container.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CharacterStateRef">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">(The 
+element 
+sequence in 
+instance 
+documents 
+is informative!)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Modifier" type="ModifierMarkupRef"/>
+          <xs:element name="Note" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Text related to a specific state that is not covered by either the state definition or modifiers. When converting NLD to coded descriptions, this will become a character state note (free-form text).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Text" type="MarkupText"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ValueMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">For single values (singleton observation or values in a sample).</xs:documentation>
+    </xs:annotation>
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="Note" type="MarkupText">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Text commenting on a sample value.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Text" type="MarkupText">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ultimately this should contain only the value itself.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="value" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">A single value of a single measurement for a character in a sampling unit. This may not be used for ranges, minimum, mean, etc., which cannot possibly occur on sampling units.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="MeasureMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">(Used inside Quantitative markup)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="UnivarSimpleStatMeasureData">
+        <xs:sequence>
+          <xs:element name="Text" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The text representing the statistical measure in the original natural language description. In English this will often be identical with the content of the value attribute. However, trailing zeros ('1.20'), exponents ('10&lt;sup&gt;2&lt;/sup&gt;) and local-specific grouping and fractional delimiters (German '1.998,55' is English '1,998.55') require a separation of issues.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PMeasureMarkup">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">(Used inside Quantitative markup)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="UnivarParamStatMeasureData">
+        <xs:sequence>
+          <xs:element name="Text" type="MarkupText">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The text representing the statistical measure in the original natural language description. In English this will often be identical with the content of the value attribute. However, trailing zeros ('1.20'), exponents ('10&lt;sup&gt;2&lt;/sup&gt;) and local-specific grouping and fractional delimiters (German '1.998,55' is English '1,998.55') require a separation of issues.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== TERMINOLOGY-BASED DATA END ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== DESCRIPTIONS START ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Descriptions are either natural language with optional markup or coded descriptions. Both are derived from the same base type:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractDescription" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Abstract base type for NaturalLanguageDescription
+and CodedDescription.
+
+The id attribute is currently not used in keyrefs from within this schema. However, it is considered generally useful to uniquely identify descriptions in federated situations.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="VersionedAbstractObject">
+        <xs:sequence>
+          <xs:element name="Scope" type="DescriptionScopeSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The scope of the description (= 'subject' of descriptive statements).
+Applications creating new data may want to make scope specifications required, but legacy data may contain only an informal description label (e. g., DELTA 'item name'; here as Repr./Label).</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="DescrScope_UniqueScopeRef">
+              <xs:selector xpath="u:*"/>
+              <xs:field xpath="@ref"/>
+            </xs:unique>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DescriptionScopeSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Extension of Scope base classes for descriptive concepts</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="ExtendedScopeSet">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Extension of base type with specific, descriptive scopes.
+
+Notes on base elements (Tax.-Cit.) in the context of a description scope:
+Repeated taxa: in addition to reasons stated in base type, these may also indicate descriptions of interactions between multiple organisms (e.g. disease symptoms).
+Specimen: If a single specimen is given, this is the description of it, if multiple specimens are given these are interpreted as "representative or studied specimens". Note: Since Specimen may include media objects, it is possible to describe, e. g., images of specimen.
+GeographicArea: Descriptions may be specific to a geographic region. A taxon may have different morphology, molecular markers, etc. in different regions.</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Part" type="DescriptiveConceptRef" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A description may cover only parts an organism, ('inflorescence', 'roots').</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Stage" type="DescriptiveConceptRef" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Developmental concepts ('larval stage', 'adult', etc.)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Sex" type="SexStatusEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(male, female, etc. ##To be discussed: should we use the UBIF sex enumeration here?)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="OtherConcept" type="DescriptiveConceptRef" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Other concepts that may define the scope of a description</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NaturalLanguageDescription">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Descriptions entered as free-form text with optional (and potentially incomplete) markup referring to concepts (= char. tree nodes), characters, and states as defined in the terminology.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractDescription">
+        <xs:sequence>
+          <xs:element name="NaturalLanguageData" type="NaturalLanguageMarkup">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The full, unchanged original wording of a natural language description is retained inisde the Text elements. Descriptive concept, character, or state markup may be added (partial or complete) without changing the original wording sequence.
+
+In contrast to CodedDescriptions, no uniqueness constraints are defined. For example, states may occur multiple times within a character (e. g., if differing in regard to modifiers but other states occur between them).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CodedDescription">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Coded description data are highly controlled by the vocabulary and structures defined in the Terminology, using references to characters, states, modifiers, numerical values for measurements. They also support a limited amount of free-form text (in Notes or Annotation only). Separating data and terminology allows rearranging and refactoring the terminology, multilingual support through central terminology translations, and multiple hierarchical views. 
+
+Coded descriptions must fulfill more rigorous consistency requirements than natural language descriptions and are more suitable for analysis. Furthermore, language-dependent annotations are minimized so that data can be easily reorganized and translated into multiple languages.
+
+Note: Representation/MediaObject of entire description may contain media like images that are not specific to a character (else add them to character elements below).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractDescription">
+        <xs:sequence>
+          <xs:element name="SummaryData" type="SummaryDataSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Summary data for aggregated or summarized data (using statistical measures, state distributions, etc.). The element is optional to support descriptions containing only sample data or media objects.
+Note: Characters are NOT required to have unique ref attributes! Data for one character may be recorded with different modifications (in spring/autumn, at tip/base).
+(The element sequence in instance documents is not informativeand may be changedat any time)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="SampleData" type="SamplingEventSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Raw sample data are recorded here. The analysed and generalized (e. g. using statistical measures) results are normally also reflected under SummaryData (with origin = 'calculated' and BasedOnSample referring to a sample ID.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">A special subtype of CodedDescription are original sampling data, which are organized into referrable SamplingEvent containers:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="SamplingEventSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Collection of Sampling events</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">(The sequence
+of Sample elements in 
+instance documents 
+is not informative
+and may be changed
+at any time!)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="SamplingEvent" type="SamplingEvent" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A container for direct ('raw') measurement results in a study. All sampling observations are assumed to be made under identical conditions. Descriptions may contain an unlimited number of Samples.
+(Attribute random declares random sampling, if false sample may or may not be biased.)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SamplingEvent">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A container for a sample data, with repeated sampling units, each of which may record multiple characters that are observed together.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractEvent">
+        <xs:sequence>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Representation 
+element in base 
+type may contain 
+a short label or 
+description of 
+sampling 
+circumstances
+(not required).</xs:documentation>
+          </xs:annotation>
+          <xs:element name="SamplingUnit" type="SamplingUnitDataSet" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A sampling unit may be an individual organism, a leaf of a tree, a piece of tissue, etc. In each sampling unit multiple characters may have been observed together ('paired observations'). Example: 'leaf shape, length, and width' of a single leaf). Value frequencies (e. g., '2.3': observed 4 x) are not supported; they are useful when only a single character variable is supported, but complicate paired observations unnecessarily. Char. values with a frequency should be entered in repeated SamplingUnits.
+
+(The sequence of SamplingUnit elements in instance documents should be preserved. Although it has no strictly defined semantics, it may be relevant if data entry is compared with the source.)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="randomized" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">If true, the sample is a random or randomized sample. If false, the sample may or may not be biased.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SamplingUnitDataSet">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">(This is equivalent to the SummaryDataSet - the sample data structure has the intermediate event for which no equivalent exists in summary data!)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Multiple paired 
+observations 
+(character data). 
+
+(Hint: Choice is 
+equivalent to class
+polymorphism, all
+derived from same
+base type.)</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Categorical" type="CatSampleData"/>
+          <xs:element name="Quantitative" type="QuantSampleData"/>
+          <xs:element name="TextChar" type="FreeFormTextData"/>
+          <xs:element name="Text" type="FreeFormTextData"/>
+          <xs:element name="Sequence" type="MolecularSequenceData"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SamplingEventRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a specific SampleData/SamplingEvent in a CodedDescription.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== DESCRIPTIONS END ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== IDENTIFICATION KEYS START ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Stored identification keys (esp. manually designed as opposed to automatically generated) are stored in a separate section:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="StoredKey">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines a stored identification key (dichotomous or multifurcating key) that has been digitized from printed publications or manually created to express expert knowledge that would not be available in dynamically created dichotomous keys (using Ratings from terminology and a 'find next best character' to minimize the average search tree).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="VersionedAbstractObject">
+        <xs:sequence>
+          <xs:element name="Scope" type="DescriptionScopeSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(Scope includes 
+source citation 
+for published 
+keys.)</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="StoredKeyScope_UniqueScopeRef">
+              <xs:selector xpath="u:*"/>
+              <xs:field xpath="@ref"/>
+            </xs:unique>
+          </xs:element>
+          <xs:element name="Question" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Optionally the first question for the root leads (for question-answer-style keys).</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:choice maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>Either a text
+statement or
+a media object
+must be present.
+Best practice:
+provide text in 
+addition to media.</xs:documentation>
+                </xs:annotation>
+                <xs:element name="Text" type="LongStringL">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en-us">If the user agrees with the statement (expressed as free-form text in Label role='full'), the node will be followed. Statements may be accompanied by multiple media objects (icon, selector). In picture keys label text may be used as title or alt-text of images.</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+                <xs:element name="MediaObject" type="MediaObjectRef">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en-us">Media specific to the characters or taxa in the current lead statement.</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:choice>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Leads" type="StoredKey_LeadSeq">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The tree structure of the stored identification key is presented as an ordered list of statement nodes together with edges pointing to parent nodes.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StoredKey_LeadSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:choice maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">An ordered list of inner leads (nodes) and result leads (terminal nodes, leaves). The order defines the sequence of lead/result statements. Both width- and breadth-first must be supported. The node/parent graph structure is limited to trees by means of identity constraints (key/keyref).</xs:documentation>
+          </xs:annotation>
+          <xs:element name="Lead">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Nodes of the 
+identification key, 
+describing a choice
+(text + optional
+illustration).
+Inner nodes may
+contain a question
+for the following
+leads; terminal
+nodes lead to 
+one of a taxon,
+subkey, or a
+secondary 
+reticulation.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="StoredKeyNode"/>
+              </xs:complexContent>
+            </xs:complexType>
+            <xs:unique name="StoredKeyNode_NoSelfReference">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Ensures that Parent does not point to the id attribute of its own node. Note that cycles with a length of "2" still require external validation!</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath=". | u:Parent"/>
+              <xs:field xpath="@id | @ref"/>
+            </xs:unique>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StoredKeyNode">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">An node in a stored identification key, containing the lead statement to follow and optionally either a next question answered by the following statements, or taxon/subkey results.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Parent" type="StoredKeyNodeRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ref. to an inner node of the current tree. Omitting this is interpreted as a reference to the root of the tree.</xs:documentation>
+          <xs:documentation xml:lang="x-internal">Because every edge defines a new node, only few deviations from a true tree are possible. However, isolated cycles (node "1" having parent "2", node "2" having parent "1", not connected to root) can occur and require external validation to be prevented. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:choice maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Either a text
+statement or
+a media object
+must be present.
+Best practice:
+provide text in 
+addition to media.</xs:documentation>
+        </xs:annotation>
+        <xs:element name="Statement" type="LongStringL">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">If the user agrees with the statement (expressed as free-form text in Label role='full'), the node will be followed. Statements may be accompanied by multiple media objects (icon, selector). In picture keys label text may be used as title or alt-text of images.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="MediaObject" type="MediaObjectRichRef">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Media specific to the characters or taxa in the current lead statement.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+      <xs:sequence>
+        <xs:element name="CodedStatements" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Currently only extension point for next version! - Intended for: "Statements in coded terminology that are equivalent to the Statement text. This information may be used to switch between stored identification keys and interactive identification (multiple entry keys). Statements like 'calyx black or petals white or cream (but not yellow)' can be expressed."</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace="##targetNamespace"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:choice>
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Choice =
+only one 
+option 
+may be 
+used</xs:documentation>
+        </xs:annotation>
+        <xs:element name="Question" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Optional question, answered by Statements in Leads below this node (for question-answer-style keys). In most key styles the question is empty (using only alternative statements).</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Either a text
+statement or
+a media object
+must be present.
+Best practice:
+provide text in 
+addition to media.</xs:documentation>
+              </xs:annotation>
+              <xs:element name="Text" type="LongStringL">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">If the user agrees with the statement (expressed as free-form text in Label role='full'), the node will be followed. Statements may be accompanied by multiple media objects (icon, selector). In picture keys label text may be used as title or alt-text of images.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="MediaObject" type="MediaObjectRef">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">Media specific to the characters or taxa in the current lead statement.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TaxonName" type="TaxonNameRef">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Refers to a taxon/class name</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Subkey" type="StoredKeyRef">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Refers to an entire stored identification key, supporting a main/subkey division.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Reticulation">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Refers to an arbitrary identification key node within the current or other keys, creating reticulations in key (id attributes of key nodes must be unique across all keys). Note: very rarely, reticulations in keys do refer to result nodes!</xs:documentation>
+            <xs:documentation xml:lang="en-us">Example for reticulation to result node: key to sections in "Phoma manual" (Boerema &amp; al.)</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="StoredKeyNodeRef">
+                <xs:attribute name="leadspecific" type="xs:boolean" default="false">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en-us">Normally, a reticulation - although pointing to a lead-specific id value - is assumed to point to the couplet in general. Very rarely keys point to specific leads directly; this can be specified by setting this to true.</xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:choice>
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Choice =
+only one 
+option 
+may be 
+used</xs:documentation>
+          </xs:annotation>
+        </xs:choice>
+      </xs:choice>
+      <xs:group ref="Extensions"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="LocalInstanceID"/>
+  </xs:complexType>
+  <xs:complexType name="StoredKeyRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to an entire stored identification key (e. g., if a key is referenced as a subkey from within another key)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StoredKeyNodeRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a node in a stored key (e. g., for reticulating keys)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== IDENTIFICATION KEYS END ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Other basic types used by SDD (compare also the types used by UBIF) ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Character rating (equivalent to DELTA wheight, reliability, etc., but characters are scored taxon specific in descriptions rather than for all taxa)</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="Rating">
+    <xs:annotation>
+      <xs:documentation source="http://www.diversitycampus.net/Projects/TDWG-SDD/docs/SDD_P_ID_Ratings.html" xml:lang="en-us">A rating of 1 (low) to 5 (high), with 3 as central value, the topic that is being rated, plus an optional indication whether inherited (= calculated based on related definitions) or defined directly.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="rating" type="Rating1to5Enum" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">A value from 1 (low) to 5 (high)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="context" type="RatingContextEnum" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Use case: topics such as ObservationConvenience, Availability, ScoringRepeatability</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="RatingSet">
+    <xs:annotation>
+      <xs:documentation source="http://www.diversitycampus.net/Projects/TDWG-SDD/docs/SDD_P_ID_Ratings.html" xml:lang="en-us">A collection of ratings to rate characters for conveniency, etc. This is especially relevant during interactive identification to rank the remaining characters for discriminative power and convenience.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Rating" type="Rating" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">A rating of 1 (low) to 5 (high), with 3 as central value, the topic that is being rated, plus an optional indication whether inherited (= calculated based on related definitions) or defined directly.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">-- Special types for natural language wordings:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="AbstractVocabularyBase" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Base of modifiers, stat. meas. elaborations, and categorical character states (both referrable concept and local character state definitions).
+
+Any use of a modifier or character state in descriptions is a reference to an object derived from this class.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractObject">
+        <xs:group ref="NaturalLanguageGroup" minOccurs="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:group name="NaturalLanguageGroup">
+    <xs:sequence>
+      <xs:element name="NaturalLanguage" type="NaturalLanguagePhraseSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Defines text phrases (before, after, and between elements) used to create natural language reports.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="NatLangPhraseString">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A text element used to define wordings for natural language output. Currently the type only adds a role attribute. Further attributes may be required if the handling of leading and trailing blanks should not work in an interoperability context (e. g., attributes like BlankBefore / BlankAfter of type BooleanTripleState?).</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="LongStringL">
+        <xs:attribute name="role" type="NatLangPhraseRoleEnum" default="Before">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">The kind of natural language phrase. Enumerated values: 'single', 'before', 'after', 'delim', etc.; see annotations in enumeration for further information.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="StringFormattingTypeEnum" use="optional" default="html">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">The kind of formatting used in the string. In contrast to most other text strings (defaulting to 'inline'), the default for natural language phrases is 'html', i.e. inline as well as block-level elements are supported in entity-escaped form. Use of xhtml ("br/" instead of "br") is highly recommend, but not validated. Using escaped 'html' requires double-escaping for gt, lt (but not amp) character entities, since all occurrences of gt and lt will be converted prior to presentation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="NaturalLanguagePhraseSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Phrase" type="NatLangPhraseString" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Phrases with roles like 'before', 'after', etc. for multiple languages/ audiences may be defined. Using a very simple grammar, the concatenation of these phrases yields a simple natural language description.
+
+External validation: for each lang./audience, each role should occur only once.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

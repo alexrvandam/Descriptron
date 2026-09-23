@@ -1,0 +1,29 @@
+# Derived from the imports of the GUI, SAM2-PAL v21, DINOLand v51 and the
+# torchvision detectors. The exported samm_requirements.txt dates from 2024 and
+# lacks cv2, scipy, sklearn, pycocotools, rembg, transformers and more, so an
+# image built from it cannot run SAM2-PAL v21 or DINOLand at all.
+numpy>=1.23
+scipy>=1.9
+pandas>=1.5
+matplotlib>=3.6
+seaborn>=0.12
+scikit-learn>=1.2
+scikit-image>=0.20
+opencv-python>=4.7          # the GUI does open windows, so not headless here
+pillow>=9
+pycocotools>=2.0.6
+umap-learn>=0.5
+tqdm>=4.65
+PyYAML>=6
+# SAM2 itself is installed from git; these are what it and the pipeline need
+hydra-core>=1.3
+iopath>=0.1.10
+omegaconf>=2.3
+# SAM2-PAL v21 letterboxes every frame using rembg foreground extraction
+rembg>=2.0
+onnxruntime>=1.16
+# DINOLand loads facebook/dinov3-* through transformers; Florence-2 likewise
+transformers>=4.38
+timm>=0.9
+einops>=0.7
+easyocr>=1.7

@@ -1,0 +1,55 @@
+# =============================================================================
+# BioRAG taxon profile — TEMPLATE
+# Copy this file, rename it (e.g. tetramorium_taxon_profile.yaml) and fill it.
+# It is the only organism-specific input to the BioRAG v2 text/key generators.
+# Everything not filled falls back to generic behaviour (see comments).
+# =============================================================================
+profile_version: 1
+
+taxon:
+  genus: "<Genus>"
+  family: "<Family>"
+  higher_classification: "<Order: Superfamily: Family>"
+  group_label_for_text: "species of <Genus>"
+  imaging: "<how specimens were imaged>"
+  colour_caveat: "<say whether photographs were colour-calibrated>"
+
+# Regex applied to image file names. The LAST match's group 1 is the specimen
+# number; specimen ID = "<species code>_<number>". If omitted, every image is
+# treated as a separate specimen.
+specimen_id:
+  number_regex: '_(\d+)_(?:head|mesosoma|wing)'   # edit to your file naming
+  sex_regex:
+    male: '_m_|_male'
+    female: '_f_|_female|_w_|_worker'
+
+# group_labels.csv code -> display name. status: described | cf | undescribed
+species:
+  sp1: {name: "<Genus> sp. 1", status: undescribed, verify: true, source: ""}
+
+# COCO category name -> term. Unlisted categories use their own name.
+structures:
+  head: {term: "head", section: "Head", sex: both, key_priority: 1}   # optional: synonyms: ["cephalic capsule"]
+  # genitalia: {term: "genital capsule", section: "Male genitalia", sex: male, key_priority: 3}
+  # plate:     {term: "subgenital plate", sex: both, split_by_sex: true, section_male: "...", section_female: "..."}
+
+description_sections: ["Head", "Mesosoma", "Legs", "Wings", "Metasoma", "Proportions"]
+
+# Abbreviation -> (category, length_mm | height_mm) on the same specimen.
+measurement_abbreviations:
+  HW: {category: head, measurement: height_mm, meaning: "head width"}
+  HL: {category: head, measurement: length_mm, meaning: "head length"}
+
+# Standard proportions for this group. sex: all | male | female
+ratios:
+  - {id: "HL/HW", num: HL, den: HW, sex: all, words: "head length / head width"}
+
+category_aliases: {}       # e.g. {cell-csc: cell-c+sc} when one structure appears under two names
+landmark_sets: {}          # e.g. head_keypoints: {term: head, landmark_name: landmark, reference_pair: auto}
+
+questions_file: null       # plain-text file of taxonomist questions per body region
+
+key:
+  feature_type_weights: {ratio: 1.0, landmark_ratio: 0.95, aspect_ratio: 0.9, length: 0.8, landmark_mm: 0.75, colour: 0.6}
+  min_specimens_primary: 2
+  max_secondary_characters: 2

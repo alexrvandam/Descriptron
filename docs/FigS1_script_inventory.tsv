@@ -1,0 +1,71 @@
+stage	script	lines_of_code	model_over_api	local_vlm	vision_network	backend_selectable	pip_package	outputs
+Annotation (the Descriptron GUI)	descriptron-v2-v73.py	11559	no	no	yes	no	descriptron-gui	writes 2 images
+Annotation (the Descriptron GUI)	sam2_pal_batch_v21.py	2497	no	no	yes	no	descriptron-vision	writes 1 figure, 15 images
+Annotation (the Descriptron GUI)	dinov3_landmark_transfer_v51.py	776	no	no	yes	no	descriptron-vision	writes 5 figures, 2 JSONs
+Images to measurements	texture_phenomics_from_coco.py	455	no	no	no	no	descriptron-core	writes 10 figures, 16 tables
+Images to measurements	texture_phenomics_homology.py	832	no	no	no	no	descriptron-core	writes 16 figures, 10 tables, 1 image
+Images to measurements	color_phenomics_homology_v2_1.py	963	no	no	no	no	descriptron-core	writes 16 figures, 10 tables, 1 image
+Images to measurements	color_extraction_with_names-v8.py	823	no	no	no	no	descriptron-core	writes 2 figures, 1 image
+Images to measurements	FHS_and_CLAHE_V21.py	1313	no	no	no	no	descriptron-core	writes 4 figures, 2 tables, 6 images
+Images to measurements	landmark_gpa_V1.py	564	no	no	no	no	descriptron-core	writes 20 figures, 8 tables
+Images to measurements	measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py	1696	no	yes	no	no	descriptron-vision	writes 8 figures, 1 image, 3 arrays
+Images to measurements	semi_landmark_and_kpts_procrustesV34_GPA.py	1843	no	no	no	no	descriptron-core	writes 30 figures, 10 tables
+Images to measurements	compile_specimen_data.py	1223	no	no	no	no	descriptron-core	writes 1 table, 1 array
+Screening, policy and matrix	biorag_annotation_screen_v1.py	192	no	no	no	no	descriptron-core	writes 4 tables, 1 JSON
+Screening, policy and matrix	biorag_annotation_reorient_v1.py	158	no	no	no	no	descriptron-core	writes 1 table, 1 JSON
+Screening, policy and matrix	biorag_label_conflict_check_v1.py	73	no	no	no	no	descriptron-core	writes 1 table, 1 JSON
+Screening, policy and matrix	biorag_specimen_id.py	64	no	no	no	no	descriptron-core	none
+Screening, policy and matrix	biorag_feature_policy.py	366	no	no	no	no	descriptron-core	none
+Screening, policy and matrix	biorag_key_feature_filter_v2.py	517	no	no	no	no	descriptron-core	writes 8 tables
+Screening, policy and matrix	biorag_add_discrete_characters_v1.py	124	no	no	no	no	descriptron-core	writes 2 tables, 1 JSON
+Screening, policy and matrix	biorag_make_taxon_profile_v1.py	125	no	no	no	no	descriptron-core	none
+Key and treatments	biorag_key_builder_v1.py	1078	yes	no	no	yes	descriptron-core	writes 1 table, 2 JSONs, 1 text
+Key and treatments	biorag_description_refiner_v1.py	733	yes	no	no	yes	descriptron-core	writes 1 table, 6 texts
+Key and treatments	biosyslit_rag_retrieval_v2.py	267	yes	no	no	no	descriptron-core	writes 1 text
+Key and treatments	biosyslit_rag_retrieval.py	3496	no	yes	no	no	descriptron-vision	writes 1 image
+Key and treatments	biorag_llm_backend.py	354	yes	no	no	yes	descriptron-core	none
+Checking the text	biorag_confabulation_checker_v2.py	1270	no	no	no	no	descriptron-core	writes 3 JSONs, 1 text
+Checking the text	biorag_subjective_checks_v1.py	433	no	no	no	no	descriptron-core	writes 1 table, 3 JSONs
+Checking the text	biorag_ontology_annotator_v2.py	319	no	no	no	no	descriptron-core	writes 2 tables, 1 JSON
+Checking the text	biorag_character_gate_v1.py	574	yes	no	no	yes	descriptron-core	writes 1 table, 3 JSONs, 2 texts
+Checking the text	biorag_gate_compare_v1.py	109	no	no	no	no	descriptron-core	writes 1 table, 1 JSON
+Descriptive categorical characters	biorag_descriptive_scoring_v1.py	340	yes	no	no	yes	descriptron-core	writes 2 tables, 2 JSONs
+Descriptive categorical characters	biorag_character_reliability_v1.py	242	no	no	no	no	descriptron-core	writes 1 table, 1 JSON
+Descriptive categorical characters	biorag_reliability_figures_v1.py	284	no	no	no	no	descriptron-core	writes 1 figure, 4 tables, 1 JSON
+Descriptive categorical characters	biorag_rerun_descriptive_tables_v1.sh	42	no	no	no	no	descriptron-core	none
+Descriptive categorical characters	biorag_retest_compare_v1.py	185	no	no	no	no	descriptron-core	writes 3 tables, 1 JSON
+Naming specimens, recognising new species	biorag_calibrate_v1.py	450	no	no	no	no	descriptron-core	writes 8 tables, 1 JSON, 1 text
+Naming specimens, recognising new species	biorag_calibration_figures_v1.py	542	no	no	no	no	descriptron-core	writes 4 figures
+Naming specimens, recognising new species	biorag_novelty_score_v1.py	1094	no	no	no	no	descriptron-core	writes 4 tables, 2 JSONs
+Naming specimens, recognising new species	biorag_key_holdout_v1.py	221	no	no	no	no	descriptron-core	writes 3 tables, 2 JSONs
+Naming specimens, recognising new species	biorag_key_fuzzy_v1.py	304	no	no	no	no	descriptron-core	writes 1 table, 1 JSON
+Naming specimens, recognising new species	biorag_graph_identify_v1.py	267	no	no	no	no	descriptron-core	writes 4 tables, 1 JSON
+Naming specimens, recognising new species	biorag_instrument_compare_v3.py	299	no	no	no	no	descriptron-core	writes 2 figures, 6 tables, 1 JSON
+Naming specimens, recognising new species	biorag_outgroup_batch_check_v1.py	127	no	no	no	no	descriptron-core	writes 2 tables, 1 JSON
+Naming specimens, recognising new species	biorag_key_fuzzy_figures_v1.py	425	no	no	no	no	descriptron-core	writes 2 figures, 1 table, 1 JSON
+Naming specimens, recognising new species	biorag_graph_support_figure_v1.py	702	no	no	no	no	descriptron-core	writes 2 figures, 4 tables, 1 JSON
+Naming specimens, recognising new species	biorag_methods_summary_figure_v1.py	396	no	no	no	no	descriptron-core	writes 2 figures
+Naming specimens, recognising new species	biorag_key_jackknife_support_v1.py	123	no	no	no	no	descriptron-core	writes 1 table, 1 JSON
+Naming specimens, recognising new species	biorag_character_robustness_v1.py	200	no	no	no	no	descriptron-core	writes 2 figures, 4 tables, 1 JSON
+Naming specimens, recognising new species	biorag_outline_shape_v1.py	558	no	no	no	no	descriptron-core	writes 4 tables, 1 JSON
+Naming specimens, recognising new species	biorag_computed_sets_v1.py	184	no	no	no	no	descriptron-core	writes 2 tables, 1 JSON
+Naming specimens, recognising new species	biorag_rebuild_downstream_v1.sh	88	no	no	no	no	descriptron-core	none
+Model-proposed binary characters	biorag_homology_frame_v1.py	355	no	no	no	no	descriptron-core	writes 3 figures, 1 table, 2 JSONs, 3 arrays
+Model-proposed binary characters	biorag_frame_orientation_v1.py	809	no	no	no	no	descriptron-core	none
+Model-proposed binary characters	biorag_frame_orientation_calibrate_v1.py	714	no	no	no	no	descriptron-core	writes 15 tables, 1 JSON
+Model-proposed binary characters	biorag_vlm_characters_v1.py	555	yes	no	no	yes	descriptron-core	writes 5 tables, 1 JSON
+Model-proposed binary characters	biorag_autapomorphy_v1.py	280	no	no	no	no	descriptron-core	writes 4 tables, 1 JSON
+Model-proposed binary characters	biorag_congruence_compare_v1.py	550	no	no	no	no	descriptron-core	writes 11 tables, 1 JSON
+Model-proposed binary characters	biorag_vlm_heatmap_figures_v1.py	627	no	no	no	no	descriptron-core	writes 2 figures, 1 table, 1 JSON
+Model-proposed binary characters	biorag_vlm_roi_figures_v1.py	230	no	no	no	no	descriptron-core	writes 1 figure, 1 table
+Model-proposed binary characters	biorag_vlm_reliability_figure_v1.py	1270	no	no	no	no	descriptron-core	writes 2 figures, 6 tables, 1 JSON
+Names, types and outputs	biorag_collaborator_forms_v1.py	265	no	no	no	no	descriptron-core	writes 2 tables
+Names, types and outputs	biorag_type_material_v1.py	332	no	no	no	no	descriptron-core	writes 1 JSON, 1 text
+Names, types and outputs	biorag_rename_species_v1.py	160	no	no	no	no	descriptron-core	none
+Names, types and outputs	build_species_treatment_docx_v2.py	458	no	no	no	no	descriptron-core	none
+Names, types and outputs	build_monograph_exports_v1.py	789	no	no	no	no	descriptron-core	writes 1 JSON, 1 text
+Names, types and outputs	make_reproducibility_bundle.py	381	no	no	no	no	descriptron-core	writes 2 texts
+Names, types and outputs	run_full_pipeline_v2.py	1632	no	no	no	no	descriptron-core	none
+(left out)	biorag_mask_characters_v1.py						retired 2026-09-20: outline descriptors duplicate the Procrustes shape variables
+(left out)	biorag_character_roi_figures_v1.py						retired with it
+(left out)	biorag_instrument_compare_v2.py						superseded by v3; kept only to reproduce the 19 September table

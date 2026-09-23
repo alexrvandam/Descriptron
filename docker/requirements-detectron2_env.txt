@@ -1,0 +1,10 @@
+# detectron2 pulls its own dependencies when it is pip-installed from source;
+# these are the extras the Descriptron training and prediction scripts import.
+numpy>=1.23
+opencv-python-headless>=4.7
+pillow>=9
+matplotlib>=3.6
+pycocotools>=2.0.6
+scipy>=1.9
+shapely>=2.0                # the predictor uses it for polygon area
+tqdm>=4.65

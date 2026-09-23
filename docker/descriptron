@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# =============================================================================
+# descriptron — the container's single entry point
+# =============================================================================
+# Every subcommand runs in the environment that tool actually needs, so a user
+# never has to know that there are four of them.
+# =============================================================================
+set -euo pipefail
+
+HOME_DIR="${DESCRIPTRON_HOME:-/opt/descriptron}"
+GUI="$HOME_DIR/gui"
+CONDA_RUN="conda run --no-capture-output -n"
+
+have_env() { [ -d "/opt/conda/envs/$1" ]; }
+
+need_env() {
+  if ! have_env "$1"; then
+    echo "This image was built without the '$1' environment." >&2
+    case "$1" in
+      detectron2_env) echo "Rebuild with --build-arg INCLUDE_DETECTRON2=true" >&2 ;;
+      metric3d)       echo "Rebuild with --build-arg INCLUDE_METRIC3D=true" >&2 ;;
+    esac
+    exit 2
+  fi
+}
+
+usage() {
+cat <<'USAGE'
+descriptron <command> [args...]
+
+  gui                 the annotation GUI (needs an X display, see README)
+  train-masks         fine-tune torchvision Mask R-CNN        [samm]
+  train-keypoints     fine-tune torchvision Keypoint R-CNN    [samm]
+  predict             predict with a torchvision checkpoint   [samm]
+  train-d2            fine-tune Detectron2 Mask R-CNN         [detectron2_env]
+  predict-d2          predict with a Detectron2 checkpoint    [detectron2_env]
+  sam2-pal            SAM2-PAL mask propagation               [samm]
+  dinoland            DINOv3 landmark transfer                [samm]
+  measure             measurements from COCO                  [measure_env]
+  pipeline            the full BioRAG v2 pipeline             [measure_env]
+  depth               metric depth (only if built in)         [metric3d]
+  shell [env]         an interactive shell (default: measure_env)
+  envs                list the environments in this image
+  help                this message
+
+Everything after the command is passed straight through, so the flags are the
+same as a native install:
+
+  docker run --rm --gpus all -v "$PWD:/data" descriptron:latest \
+      train-masks --coco-json /data/annotations.json --img-dir /data/images \
+                  --output-dir /data/out --total-iters 35000
+USAGE
+}
+
+cmd="${1:-help}"; shift || true
+case "$cmd" in
+  help|-h|--help) usage ;;
+  envs)  ls -1 /opt/conda/envs ;;
+  gui)
+    need_env samm
+    if [ -z "${DISPLAY:-}" ]; then
+      echo "No DISPLAY set — the GUI needs an X server forwarded into the container." >&2
+      echo "See docker/README.md; on Linux this is usually:" >&2
+      echo "  xhost +local:docker && docker run --rm --gpus all \\" >&2
+      echo "    -e DISPLAY=\$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \\" >&2
+      echo "    -v \"\$PWD:/data\" descriptron:latest gui" >&2
+      exit 3
+    fi
+    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v73.py" "$@" ;;
+  train-masks)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/torchvision_det/tv_train_v1.py" --task masks "$@" ;;
+  train-keypoints)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/torchvision_det/tv_train_v1.py" --task keypoints "$@" ;;
+  predict)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/torchvision_det/tv_predict_v1.py" "$@" ;;
+  train-d2)
+    need_env detectron2_env
+    exec $CONDA_RUN detectron2_env python \
+      "$GUI/detectron2/detectron2_training_and_filterV10_and_kpts-17.py" "$@" ;;
+  predict-d2)
+    need_env detectron2_env
+    exec $CONDA_RUN detectron2_env python \
+      "$GUI/detectron2/detectron2_predict_and_filterV10_and_kptsV2.py" "$@" ;;
+  sam2-pal)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/sam2_pal_batch_v21.py" "$@" ;;
+  dinoland)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/dinov3_landmark_transfer_v51.py" "$@" ;;
+  measure)
+    need_env measure_env
+    exec $CONDA_RUN measure_env python \
+      "$GUI/measure/measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py" "$@" ;;
+  pipeline)
+    need_env measure_env
+    exec $CONDA_RUN measure_env python "$GUI/measure/run_full_pipeline_v2.py" "$@" ;;
+  depth)
+    need_env metric3d
+    exec $CONDA_RUN metric3d python "$GUI/metric3d/measure_metric3d_v16.py" "$@" ;;
+  shell)
+    env_name="${1:-measure_env}"; shift || true
+    need_env "$env_name"
+    exec $CONDA_RUN "$env_name" bash "$@" ;;
+  *)
+    echo "Unknown command: $cmd" >&2; echo >&2; usage >&2; exit 1 ;;
+esac

@@ -1,0 +1,37 @@
+Head and antennae
+Head pale yellow, yellow, ochreous, brown, dark brown, or black?
+Antennae pale yellow, yellow, ochreous, brown, dark brown, or black?
+Antennal segments 9 and 10 entirely dark brown or black?
+Any antennal segments (e.g., 4, 6, or 8) brown or dark brown apically?
+Head with or without genal processes? If present, are genal processes short (< 0.5 x vertex length) or long (> 0.5 x vertex length); conical, rounded, or rectangular; subacute, pointed or blunt apically?
+What is the ratio of vertex length to vertex width?
+Are the antennae short (< 1.0 x head width) or long (> 1.0 x head width)?
+What are the relative lengths of segment 10, long terminal seta, and short terminal seta?
+
+Rostrum
+What is the ratio of the lengths of labium segment 1 to labial segment 2?
+What is the combined length of labium segments (1 and 2) relative to the head width?
+
+Legs
+What is the coloration of the metafemur? (pale yellow / yellow / ochreous / brown / dark brown / black)
+What is the coloration of the metatibia? (pale yellow / yellow / ochreous / brown / dark brown / black)
+What is the coloration of the metatarsus? (pale yellow / yellow / ochreous / brown / dark brown / black)
+What is the ratio of the length of the metatibia to the length of the metafemur?
+What is the ratio of the length of the metatibia to the head width?
+
+Forewings
+What is the ratio of forewing length to head width?
+What is the ratio of forewing length to forewing width?
+
+Male terminalia
+Proctiger. What is the ratio of the proctiger length to head width? Is the proctiger narrow or broad? Is the proctiger broadest in the basal third, middle, or apical third? Is the posterior margin of the proctiger relatively straight, or weakly or strongly expanded? What is the ratio of the length of the proctiger to the length of the paramere? What is the ratio of the length of the proctiger to the combined length of the median and distal segments of the aedeagus?
+Subgenital plate. Subgenital plate subglobular, globular, triangular, or elongate? Is the dorsal margin of the subgenital plate sinuous, or nearly straight? Is the ventral margin of the subgenital plate evenly or unevenly rounded; convex, angular or not produced?
+Paramere. Paramere narrowly lamellar, broadly lamellar, rounded, finger-shaped, or blade-shaped? Is the paramere broadest in the basal third, in the middle, or in the apical third? Is the paramere narrowly or broadly rounded apically; is the apex relatively straight, or directed anteriad or posteriad? Is the anterior margin of the paramere nearly straight, or weakly or strongly expanded? Is the posterior margin of the paramere nearly straight, or weakly or strongly expanded?
+Aedeagus. Is the medial segment of the aedeagus weakly or strongly expanded basally? Is the distal segment of the aedeagus narrowly or broadly oval? What is the ratio of the length of the distal segment of the aedeagus to the length of the medial segment of the aedeagus? Is the sclerotised end tube of the ductus ejaculatorius short or long; nearly straight, weakly sinuous, or strongly sinuous?
+
+Female terminalia
+Proctiger. What is the ratio of the proctiger length to head width? Is the dorsal margin of the proctiger distal to the circumanal ring almost straight or sinuate? Is the apex of the proctiger narrowly or broadly narrowed; subacute or blunt? Is the apex of the proctiger relatively straight, or weakly or strongly upturned? What is the ratio of the length of the circumanal ring to the entire length of the dorsal margin of the proctiger?
+Subgenital plate. What is the ratio of the length of the subgenital plate to the length of the proctiger? Is the ventral margin of the subgenital plate with or without a conspicuous angle? If present, is the angle located in the basal third, in the middle, or in the apical third of the ventral margin? Is the apex of the subgenital plate narrowly or broadly narrowed; pointed or blunt?
+
+Taxonomic proportions
+TAXONOMIC PROPORTIONS -- ALWAYS INCLUDE IN DESCRIPTION (not Diagnosis or Key): The following standard taxonomic ratios MUST be reported in the DESCRIPTION section of every species description, regardless of statistical significance. These are standard measurements that taxonomists measure with a micrometer. Report each as mean (range) with sample size. Use the ratio_* columns from the compiled data. Abbreviation system (note: our LAB1 = collaborator LAB2 median labium, our LAB2 = collaborator LAB3 distal labium): Head ratios: VL/VW (ratio_VL/VW), AL/HW (ratio_AL/HW). Rostrum ratios: LAB2/LAB3 (ratio_LAB2/LAB3), (LAB2+LAB3)/HW (ratio_(LAB2+LAB3)/HW). Leg ratios: MF/MT (ratio_MF/MT), MT/HW (ratio_MT/HW). Forewing ratios: FL/HW (ratio_FL/HW), FL/FW (ratio_FL/FW). Male terminalia ratios (males only): MP/HW (ratio_MP/HW), MP/PL (ratio_MP/PL), MP/DL (ratio_MP/DL). Female terminalia ratios (females only): FP/HW (ratio_FP/HW), CRL/FP (ratio_CRL/FP), SP/FP (ratio_SP/FP). Report these in the appropriate body-part section of the Description. If a ratio value is missing, note the gap -- do NOT fabricate values.

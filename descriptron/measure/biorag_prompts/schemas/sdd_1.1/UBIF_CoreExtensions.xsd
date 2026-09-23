@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:u="http://rs.tdwg.org/UBIF/2006/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:html="http://www.w3.org/1999/xhtml" targetNamespace="http://rs.tdwg.org/UBIF/2006/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="Unified Biosciences Information Framework (UBIF) 1.1 rev. 4">
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Unified Biosciences Information Framework (UBIF) XML schema. This schema provides core level extensions for first class object types.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Copyright © 2006 TDWG (Taxonomic Databases Working Group, www.tdwg.org). See the file UBIF_(c).xsd for authorship and licensing information.</xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="UBIF_CoreOntology.xsd"/>
+  <xs:include schemaLocation="UBIF_LinneanCore.xsd"/>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Fundamental UBIF object types not imported from the schemata of other working groups:</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="TechnicalMetadata">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Describes the providers and application/ script(s) that produced the current data set. The information provided here is intended to
+a) Help with UDDI registration
+b) facilitate debugging
+@@ NOT CURRENTLY DONE: c) evaluate the quality and scope of archived data, especially whether the data contained in the document are complete or an excerpt from a larger data set.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Generator" type="DocumentGenerator">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Which tool did it? Metadata about the software (application, script, etc.) that provided or transformed the data.
+Purpose: provide the ability to react to known deficits of generators, esp. where syntactically correct but semantically faulty data (misapplication of data elements, etc.) are generated.
+</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TechnicalContact" type="AgentString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Who did it?
+A technical contact is one to whom questions about accessibility of a provider or resource should be directed.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="AdministrativeContact" type="AgentString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Who did it?
+Administrative contacts are those to whom questions about data, IPR or restrictions on should be directed. The contact listed here are not necessarily those responsible for the content, especially if the dataset is provided by a different person/organization than those who have created it. For content contacts compare Dataset/RevisionData/ Creators. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="Extensions" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="created" type="xs:dateTime" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">When was the current document or data stream created by the provider? Contains date and time, either as local time with timezone information or UTC (Universal time coordinates, recommended).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expires" type="xs:dateTime" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">After this date cached dataset data must be refreshed or considered archival-only. No guarantee is given that data do not change prior to this date: if the most current data are desired, a test for updates may be necessary.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="DocumentGenerator">
+    <xs:attribute name="name" type="ShortString" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Name of the software application or package that generated this document. This may also be the name of a script that is not part of a larger application. In the case of large applications, the attribute 'routine' may provide additional detail. (~=atom:generator/text())</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="version" type="ShortString" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Version of the application that has generated this document (~=atom:generator/@version). This is not content version; compare RevisionData/Version.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="uri" type="xs:anyURI" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Optional globally unique name for a generator software (~=atom:generator/@uri).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="routine" type="ShortString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Optional string allowing a generating application to identify either one of multiple transforming routines (database code, xslt, etc.), or conditions under which a single routine may behave differently.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="notes" type="LongString" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Additional information about the generating application that is not part of the name or version. A copyright of the generating application may be is specified here, but this does not affect the content copyright of the data.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Taxon names (includes taxon in the biological as well as a more general sense):</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">(... these are defined in a separate LinneanCore file)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Taxon class hierarchy (biology: taxon concepts):</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="TaxonHierarchyCore">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">TaxonHierarchy plus core level extensions.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TaxonHierarchy">
+        <xs:group ref="TaxonHierarchyCoreExtensions"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:group name="TaxonHierarchyCoreExtensions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Extensions of 
+AbstractObject
+specific to 
+TaxonHierarchy</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Scope" type="TaxonomicScopeSet" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Scope of the taxon hierarchy, currently only citation 
+and taxonomic scope 
+(i.e. intended scope, 
+not actual scope)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TaxonHierarchyType" type="TaxonHierarchyTypeEnum">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The taxon hierarchy supports taxonomic (order/family/genus etc.) and non-taxonomic (weed species, diseases, herb/shrub/tree) hierarchies. For many analytical purposes it is relevant whether a hierarchy is based on phylogenetic (= evolutionary) relatedness or whether it is an operational categorization.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Nodes" type="TaxonHierarchy_NodeSeq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The tree structure of the taxon hierarchy is presented as an ordered list of nodes together with edges pointing to parent nodes. Inner nodes may have taxon name references or may be anonymous (esp. for phylogenetic analyses).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="SpecificExtension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="TaxonHierarchy_NodeSeq">
+    <xs:complexContent>
+      <xs:extension base="Seq">
+        <xs:sequence>
+          <xs:element name="Node" type="TaxonHierarchyNode" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">An ordered list of nodes. The order defines the sequence of taxa at the same level. Both width- and breadth-first must be supported. The node/parent graph structure is limited to trees by means of identity constraints (unique/keyref).</xs:documentation>
+            </xs:annotation>
+            <xs:unique name="TaxonHierarchyNode_NoSelfReference">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Ensures that Parent does not point to the id attribute of its own node. Note that cycles with a length of 2 still require external validation!</xs:documentation>
+              </xs:annotation>
+              <xs:selector xpath=". | u:Parent"/>
+              <xs:field xpath="@id | @ref"/>
+            </xs:unique>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TaxonHierarchyNode">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">A node in a class hierarchy tree (biology: taxonomical hierarchy)
+
+NOTE: part of the constraints on the tree are not yet validated:
+Inner nodes may be anonymous, but terminal nodes must point to a taxon name.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Parent" type="TaxonHierarchyNodeRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ref. to an inner node of the current tree. Omitting this is interpreted as a reference to the root of the tree.</xs:documentation>
+          <xs:documentation xml:lang="x-internal">Because every edge defines a new node, only few deviations from a true tree are possible. However, isolated cycles (node 1 with parent 2, node 2 with parent 1, not connected to root) can occur and require external validation to be prevented. 
+Further indirect connection through multiple nodes referring to the same taxon name are possible. This may be prevented by appropriate xs:unique identity constraints, requiring in each taxon hierarchy, each name to occur only once.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TaxonName" type="TaxonNameRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Reference to a taxon name. Inner nodes may be anonymous or identified as a higher taxon; terminal nodes should always point to a taxon name (requires external validation).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Synonyms" type="TaxonNameRefSeq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">(The expression of synonyms may be essential for reports and to convey the concept of a taxon to information consumers.)</xs:documentation>
+        </xs:annotation>
+        <xs:unique name="TaxonHierarchyNode_UniqueSynTaxonNames">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">References to synonyms must be unique (i.e. the same name may not appear twice).</xs:documentation>
+          </xs:annotation>
+          <xs:selector xpath="u:TaxonName"/>
+          <xs:field xpath="@ref"/>
+        </xs:unique>
+      </xs:element>
+      <xs:group ref="Extensions" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="LocalInstanceID"/>
+  </xs:complexType>
+  <xs:complexType name="TaxonHierarchyNodeRef">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Refers to a node in a taxon hierarchy</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractLocalRef"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Specimens ('Unit' in ABCD, 'Object' in earlier versions of UBIF/SDD):</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="SpecimenCore">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Specimen plus core level extensions.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Specimen">
+        <xs:group ref="SpecimenCoreExtensions"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:group name="SpecimenCoreExtensions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Extensions of 
+AbstractObject
+specific to 
+Specimen</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">@@ These are just the preliminary elements identified by SDD to be necessary as local extensions. 
+A decision needs to be made, 
+compare the DWC-based extensions presented in CoreExtensions_Unused! @@</xs:documentation>
+      </xs:annotation>
+      <xs:element name="TaxonName" type="TaxonNameRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Identification of specimen. The information may come from the service provider. If the service provider only provides a name, this must be compared with and if necessary added to the list of TaxonNames so that a TaxonName reference may be used here.
+This may point to a higher taxon (family, order, or even "plantae") to indicate incomplete, broad identifications.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="IdentificationCertainty" type="IdentificationCertaintyEnum" default="IdentificationCertaintyUnknown" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Default is 'certain'; 'Abies cf. alba' would be recorded as 'uncertain'.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="IsPreservedInCollection" type="xs:boolean" default="true" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">False = object has not been collected and preserved (it may still be databased in an observation database and have an ExternalID!). The default for this element is true, i. e. if the element is missing the object has been collected/preserved.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Media (especially images, audio/video, but potentially also complex objects like html with images, pdf, etc.):</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="MediaObjectCore">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">MediaObject plus core level extensions.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="MediaObject">
+        <xs:group ref="MediaObjectCoreExtensions"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:group name="MediaObjectCoreExtensions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Extensions of 
+AbstractObject 
+specific to 
+MediaObject.
+Note: the 'Caption' element is 
+already covered in 
+Representation/Detail 
+role='caption' in the 
+abstract object base type!</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Type" type="ResourceTypeEnum">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Type of media object, based on DCMI Type vocabulary 
+(~= DC.Type, 1.1)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:choice>
+        <xs:element name="Source" type="URIRef">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">External source
+referenced through
+a href. Here media 
+type is optional,
+because resolution
+usually will deliver it.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:sequence>
+          <xs:element name="EncodedData" type="EncodedContent">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Optionally the full media object data may be embedded (as an alternative or in addition to defining a URI). Note: A resource like an image should be directly encoded, i.e. not wrapped into a MIME object first.
+
+The data source may optionally be stored in the href attribute (in addition to EncodedData).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== For all objects in the core ontology, collections of type set are defined. These form the root-level collections in the Dataset object.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="TaxonNameSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="TaxonName" type="TaxonNameCore" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Biology: Object in a nomenclator</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TaxonHierarchySet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="TaxonHierarchy" type="TaxonHierarchyCore" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Biology: Taxonomic hierarchy, or arbitrary set of taxa.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpecimenSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Specimen" type="SpecimenCore" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Objects being observed or in a collection.
+Specimens may be identified or
+assigned to a taxon name as types.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AgentSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Agent" type="Agent" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PublicationSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Publication" type="Publication" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Printed or digital publication
+(including database source)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GeographicAreaSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="GeographicArea" type="GeographicArea" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MediaObjectSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="MediaObject" type="MediaObjectCore" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AudienceSet">
+    <xs:complexContent>
+      <xs:extension base="Set">
+        <xs:sequence>
+          <xs:element name="Audience" type="AudienceCore" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

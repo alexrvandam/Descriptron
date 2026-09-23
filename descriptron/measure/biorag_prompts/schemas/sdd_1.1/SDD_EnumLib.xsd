@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:html="http://www.w3.org/1999/xhtml" targetNamespace="http://rs.tdwg.org/UBIF/2006/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="Unified Biosciences Information Framework (UBIF) 1.1 rev. 4">
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">This file will be included into the UBIF/SDD integration schema 'SDD.xsd' (SDD uses the same namespace as UBIF).</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Copyright © 2006 TDWG (Taxonomic Databases Working Group, www.tdwg.org). See the file SDD_(c).xsd for authorship and licensing information.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Enumerations to support interoperability:</xs:documentation>
+    <xs:documentation xml:lang="en-us">Internal formatting note: Annotations of individual enumerated values should be written as "short label" + " -- " + "detailed information" or "[abbreviation]" + " -- " + "short label" + " -- " + "detailed information". An xslt script transforms such schema annotations into a data document that can directly be used in user interfaces.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Please read: An important feature of this schema file is that these enumerations may be turned into data, many of them including extra specification data. Please see UBIF-EnumerationTools for further information. Using the data files in application development rather than hardcoding enumerations in code enables simple adaption to future versions of UBIF.</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="NatLangPhraseRoleEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Enumerated value expressing the kind of phrase or "wording fragment" used to create natural language reports (especially object descriptions). These are currently highly constrained, but either additional values or free extensibility (by union of this type with xs:anyURI) are expected for future releases of UBIF.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="Before">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">[before] -- Phrase before contained elements; or single phrase -- Free-form text that is being output in natural language reports before the natural language phrases for the children (if any). Descriptive terms with children are, e. g., modifiers, statistical measures, or characters/concepts; terms without children are, e. g., characters states and status values.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="After">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">[after] -- Phrase after contained elements -- Free-form text output in natural language reports for objects with children (= contained objects) after the wording for the children. In the case of a character in an object description this is the wording after all states, or numerical values (including the measurement unit if present).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Delim">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">[delim.] -- Default delimiter phrase between child obj. -- Free-form text output in natural language reports between multiple child objects. Examples: ', ' (i. e. comma). Special delimiters may be defined for the delimiter in front of the last element and the case of exactly two child objects. Example: ', '.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LastDelim">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">[delim.] -- Delimiter phrase between two last child obj. -- Free-form text output in natural language reports before the last child object (i.e. between the second-but-last and the last). Examples: en-US: ', or ', de: ' oder ' (note comma and leading/trailing blanks!). If missing, the default delimiter is used. If defined, the special 2-obj.-delimiter is preferred over this for the case of only two child objects.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Exactly2">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">[bw. 2] -- Delimiter phrase between exactly 2 child obj. -- Free-form text output in natural language reports between children when there are exactly two children. If missing, the default 'delim' wording definitions will be used. Example: ' or ' in US-English.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CharacterTreeRoleEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines the intended roles that a designer may assign to a character tree (list of enumerated values to support application interoperability). Note: no values for designing the terminology are given; in the use cases all character trees are available.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="DescriptionEditing">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For description editing -- Setting this value in a character tree is a recommendation to applications with a user interface to offer this tree for editing the description data set (the application may, however, enable the user to select any character tree).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="InteractiveIdentification">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For interactive identification -- Setting this value in a character tree is a recommendation to applications with a user interface to offer this tree for interactive identification.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TerminologyReporting">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For terminology reporting -- Setting this value in a character tree is a recommendation to applications to use this for creating a report of the character terminology. (Note that no TerminologyEditing value is defined; all character trees should be available when designing the terminology. However, the tree marked as TerminologyReporting may be used as the initial editing view.)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NaturalLanguageReporting">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For natural language reporting -- Setting this value in a character tree is a recommendation to applications to offer this tree for natural language reporting.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Filtering">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For filtering -- Setting this value in a character tree is a recommendation to applications to offer this tree for filtering purposes. Some trees are explicitly (separately) typed as being intended exclusively for filtering/subset definition; but many trees are useful for filtering purposes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Management">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For management purposes -- Setting this value in a character tree is a recommendation to applications to offer this tree not to normal identification or editing users, but only to users involved in managing data collection or terminology. An example of such trees are trees created to support concept nodes for modifier definition, dependency rules, or global states.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RatingContextEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines the topic of a concept/character rating.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="ObservationConvenience">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Convenience -- How conveniently can be character be observed? This may includes a measure of cost of equipment and expendables (such as chemical reagents). Convenience should be rated relative to other methods required for identifications within a taxonomic group, i. e. if microscopic methods are always necessary in taxon group, microscopic characters may be considered convenient within this group. Also, a character may be convenient is one group, but inconvenient in another.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Availability">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Availability -- How available is the character or concept for identification? For example, ratings would be low if a character is available only during a short time in the life of an object, or only expressed with low frequency in populations.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Repeatability">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Repeatability -- How reliable and consistent are repeated measurements or scorings of the character by different observers and on different objects? This may include both variability of values (frequency of polymorphisms) and variability in how the observations are interpreted. It depends both on precision (quality of being reproducible) and accuracy (nearness to the true value).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CostEffectiveness">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Cost-Effectiveness -- How reliable and consistent are repeated scorings of the character by different observers and on different objects? This may include both variability of values (frequency of polymorphisms) and variability in how the observations are interpreted. It depends both on precision (quality of being reproducible) and accuracy (nearness to the true value).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PhylogeneticWeighting">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Phylogenetic weighting -- A weighting factor rating the relative weight of a character for the purpose of phylogenetic analysis.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RequiredExpertise">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Required expertise -- The user is expected to have this expertise level at least.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataOriginEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines the origin of data that may have been entered, calculated, aggregated or inherited</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="OriginalData">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Original data, directly entered by a machine or human agent -- These are the original data all other cached data (Origin other than 'OriginalData') are based upon.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Calculated">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Calculated data, based on other data using a calculation rule -- Examples: a ratio calculated from other characters, a mean calculated from a sample that is available under SampleData/Sample (if a mean is calculated from data no longer available, it would be recorded as 'OriginalData').</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Mapped">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Mapped data, based on other data using a mapping definition -- Mapping examples are numeric to categorical, or from fine-grained categorical to coarse-grained categorical.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Aggregated">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Aggregated data, derived from data further down in the hierarchy -- This applies both to aggregating data from specimens or other individual to classes (taxa), as well as aggregating from lower classes/taxa to higher classes/taxa. (= e.g. 'Compile from below' in BioLink). In the case of descriptive summary data the relevant hierarchy is the taxon hierarchy.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Inherited">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Inherited data, derived from data further up in the hierarchy -- In the case of descriptive summary data the relevant hierarchy is the taxon hierarchy.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ModifierClassEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Defines a subset of possible modifier classes. Used only on those modifiers that need to be typed to achieve application interoperability (especially when modifier specifications add a value-based interpretation for a modifier, like frequency or certainty values). More values may be added to this enumeration in the future.</xs:documentation>
+      <xs:documentation xml:lang="en-us">Technical note: The "Proportion values" mentioned in several annotation descriptions refer to Modifier/Specification/ProportionValueRange.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="Frequency">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Frequency modifer --  Proportion values specify a frequency range.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Certainty">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Certainty modifer -- Proportion values specify a certainty range.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Seasonal">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Seasonal modifer -- Proportion values specify a season of the year. The proportion value 0 is interpreted as day 1, the proportion value 1 as day 365 of the year.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Diurnal">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Diurnal modifer -- This refers to parts of the day (24 h clock, i.e. including events that might strictly be called 'nocturnal'). Proportion values specify a time of the day. The proportion values 0 and 1 are both to be interpreted as midnight. Example: A modifier "in the morning" may be specified as '0.25-0.375'.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TreatAsMisinterpretation">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Treat as misinterpretation -- The current modifier becomes one of a special class of misinterpretation modifiers. States to which such modifiers are added are known to be intentionally wrongly scored to accomodate known misunderstandings of the character under study. Example: dogwood bracts looking like petals, and petal scored as 'white (by misinterpretation)'. - With regard to (not misinterpreted) data, both frequency and certainty may be interpreted as 0 to 0, i. e. not occurring, certainly false.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OtherModifierClass">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Other modifier -- All other modifers for which specifications are not yet defined. Examples are developmental, absolute and relative spatial modifiers, or modifiers of degree.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UnivarStatMeasureClassEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">When mapping numerical ranges to categorical states (as in a histogram), several methods which statistical measures are used for the mapping are possible. Using the central value compares a point with the mapping range, whereas using ranges or extremes results in a comparison of two kind of ranges for overlap. Only the central value method can guarantee an unambiguous partitioning into categories. However, the ranges or extremes methods may be desirable because of their improved error tolerance.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="CentralMeasure">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Central measure -- The first central measure encountered (mean, median, mode) is used as the basis of comparison. If none is found, but ranges or extremes are present, a central value is calculated based on the these.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Ranges">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ranges -- Any ranges that are not the extremes (quantile, percentile, confidence interval, mean plus/minus s.d., etc.) is attempted to use for comparison. If none is found, Extreme values are used.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Extremes">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Extremes -- The extreme range values (= minimum and maximum) are used as the basis of comparison.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StateCollectionModelEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Used in descriptive data (not in terminology): Collections of states in instance documents may be ordered (sequence) or unordered (set), and may be connected with 'and', 'or', 'with', or 'between'. Since set/sequence and operators are dependent on each other, the two aspects are combined into a 'model' enumeration</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="OrSet">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Unordered set of states, combined with 'or' -- Multiple states scored for a character in a description form a set. The order of states has no special meaning and may be changed. In natural language output the states should be combined with 'or' to express that in individual objects (that belong to the class that is being described), the states may occur together or alone.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OrSeq">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ordered sequence of states, combined with 'or' -- Multiple states scored for a character in a description form a sequence, i. e. the state order carries some semantics and should be preserved in output. The sequence semantics is not explicitly defined, but intelligible to human consumers and presumably relates to some concept of relevance or importance. In natural language output the states should be combined with 'or' to express that in individual objects (that belong to the class that is being described), the states may occur together or alone.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AndSet">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Unordered set of states, of states, combined with 'and' -- Multiple states scored for a character in a description form a set. The order of states has no special meaning and may be changed. In natural language output the states should be combined with 'and' to express that in any individual object (that belong to the class that is being described), the states will always occur together. Example: two colors that occur together in a pattern.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AndSeq">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Ordered sequence of states, combined with 'and' -- Multiple states scored for a character in a description form a sequence, i. e. the state order carries some semantics and should be preserved in output. The sequence semantics is not explicitly defined, but intelligable to human consumers and presumably relates to some concept of relevance or importance. In natural language output the states should be combined with 'and' to express that in any individual object (that belong to the class that is being described), the states will always occur together. Example: a black part with small red markings, is more appropriately described as 'black and red' than 'red and black'.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="WithSeq">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Primary together with secondary states -- This is a special case of AndSeq, and in many circumstances (except natural language generation) may be treated as AndSeq. Example: "Green with brown" (often this may be two characters, e. g. base color and dot color). All states except for the first are considered secondary.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Between">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Intermediate value between states -- True value lying intermediate between (usually two) states. Example: "Between oval and elliptic" = "Oval to elliptic".</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MolecularSequenceTypeEnum">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Currently limited to 'Nucleotide' and 'Protein', but future SDD versions may expand this after appropriate discussion. A distinction between nucleotide type-subtypes RNA/DNA is currently not considered necessary; the symbols U (RNA) and T (DNA) should be considered equal for the purpose of analysis.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:QName">
+      <xs:enumeration value="Nucleotide">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Nucleotide sequence -- This includes both DNA and RNA sequences.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Protein">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Protein  sequence</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

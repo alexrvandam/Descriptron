@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "descriptron-gui"
+version = "2.0.0"
+description = "The Descriptron annotation GUI: SAM2-assisted segmentation, keypoints and COCO export"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex R. Van Dam" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: X11 Applications",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+# tkinter is part of the standard library and so is not listed here, but it is
+# not always packaged with Python on Linux: `apt install python3-tk` if the GUI
+# fails to start. The GUI drives the analysis scripts directly, so it needs core
+# as well as vision — it is not a thin front end.
+dependencies = [
+  "descriptron-core==2.0.0",
+  "descriptron-vision==2.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "build>=1", "twine>=5"]
+
+[project.scripts]
+descriptron-gui = "descriptron_gui.cli:main"
+
+[project.gui-scripts]
+# on Windows this launches without a console window behind it
+descriptron-gui-app = "descriptron_gui.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/alexrvandam/Descriptron"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/descriptron_gui"]

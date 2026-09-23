@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:u="http://rs.tdwg.org/UBIF/2006/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:html="http://www.w3.org/1999/xhtml" targetNamespace="http://rs.tdwg.org/UBIF/2006/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="Unified Biosciences Information Framework (UBIF) 1.1 and SDD 1.1 rev. 5 (minor change in SDD_TypeLib.xsd)">
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">This is the schema file to be referenced in instance documents for validation. It is the top level schema file that integrates the schema components.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">This version integrates UBIF and SDD. To add further object types, this file has to be changed.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Copyright © 2006 TDWG (Taxonomic Databases Working Group, www.tdwg.org). See the file SDD_(c).xsd for authorship and licensing information.</xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="SDD_TypeLib.xsd"/>
+  <xs:element name="Datasets">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Root element for files or data streams. Multiple Dataset objects are completely independent. Potential relationship may be detected by the consumer, but are not expressed in the UBIF format. The sequence of Dataset objects has no semantics and does not have to be preserved.
+
+The version of the UBIF standard used is defined in the namespace declaration and needs no separate data element.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="TechnicalMetadata" type="TechnicalMetadata">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Metadata describing provider and process that created the current xml document. The provider is not necessarily the creator or owner of the dataset, compare Owner, IPR of dataset itself.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Dataset" type="Dataset" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Data from one or several object types, with common technical and content metadata.</xs:documentation>
+          </xs:annotation>
+          <xs:unique name="AnyObjectURI">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The attribute uri is optional in any first class object and denotes the preferred globally unique identifier. Not two objects may have the same uri. However, although strictly the constraint is global, to simplify dataset integration (where 2 datasets may, e.g., contain the same mediaobject), the uniqueness constraint is enforced only within a dataset, not within the set of datasets.</xs:documentation>
+            </xs:annotation>
+            <xs:selector xpath=".//u:*"/>
+            <xs:field xpath="@uri"/>
+          </xs:unique>
+        </xs:element>
+        <xs:group ref="SpecificExtension" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+    <!-- NOTE: Following the decision to make the xml:lang attribute optional on Label/Detail etc. elements, and make it inheritable from a "default" xml:lang on the dataset, many uniqueness constraints on unique label and unique role elements can no longer be expressed in w3c schema. We had to balance the convenience of not requiring to state language each time against validation issues. We believe the following rules should be externally validated. Where the audience is part of a rule, and where it is missing, the audience may be treated as an empty string, i.e. a rule should be evaluated, not skipped.
+<xs:unique name="TaxonNames_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:TaxonNames/u:TaxonName/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="TaxonHierarchy_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:TaxonHierarchies/u:TaxonHierarchy/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Specimen_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:Specimens/u:Specimen/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="DescriptiveConcept_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">All representations within a Label must have different language values.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:DescriptiveConcepts/u:DescriptiveConcept/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="ConceptState_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">@FIXME@ The labels of concept state definitions are required and must - for each concept - be unique for a given language. They do not have to be unique across concepts. Example: two states 'rough' in a single concept are undesirable, but state labels 'rough' for one concept observed with fingers and another concept using an electron microscope would be ok.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:DescriptiveConcepts/u:DescriptiveConcept/u:ConceptStates/u:StateDefinition/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="StatisticalMeasureElaboration_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of Statistical measure elaborations are required and must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Node/u:InheritableDefinitions/u:RecommendedMeasures/u:StatisticalMeasure/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Modifier_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of modifier definitions are required and must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:DescriptiveConcepts/u:DescriptiveConcept/u:Modifiers/u:Modifier/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Character_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of Character definitions are required and must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:Characters/u:*/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="CharacterState_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">@@@ The labels of character state definitions are required and must - for each character - be unique for a given language. They do not have to be unique across concepts. Example: two states 'rough' in a single character are undesirable, but state labels 'rough' for one character observed with fingers and another char. using an electron microscope would be ok.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:Characters/u:Character/u:States/u:StateDefinition/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="CharacterTree_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of CharacterTree definitions are required and must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Sample_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The audience values must uniquely identify the representations within each Note element (no duplicate language/audience-combination allowed).</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SampleData/u:Sample/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="StoredKey_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of stored key definitions (i. e. for the entire key) are required and must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:StoredKeys/u:StoredKey/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Agents_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:Agents/u:Agent/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="MediaObjects_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:MediaObjects/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Audience_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of audience definitions are required and must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:Audiences/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="GeographicArea_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:GeographicAreas/u:*/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="Publications_UniqueLabelText">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">The labels of objects must be unique for a given language.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath="u:Dataset/u:Publications/u:Publication/u:Representation"/>
+<xs:field xpath="u:Label"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="UniqueLabelRepresentation">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">For each language/audience, the label representation of must be unique, i.e. no role should appear twice in the same language/audience.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath=".//u:Representation"/>
+<xs:field xpath="u:Label/@role"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+<xs:unique name="UniqueDetailRepresentation">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">For each language/audience, the detail representation of must be unique, i.e. no role should appear twice in the same language/audience. NOTE: This rule may be joined with UniqueLabelRepresentation, because the values or role in Label and in Detail do not overlap.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath=".//u:Representation"/>
+<xs:field xpath="u:Detail/@role"/>
+<xs:field xpath="u:Detail/@xml:lang"/>
+<xs:field xpath="u:Detail/@xml:audience"/>
+</xs:unique>
+<xs:unique name="IPR_UniqueRepresentation">
+<xs:annotation>
+<xs:documentation xml:lang="en-us">For each language/audience, the label representation of must be unique, i.e. no statement role should appear twice in the same language/audience.</xs:documentation>
+</xs:annotation>
+<xs:selector xpath=".//u:IPRStatements/u:IPRStatement"/>
+<xs:field xpath="u:Label/@role"/>
+<xs:field xpath="u:Label/@xml:lang"/>
+<xs:field xpath="u:Label/@xml:audience"/>
+</xs:unique>
+		<xs:unique name="AbstractObject_UniqueLabelRoleLangAudience2">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-us">With any object representation, all Labels must have different role/language/audience values. Uniqueness is required only within each object representation, not in the entire dataset or file.
+
+@NOTE FOR JACOB: Currently this does not work. It should prevent minimized code like: 
+<Representation>
+										<Label xml:lang="en">X</Label>
+										<Label xml:lang="en">2nd</Label>
+									</Representation>
+which because of default values is:
+<Representation>
+										<Label role="full" xml:lang="en" audience="?">X</Label>
+										<Label role="full" xml:lang="en" audience="?">2nd</Label>
+									</Representation>
+Older versions of Spy did have a problem with default values, and did not evaluate this constraint if attributes were missing. The newest version, however, does not even evaluate a testing constraint with only language in it, and I suspect something else is wrong. </xs:documentation>
+							</xs:annotation>
+							<xs:selector xpath="."/>
+							<xs:field xpath="u:Label/@role"/>
+							<xs:field xpath="u:Label/@xml:lang"/>
+							<xs:field xpath="u:Label/@audience"/>
+						</xs:unique>
+-->
+    <xs:unique name="AnyObjectKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Global Uniqueness constraint. This is under discussion and will be settled before betas end. Applications should not rely on its presence or absence until it is settled. Removing it requires no changes in the schema, and existing instance documents will remain valid under such a new version. However, software consuming instance documents that relies on uniquenes may be in trouble if id values in fact are no longer unique within the document, but only within an object class (like specimen, character). - Note: A related constraint, AnyObjectURI, is defined on individual dataset objects.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath=".//u:*"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="DatasetKey">
+      <xs:selector xpath="u:Dataset"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="TechnicalOrAdministrativeContact_Keyref" refer="AgentKey">
+      <xs:selector xpath="u:TechnicalMetadata/u:TechnicalContact | u:TechnicalMetadata/u:AdministrativeContact"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="TaxonNameKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of TaxonName-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:TaxonNames/u:TaxonName"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="TaxonName_Keyref" refer="TaxonNameKey">
+      <xs:selector xpath=".//u:TaxonName"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="TaxonHierarchyKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of TaxonHierarchy-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:TaxonHierarchies/u:TaxonHierarchy"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="TaxonHierarchyNode_Key">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Currently we do not distinguish between inner and terminal nodes in this tree.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:TaxonHierarchies/u:TaxonHierarchy/u:Nodes/u:Node"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="TaxonHierarchyNode_Keyref" refer="TaxonHierarchyNode_Key">
+      <xs:selector xpath="u:Dataset/u:TaxonHierarchies/u:TaxonHierarchy/u:Nodes/u:Node/u:Parent"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="SpecimenKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Specimen-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Specimens/u:Specimen"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="Specimen_Keyref" refer="SpecimenKey">
+      <xs:selector xpath=".//u:Specimen"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="DescriptiveConceptKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of DescriptiveConcept-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:DescriptiveConcepts/u:DescriptiveConcept"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="DescriptiveConcept_Keyref" refer="DescriptiveConceptKey">
+      <xs:selector xpath=".//u:DescriptiveConcept |.//u:ModifierConcept |.//u:Scope/u:Part |.//u:Scope/u:Stage |.//u:Scope/u:Sex |.//u:Scope/u:OtherConcept"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="ConceptStateKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">All concept state (also known as "global states) id values must be unique in an entire project (i. e. not only within a concept).</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:DescriptiveConcepts/u:DescriptiveConcept/u:ConceptStates/u:StateDefinition"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="ConceptState_Keyref" refer="ConceptStateKey">
+      <xs:selector xpath="u:Dataset/u:Characters/u:CategoricalCharacter/u:States/u:StateReference"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="ModifierKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Modifier-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:DescriptiveConcepts/u:DescriptiveConcept/u:Modifiers/u:Modifier"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="ModifierConcept_Keyref" refer="ModifierKey">
+      <xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Node/u:InheritableDefinitions/u:RecommendedModifiers/u:ModifierConcept"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="CharacterKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Character-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Characters/u:*"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="CharacterKey_Categorical">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Character-type-specific key, used in type-specific keyrefs.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Characters/u:CategoricalCharacter"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="CharacterKey_Quantitative">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Character-type-specific key, used in type-specific keyrefs.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Characters/u:QuantitativeCharacter"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="CharacterKey_Text">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Character-type-specific key, used in type-specific keyrefs.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Characters/u:TextCharacter"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="CharacterKey_Sequence">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Character-type-specific key, used in type-specific keyrefs.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Characters/u:SequenceCharacter"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="CharacterStateKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Contains all locally defined character states (= StateDefinition) plus those concept states actually referenced in a character (StateReference; here the ref attribute is automatically also used as a new within-character id). Note that state ids are required to be unique across all characters, not only within each character. In descriptions this constraint is currently redundant, because states are referenced within character references. However, this constraint simplifies application design, and occasionally (e. g., in dependency definitions) states are referenced without a character reference.
+
+Note: the "*" at the end of the selector xpath refers to either StateReference (with @ref) or StateDefinition (with @id).</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath=".//u:StateDefinition"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <!-- The following is redundant after the decision to require all object ids to be unique within a document:
+    <xs:unique name="CharacterStateKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Ensures that local as well as concept state keys are unique throughout the instance document. This is currently not used, but introduced to simplify possible future schema changes (enabling direct use of concept states in descriptions).</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath=".//u:StateDefinition"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+-->
+    <xs:unique name="CharacterTree_Key">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">This identifies an entire character tree (i. e. not the nodes in the tree)</xs:documentation>
+        <xs:documentation xml:lang="en-us">===== START of CharacterTree-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <!--
+		<xs:keyref name="CharacterTree_Keyref" refer="CharacterTree_Key">
+			<xs:annotation>
+				<xs:documentation xml:lang="en-us">(Currently no references to entire character trees exist in SDD 1.0).</xs:documentation>
+			</xs:annotation>
+			<xs:selector xpath="u:Dataset/u:X/u:X"/>
+			<xs:field xpath="@ref"/>
+		</xs:keyref>
+-->
+    <xs:unique name="CharacterTreeNode_Key">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Inner nodes ("Nodes/Node") have id-attribute and are referable, character leaves ("Nodes/Char") lack id-attribute and are not referable. ID-values must be unique across character trees (possibly in multiple datasets!).</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Node"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="CharacterTreeNode_Keyref" refer="CharacterTreeNode_Key">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Inner nodes ("Nodes/Node") have id-attribute and are referable, character leaves ("Nodes/Char") lack id-attribute and are not referable.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Node/u:Parent|u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Char/u:Parent"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="CharacterTreeNodeConcept_Keyref" refer="DescriptiveConceptKey">
+      <xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Node/u:Concept"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="CharacterTreeCharacter_KeyRef" refer="CharacterKey">
+      <xs:selector xpath="u:Dataset/u:CharacterTrees/u:CharacterTree/u:Nodes/u:Char"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="DescriptionKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Description-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription|u:Dataset/u:NaturalLanguageDescriptions/u:NaturalLanguageDescription">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">A joint key for CodedDescription or NaturalLanguageDescription elements.</xs:documentation>
+        </xs:annotation>
+      </xs:selector>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="CategoricalCharacter_Keyref" refer="CharacterKey_Categorical">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">References to the various derived character types require definitions of the same character type. This is achieved by corresponding key/keyref pairs for each character type.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SummaryData/u:Categorical | u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SampleData/u:SamplingEvent/u:SamplingUnit/u:Categorical"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="QuantitativeCharacter_Keyref" refer="CharacterKey_Quantitative">
+      <xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SummaryData/u:Quantitative | u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SampleData/u:SamplingEvent/u:SamplingUnit/u:Quantitative"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="TextCharacter_Keyref" refer="CharacterKey_Text">
+      <xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SummaryData/u:TextChar | u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SampleData/u:SamplingEvent/u:SamplingUnit/u:TextChar"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="CharacterSequence_Keyref" refer="CharacterKey_Sequence">
+      <xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SummaryData/u:Sequence | u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SampleData/u:SamplingEvent/u:SamplingUnit/u:Sequence"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="BasedOnSample_Keyref" refer="SampleKey">
+      <xs:selector xpath=".//u:BasedOnSample"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="CharacterState_Keyref" refer="CharacterStateKey">
+      <xs:selector xpath=".//u:State | .//u:ToState | u:Dataset/u:Characters/u:CategoricalCharacter/u:Mappings/u:Mapping/u:From | u:Dataset/u:Characters/u:CategoricalCharacter/u:Mappings/u:Mapping/u:To">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Element name "State" is currently restricted to this type, but may later be used elsewhere for different purposes, requiring a more specific xpath. Currently State occurs in summary data, sample data, mapping and dependency definitions (OnlyApplicableIf, InapplicableIf).</xs:documentation>
+        </xs:annotation>
+      </xs:selector>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="Modifier_Keyref" refer="ModifierKey">
+      <xs:selector xpath=".//u:Modifier"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="SampleKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Sample-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:CodedDescriptions/u:CodedDescription/u:SampleData/u:SamplingEvent">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">A key to identify a specific sample. This is used when summary statistics are calculated from sample data that are also present in the dataset (compare the "BasedOnSample" element).</xs:documentation>
+        </xs:annotation>
+      </xs:selector>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="IdentificationKeyKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">This identifies an entire Identificationkey (i. e. not the nodes/steps in the key)</xs:documentation>
+        <xs:documentation xml:lang="en-us">===== START of IdentificationKey-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:IdentificationKeys/u:IdentificationKey"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="IdentificationKey_Keyref" refer="IdentificationKeyKey">
+      <xs:selector xpath="u:Dataset/u:IdentificationKeys/u:IdentificationKey/u:Leads/u:Result/u:Subkey"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="IdentificationKeyLeadKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Inner leads ("Leads/Lead") have id-attribute and are referable, result leads ("Leads/Result") may have id-attribute and are not referable. Results must be referable only in case of reticulation, but not in case of parent. ID-values must be unique across character trees (possibly in multiple datasets!).</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:IdentificationKeys/u:IdentificationKey/u:Leads/u:Lead"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:unique name="IdentificationKeyLeadKey_Reticulation">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">Compare IdentificationKeyLeadKey, this one includes the Result@id nodes and is referenced for reticulation elements.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:IdentificationKeys/u:IdentificationKey/u:Leads/u:Lead  | u:Dataset/u:IdentificationKeys/u:IdentificationKey/u:Leads/u:Result"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="IdentificationKeyLead_Keyref" refer="IdentificationKeyLeadKey">
+      <xs:selector xpath="u:Dataset/u:IdentificationKeys/u:IdentificationKey/u:Leads/u:*/u:Parent"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:keyref name="IdentificationKeyLead_KeyrefReticulation" refer="IdentificationKeyLeadKey_Reticulation">
+      <xs:selector xpath="u:Dataset/u:IdentificationKeys/u:IdentificationKey/u:Leads/u:Result/u:Reticulation"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="AgentKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Agent-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Agents/u:Agent"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="Agent_Keyref" refer="AgentKey">
+      <xs:selector xpath=".//u:Agent"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="MediaObjectKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of MediaObject-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:MediaObjects/u:MediaObject"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="MediaObject_Keyref" refer="MediaObjectKey">
+      <xs:selector xpath=".//u:MediaObject"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="AudienceKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Audience-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Audiences/u:Audience"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="Audience_Keyref" refer="AudienceKey">
+      <xs:selector xpath=".//u:Audience"/>
+      <xs:field xpath="@audience"/>
+    </xs:keyref>
+    <xs:unique name="GeographicAreaKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of GeographicArea-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:GeographicAreas/u:GeographicArea"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="GeographicArea_Keyref" refer="GeographicAreaKey">
+      <xs:selector xpath=".//u:GeographicArea"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+    <xs:unique name="PublicationKey">
+      <xs:annotation>
+        <xs:documentation xml:lang="en-us">===== START of Publication-related identity constraints ====</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath="u:Dataset/u:Publications/u:Publication"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <xs:keyref name="Citation_Keyref" refer="PublicationKey">
+      <xs:selector xpath=".//u:Citation"/>
+      <xs:field xpath="@ref"/>
+    </xs:keyref>
+  </xs:element>
+  <xs:complexType name="Dataset">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Dataset itself is derived from Abstract object, as are the base types for which it contains collections.
+
+The first elements (Repres., Links, RevisionData, Owner, IPRStatem.) are content metadata for the entire data set / data collection. If, e.g. in response to queries, data subsets are extractet from a larger base data set, these metadata are not required to be specific to each document, but may may describe the base set itself. Link uri should then refer to the base set using rel=BasedUpon, and the dataset-uri may contain a query URI (or be omitted).
+
+If a history of the data collection
+(revised or expanded in various
+projects or at different institutions, aggregated from multiple sources)
+is available, this may be reflected in the IPR statements and possibly in
+the list of Owners.
+
+Note: if a data set is an extract from a larger base set, it is recommended to use 'Link rel = BasedOn' to point to the complete data set. Note that this may enable indexing robots to index the entire base data set.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="OwnedAbstractObject">
+        <xs:sequence>
+          <xs:element name="Scope" type="ExtendedScopeSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">The scope of the dataset
+
+NOTE: This is the last metadata element of the dataset itself. The following elements contain object collections ('payload'):</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="TaxonNames" type="TaxonNameSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Taxon names used in the data set. Each object contains a name - either locally defined or representing an external resource defined in a linking mechanism and defines a local id attribute that may be referred to multiple times from within the data set.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="TaxonHierarchies" type="TaxonHierarchySet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Optional hierarchy (= tree, biology: taxonomy) of taxon classes defined above. A hierarchy may be incomplete, i. e. some TaxonName object may not be in the hierarchy. TaxonHierarchies may be locally defined or represent an external source.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Specimens" type="SpecimenSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Specimens (including ABCD.Units) are physical objects that have been collected or observed.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="TaxonOccurrences" type="VersionExtension" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(Extension point for future core ontology objects. This should include observations and organism interactions)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="TaxonIdentifications" type="VersionExtension" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(Extension point for future core ontology objects)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Geolocalisations" type="VersionExtension" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(Extension point for future core ontology objects. An occurrence may 
+have multiple geolocalisations, especially later coordinate or grid estimates, adjustments for geo. area name changes etc. This is analogous to taxon identifications.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SDD-DescriptiveTerminology"/>
+          <xs:group ref="SDD-DescriptiveData"/>
+          <xs:element name="Agents" type="AgentSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Documentation of persons/organizations involved in the authoring, compiling, editing, etc. of the data set.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Publications" type="PublicationSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Publications used in the data set, defined through objects (= local or external link, see under Agents).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="GeographicAreas" type="GeographicAreaSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Named geographical areas (continents, countries, cities, national parks, locally described places, etc.). An example of an external gazetteer referred to is the TDWG Geography standard.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="MediaObjects" type="MediaObjectSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Resource definitions containing links like URLs or actually embedding the resource (e. g. encoded images).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Audiences" type="AudienceSet" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">An Audience is an extension of language (including dialect), with expertise (pupil, beginner, expert) and other parameters (policy makers, farmers, etc.)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="language">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">The language on dataset is required; if no language is known this should be explicitly stated (lang="und"). This value is inherited in all places where an xml:lang attribute is specified in the UBIF schema (on Label, Detail, etc.) if no other value is given there (i.e. this value must be interpreted as a dataset-wide default).</xs:documentation>
+          </xs:annotation>
+        </xs:attributeGroup>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

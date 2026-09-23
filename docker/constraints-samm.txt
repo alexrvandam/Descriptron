@@ -1,0 +1,7 @@
+# Nothing in this environment may move torch. rembg and easyocr both depend on
+# torch without an upper bound, so an unconstrained `pip install` upgraded it
+# from the pinned 2.4.0+cu121 to 2.14.0+cu130 — the image still ran, but it was
+# no longer the environment SAM2-PAL and DINOLand were validated against, and
+# torchvision 0.29 has already changed APIs this code uses.
+torch==2.4.0
+torchvision==0.19.0

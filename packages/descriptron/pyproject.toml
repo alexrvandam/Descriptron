@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "descriptron"
+version = "2.0.0"
+description = "Descriptron: image annotation, phenomics and evidence-tiered species descriptions"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex R. Van Dam" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+# This package contains no code. It exists because `pip install descriptron` is
+# what people will type, and it should give them the whole system rather than a
+# "no matching distribution" error.
+dependencies = [
+  "descriptron-core==2.0.0",
+  "descriptron-vision==2.0.0",
+  "descriptron-gui==2.0.0",
+]
+
+[project.optional-dependencies]
+llm = ["descriptron-core[llm]==2.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/alexrvandam/Descriptron"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/descriptron"]

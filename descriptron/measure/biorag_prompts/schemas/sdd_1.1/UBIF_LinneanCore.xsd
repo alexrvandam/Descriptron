@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema xmlns="http://rs.tdwg.org/UBIF/2006/" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://rs.tdwg.org/UBIF/2006/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="Unified Biosciences Information Framework (UBIF) 1.1">
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">UBIF version of Linnean Core 0.2 (definitions inherited from LinneanCore 0.1.6, modified to correct problems and make use of UBIF common types, checked against TCS 1.0)</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Unfortunately, it proved not possible to directly use TCS types, partly because of the generous use of mixed content in TCS, which is generally avoided in UBIF, partly because the desire to reuse the UBIF publications/citation and agents types and objects (which in TCS are left undefined), and partly because of some minor problems detected in TCS. Note, however, that this structure remains fairly focussed on general name needs and does not attempt to include full nomenclature or concept-relationship information.</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Copyright © 2006 TDWG (Taxonomic Databases Working Group, www.tdwg.org). See the file UBIF_(c).xsd for authorship and licensing information.</xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="UBIF_CoreOntology.xsd"/>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">=== Taxon names ===</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang="en-us">Note: although 'taxon' may be used in a general sense as a named class, the extensions here cover primarily biological scientific (Linnean) names.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="TaxonNameCore">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">TaxonName plus core level extensions.
+
+Note: Taxon names are not restricted to accepted names, it is also use to express Synonyms in the TaxonHierarchyNode type)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TaxonName">
+        <xs:sequence>
+          <xs:group ref="TaxonNameCoreExtensions">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Extensions of AbstractObject
+specific to TaxonName. 
+
+Contains rank plus a structured form of taxonomic names (Genus/Higher taxon, rank, optional specific/infraspecific epithets, authors). Note that simply splitting into taxon name and authors does not work, because authors may be in the middle of the parts of the taxon name (e. g. in botanical autonyms). </xs:documentation>
+            </xs:annotation>
+          </xs:group>
+          <xs:group ref="SpecificExtension" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:group name="TaxonNameCoreExtensions">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Extensions of AbstractObject
+specific to TaxonName. 
+
+This may be further extended to support a structured form of taxonomic names (Genus/Higher taxon, rank, optional specific/infraspecific epithets, authors). However, note that simply splitting into taxon name and authors does not work, because authors may be in the middle of the parts of the taxon name (e. g. in botanical autonyms). Currently the development of the TDWG taxon names standard should be awaited first.
+
+Note that Taxon names are not restricted to accepted names, it is also use to express Synonyms in the TaxonHierarchyNode type)</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="NomenclaturalCode" type="NomenclaturalCodesEnum" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The nomenclatural code governing the taxon name. Note that, e.g., a genus name may be validly used for different organisms under different codes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Rank" type="TaxonomicRank" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">For biological taxonomic names: order, family, species, etc. Derived from an enumerated value list. This element needs to be interoperable; formatting often depends on specific ranks rather than on relative place in the hierarchy alone.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CanonicalName" type="LinneanCanonicalTaxonName" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Canonical name enforcing strict inclusion of only nomenclatural information, i.e. not taxonomic hierarchy information with the exception of the necessary placements within Genus or Species. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CanonicalAuthorship" type="LinneanCanonicalTaxonAuthorship" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Canonical authorship of the name, optionally atomized</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ConceptSuffix" type="CitationString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">A part of the taxon name indicating either imprecise concept hints ('s. str.', 'p.p.', 's. l.', 'auct.', an informal or fomal according-to citation ('sec. Muell.', 'sensu Hagedorn, Sydowia 1998'). In the later case this may be made more precise by using the available attributes to add a local or uri reference to a publication.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Race" type="ShortString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Race numbers, names, possibly other ranks not governed by a code (patho/bio/serovar).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TaxonPlacement" type="TaxonNameRefSeq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Additional hierarchical information which may be designed to be part of the name. Example: a name may be cited as "Cortinarius (subg. Phlegmacium) glaucopus s. l. (Cortinariaceae)". Here 'Cortinarius glaucopus' is canonical name, 's. l.' Concept suffix, and 'Phlegmacium' and 'Cortinariaceae' is additional hierarchical placement information.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="LinneanCanonicalTaxonName">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Canonical name of a taxon (normalized according to nomenclatural code rules, without non-required hierarchy elements like subgenus for a species, or more than one infraspecific epithet ('G. spex var. x  f. y').</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Simple" type="ShortString">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">A string containing the full canonical taxon name without authors.
+
+The following name 'atomization' is optional:</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:choice minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">(Choice 
+between 
+supra-
+generic 
+and genus, 
+bi- or 
+trinomial)</xs:documentation>
+        </xs:annotation>
+        <xs:element name="SupragenericName" type="ShortString">
+          <xs:annotation>
+            <xs:documentation xml:lang="en-us">Uninomial name of higher taxon down to (and excluding) the Genus.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:sequence>
+          <xs:element name="Genus" type="TaxonString">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">Genus itself (uninomial), or Genus part of bi- or trinomials as string (then optionally with a reference to the id of the exact Genus record).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:choice minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en-us">(If present, this
+creates a bi- or 
+trinomial name. 
+This is then a 
+choice between 
+infrageneric 
+and specific/
+infraspec. names)</xs:documentation>
+            </xs:annotation>
+            <xs:element name="InfragenericEpithet" type="ShortString">
+              <xs:annotation>
+                <xs:documentation xml:lang="en-us">Infrageneric epithet is used *only* for infrageneric names itself. The choice to the left prevents using this  in combination with a species epithet; doing so would express taxonomic opinion that is redundant in a canonical name.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:sequence>
+              <xs:element name="SpecificEpithet" type="TaxonString">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">Species epithet of specific (binomial) or infraspecific (trinomial) names as string. In the latter case the ref attribute may optionally refer to the id of the exact Species record (necessary for homonyms).</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="InfraspecificEpithet" type="ShortString" minOccurs="0">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us">Infraspecific epithet of ranks governed by the code (subspecies down to subsubforma). If infraspecific epithet is missing, rank must be 'sp' (external validation required). Note: If multiple infraspecific epithets are present, all but the lowest ranking are redundant indications of hierarchy that is not part of a *canonical* name under the codes of nomenclature.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="CultivarNameGroup" type="ShortString" minOccurs="0">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en-us"> The name of the Cultivar, Cultivar Group, grex, convar or graft chimera. Under the ICNCP. Just include here the string of the name. i.e. omitting single quotes around cultivar names, the word 'group' that denoting cultivar group (and which is language- dependent) and the '+'-sign in chimeras. These symbols are implicit in the rank of the name.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:choice>
+        </xs:sequence>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LinneanCanonicalTaxonAuthorship">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">The Canonical citation (authorship of a taxon) includes only the authorship of the lowest ranking epitheton (to also include the authorship of the species for infraspecific taxa is not uncommon, but not recommended by the codes).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Simple" type="LongString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The full, code-appropriate author- team-plus-citation-string for the current name at this rank. Examples: 'L.'; '(L.) Smith &amp; Jones ex Brown, Green &amp; Black 1888'. Where atomized citation data exist, this text should be derived from them.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="BaseCitation" type="TaxonAuthorshipCitation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The primary citation for the monomial or the lowest ranking epithet in bi- or trinomial names. For a recombined name this is the basionym citation, for a replacement/nom.nov. name the citation of the new, replacing name.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="BaseCitationBracketed" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Indicates that brackets/parentheses are required around BaseCitation, i.e. the name is recombined or its status changed. Necessary because CombinationCitation may not have been recorded. Redundant if CombinationCitation is present, this should then be interpreted as 'true'.
+In TCS 1.0 this is expressed as a choice between the 'Authorship' and 'BasionymAuthorship' elements.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CombinationCitation" type="TaxonAuthorshipCitation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The combining author(s) creating the new combination (= authors occurring after authors in brackets). Zoology often does not record this though the ICZN recommends that they should be included (Art.51G). Botany generally does and has priority rules to rule on homonymic combinations.
+External validation: This element should not occur when BaseCitation is missing.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TaxonAuthorshipCitation">
+    <xs:annotation>
+      <xs:documentation xml:lang="en-us">Combines a taxonomic authors with a publication citation (= publication plus location like page).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Authors" type="AgentStringSeq">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Nomenclatural authors (i.e. excluding sensu/sec. authors)
+
+Following TCS 1.0, sanctioning in fungi is expressed by treating the ':'-literal in a separate Agent element. Similarly, name-validation may be included and the 'ex'-literal treated the same way (note: bot./zoo. confusion exists whether validated or validating authors are 'ex-authors'). Overloading of the Agent element with these special semantics reduces the complexity of the model.
+(Agent element seq. in instance documents is informative!)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Citation" type="CitationString" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">String containing informal free-form publication text, optionally identified as an exact publication object plus location-attribute (page number etc.)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Date" type="CompositeDate" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">The actual publication date (usually only year, sometimes month relevant for taxonomic priority). Necessary if full Citation (element above) is unknown, or if the citation data referenced through uri are unable to differentiate between year-of and year-on (year publication claims to have been published in).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="AuthorTeamsDiffer" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en-us">Flag to mark that taxon authors differ from authors of the publication in which the taxon was published (perhaps only in sequence). Machine-comparison of author teams is difficult: not only must the sanctioning and validation cases be handled, but also taxon authors are in botany usually expressed using standardized abbreviations, whereas publication authors (optionally added after 'in') should be spelled out.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

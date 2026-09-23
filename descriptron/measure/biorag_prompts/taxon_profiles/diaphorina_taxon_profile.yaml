@@ -1,0 +1,239 @@
+# =============================================================================
+# BioRAG taxon profile — Diaphorina (Hemiptera: Psylloidea: Liviidae)
+# profile_version 1 (2026-09-17)
+# -----------------------------------------------------------------------------
+# This is the ONLY organism-specific input to the BioRAG v2 text and key
+# generators. The system prompts (biorag_system_prompts_v1.txt) stay universal.
+# To use BioRAG on another group, copy TEMPLATE_taxon_profile.yaml and fill it.
+#
+# Entries marked  verify: true  are working names that the taxonomist must
+# confirm before publication. The scripts print them in the provenance report.
+# =============================================================================
+profile_version: 1
+
+taxon:
+  genus: Diaphorina
+  family: Liviidae
+  higher_classification: "Hemiptera: Psylloidea: Liviidae"
+  group_label_for_text: "species of Diaphorina"
+  imaging: "slide-mounted specimens photographed with a Leica stereo/compound microscope; forewing, head, rostrum, metaleg and terminalia imaged separately"
+  # Is colour comparable between specimens? False here: the images are uncalibrated sRGB
+  # and preparation bleaches specimens unevenly, so the SHADE of a structure cannot be
+  # compared, while the PATTERN of pigment - where it sits, how far it reaches, how sharp
+  # its edges are, how coarse the markings - survives both and remains a good character.
+  # Character discovery drops shade-only proposals when this is false.
+  colour_calibrated: false
+  colour_caveat: "CIE L*a*b* values were computed from sRGB photographs of slide-mounted specimens that were not colour-calibrated; treat them as approximate and prefer colour words."
+
+# How to read specimen number and sex from an image file name.
+# number_regex: the LAST match's first group is the specimen number; the
+# specimen ID becomes "<species code>_<number>".
+specimen_id:
+  number_regex: '_?(\d+)_(?:forewing|head|rostrum|metaleg|te+rminalia)'
+  sex_regex:
+    male: '_m_|_male'
+    female: '_f_|_female'
+
+# Species codes (as used in group_labels.csv) -> display names.
+# status: described | cf | undescribed
+#   described   -> treatment gets "Material examined"; no type designations
+#   cf          -> identification uncertain; "Material examined"; no types
+#   undescribed -> treatment may list PROPOSED type material (to be confirmed)
+species:
+  acok:        {name: "Diaphorina acokantherae", status: described, verify: true, source: "Diaphorina_Leica folder name 'acokantherae'"}
+  cf.carrisae: {name: "Diaphorina cf. carrisae", status: cf, verify: true, source: "collaborator locality DOCX; slide label 'cf. carrisae'. Published epithet is spelled 'carissae' in the literature PDFs — confirm spelling"}
+  cf.ender:    {name: "Diaphorina cf. enderleini", status: cf, verify: false, source: "collaborator locality DOCX; D. enderleini Klimaszewski, 1964 (Alene et al. 2011)"}
+  fab:         {name: "Diaphorina fabulosa", status: described, verify: true, source: "Diaphorina_Leica folder name 'fabulosae'; spelling 'fabulosa' as in literature PDFs"}
+  kenya:       {name: "Diaphorina sp. 'kenya'", status: undescribed, verify: true, source: "collaborator locality DOCX calls it 'Diaphorina kenya' (working name)"}
+  punctulata:  {name: "Diaphorina punctulata", status: described, verify: true, source: "Diaphorina_Leica folder name"}
+  sp1:         {name: "Diaphorina sp. 1", status: undescribed, verify: true, source: "morphospecies code"}
+  sp1A:        {name: "Diaphorina sp. 1A", status: undescribed, verify: true, source: "collaborator locality DOCX 'Diaphorina sp1A'"}
+  sp2:         {name: "Diaphorina sp. 2", status: undescribed, verify: true, source: "morphospecies code"}
+  sp3:         {name: "Diaphorina sp. 3", status: undescribed, verify: true, source: "morphospecies code"}
+  sp4:         {name: "Diaphorina sp. 4", status: undescribed, verify: true, source: "morphospecies code"}
+  sp5:         {name: "Diaphorina sp. 5", status: undescribed, verify: true, source: "morphospecies code"}
+  sp6:         {name: "Diaphorina sp. 6", status: undescribed, verify: true, source: "morphospecies code"}
+  sp8:         {name: "Diaphorina sp. 8", status: undescribed, verify: true, source: "morphospecies code"}
+  sp9:         {name: "Diaphorina sp. 9", status: undescribed, verify: true, source: "morphospecies code"}
+  sp11:        {name: "Diaphorina sp. 11", status: undescribed, verify: true, source: "morphospecies code (raw images filed under Diaphorina_Leica/sp1)"}
+  sp12:        {name: "Diaphorina sp. 12", status: undescribed, verify: true, source: "morphospecies code; includes specimen 12-5 from folder 'unknown species_12-5'"}
+  sp17:        {name: "Diaphorina sp. 17", status: undescribed, verify: true, source: "morphospecies code"}
+  sp18:        {name: "Diaphorina sp. 18", status: undescribed, verify: true, source: "morphospecies code"}
+  sp19:        {name: "Diaphorina sp. 19", status: undescribed, verify: true, source: "morphospecies code"}
+  sp20:        {name: "Diaphorina sp. 20", status: undescribed, verify: true, source: "morphospecies code"}
+  sp21:        {name: "Diaphorina sp. 21", status: undescribed, verify: true, source: "morphospecies code"}
+  sp22:        {name: "Diaphorina sp. 22", status: undescribed, verify: true, source: "morphospecies code"}
+  sp23:        {name: "Diaphorina sp. 23", status: undescribed, verify: true, source: "morphospecies code"}
+  striata:     {name: "Diaphorina striata", status: described, verify: true, source: "Diaphorina_Leica folder name"}
+  strych:      {name: "Diaphorina sp. 'strych'", status: undescribed, verify: true, source: "Diaphorina_Leica folder name 'strych' (epithet unknown — supply full name)"}
+  turn:        {name: "Diaphorina turneri", status: described, verify: true, source: "Diaphorina_Leica folder name 'turneri'"}
+  virg:        {name: "Diaphorina virgata", status: described, verify: true, source: "Diaphorina_Leica folder name 'virgata'"}
+  zebrana:     {name: "Diaphorina zebrana", status: described, verify: true, source: "Diaphorina_Leica folder name; name occurs in literature PDFs"}
+
+# Annotation categories -> morphological terms.
+#   section:      description section the structure is written under
+#   sex:          male | female | both   (structure present only in that sex)
+#   split_by_sex: true -> the structure differs between sexes (e.g. male and
+#                 female subgenital plates); features are kept separate per sex
+#   key_priority: 1 = easiest to see on a mounted specimen, 3 = needs dissection
+#   exclude:      true -> never used
+#   synonyms:     other words the text may use for the structure (used by the
+#                 confabulation checker to read which structure a number belongs to)
+structures:
+  whole_head:        {term: "head", section: "Head", sex: both, key_priority: 1}
+  vertex:            {term: "vertex", section: "Head", sex: both, key_priority: 1}
+  genal_processes: {term: "genal processes", section: "Head", sex: both, key_priority: 1, ontology_broader: AISM:0004026}
+  antenna:           {term: "antenna", section: "Antenna", sex: both, key_priority: 1}
+  head_keypoints:    {term: "head (landmarks)", section: "Head", sex: both, key_priority: 2}
+  # NOTE: internal annotation codes LAB1/LAB2 = published labial segments LAB2/LAB3.
+  # Printed text uses ONLY the published numbering (term/short below).
+  LAB1: {term: "median labial segment (LAB2)", short: "median labial segment", section: "Rostrum", sex: both, key_priority: 1, ontology_broader: AISM:0000087}
+  LAB2: {term: "apical labial segment (LAB3)", short: "apical labial segment", section: "Rostrum", sex: both, key_priority: 1, ontology_broader: AISM:0000087}
+  whole_wing:        {term: "forewing", section: "Forewing", sex: both, key_priority: 1, synonyms: ["membrane", "wing membrane", "fore wing"], ontology: AISM:0000037}
+  pterostigma: {term: "pterostigma", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-c+sc: {term: "forewing cell c+sc", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-csc: {term: "forewing cell c+sc", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}   # alias, see category_aliases
+  cell-Rs: {term: "forewing cell rs (Rs)", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-r2: {term: "forewing cell r2", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-m1: {term: "forewing cell m1", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-m2: {term: "forewing cell m2", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-cu1: {term: "forewing cell cu1", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-cu2: {term: "forewing cell cu2", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  cell-a: {term: "forewing anal cell (a)", section: "Forewing", sex: both, key_priority: 1, ontology_broader: AISM:0004242}
+  forewing_keypoints: {term: "forewing (vein-junction landmarks)", section: "Forewing", sex: both, key_priority: 1}
+  femura:            {term: "metafemur", section: "Metaleg", sex: both, key_priority: 1, synonyms: ["hind femur", "metafemora"]}
+  tibia:             {term: "metatibia", section: "Metaleg", sex: both, key_priority: 1, synonyms: ["hind tibia", "metatibiae"]}
+  male_proctiger: {term: "male proctiger", section: "Male terminalia", sex: male, key_priority: 2, ontology: AISM:0004060}
+  paramere:          {term: "paramere", section: "Male terminalia", sex: male, key_priority: 2}
+  proximal_aedeagus: {term: "proximal (basal) segment of aedeagus", short: "proximal aedeagal segment", section: "Male terminalia", sex: male, key_priority: 3, ontology_broader: AISM:0004062}
+  distal_aedeagus: {term: "distal segment of aedeagus", short: "distal aedeagal segment", section: "Male terminalia", sex: male, key_priority: 3, ontology_broader: AISM:0004062}
+  subgenital_plate: {term: "subgenital plate", section_male: "Male terminalia", section_female: "Female terminalia", sex: both, split_by_sex: true, key_priority: 2, ontology_broader: AISM:0004058}
+  female_proctiger: {term: "female proctiger", section: "Female terminalia", sex: female, key_priority: 2, ontology: AISM:0004060}
+  circumanal_ring: {term: "circumanal ring", section: "Female terminalia", sex: female, key_priority: 2, ontology_broader: AISM:0004060}
+  Unknown:           {exclude: true}
+
+# OBO ontology releases used by biorag_ontology_annotator_v2.py (downloaded to
+# biorag_prompts/ontologies/). Structures carry `ontology:` (the term for this
+# structure) or `ontology_broader:` (the nearest term that exists), verified
+# against the release by the annotator.
+ontologies: [pato, aism]
+
+# Category names that denote the same structure (merged into the right-hand name).
+# 'cell-csc' is 'cell-c+sc' after a step that stripped '+' from folder names.
+category_aliases:
+  cell-csc: cell-c+sc
+
+# Which structure lies next to which in the photographs, for biorag_frame_orientation_v1.
+# A homology frame built by a similarity fit onto a nearly half-turn-symmetric outline can
+# come out end for end; the neighbour settles it without a threshold, because the end of
+# the tibia that touches the femur is the proximal end of that tibia whatever the frame did
+# with it. Measured coverage on this data set: 1241 of 1398 frames (88.8 %).
+orientation_neighbours:
+  tibia: [femura]                 # 137 frames, 34 of them end for end
+  femura: [tibia]                 # 143 frames, 41 end for end
+  LAB2: [LAB1]                    # 129 frames, 57 end for end
+  LAB1: [LAB2]                    # 130 frames, 0 — the negative control
+  proximal_aedeagus: [distal_aedeagus]
+  distal_aedeagus: [proximal_aedeagus]
+  subgenital_plate: [male_proctiger, female_proctiger]
+  female_proctiger: [circumanal_ring]
+  male_proctiger: [paramere]      # weak: the two lie side by side, most readings rejected
+  paramere: [male_proctiger]      # weak, likewise
+  circumanal_ring: [female_proctiger]   # weak: the ring sits ON the proctiger
+
+# Structures no neighbour touches end on: the forewing and its cells. Base and apex are
+# given by the cells at either end of the wing, and the direction between their centroids
+# is carried into the frame and compared with its long axis.
+orientation_axes:
+  whole_wing:  {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  pterostigma: {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-a:      {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-cu1:    {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-cu2:    {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-m1:     {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-m2:     {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-r2:     {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+  cell-Rs:     {from: [cell-cu2, cell-a], to: [cell-r2, cell-Rs]}
+
+# Structures whose outline registration may vote on a photograph's handedness (part B).
+# Chosen by measurement, not by anatomy: these are the ones whose mirror calls agree with
+# another structure from the SAME photograph far above chance (kappa 0.73-1.00). The wing
+# outline itself, the pterostigma and cell-cu2 are too nearly symmetric to read (kappa
+# <= 0.32) and are carried by the vote instead; the femur and tibia reach only 0.29 and are
+# left alone; the terminalia are never called mirrored at all.
+orientation_mirror_voters: [cell-a, cell-cu1, cell-m1, cell-m2, cell-r2, cell-Rs, LAB1, LAB2]
+
+description_sections: ["Head", "Antenna", "Rostrum", "Forewing", "Metaleg", "Male terminalia", "Female terminalia", "Proportions"]
+
+# Measurement abbreviations used by the ratio definitions below.
+# category + measurement (length_mm | height_mm) on the SAME specimen.
+# NOTE: 'height_mm' is the maximum Feret width perpendicular to the long axis.
+measurement_abbreviations:
+  HW:   {category: whole_head,       measurement: height_mm, meaning: "head width"}
+  VW:   {category: vertex,           measurement: height_mm, meaning: "vertex width"}
+  VL:   {category: vertex,           measurement: length_mm, meaning: "vertex length"}
+  AL:   {category: antenna,          measurement: length_mm, meaning: "antenna length"}
+  LAB2: {category: LAB1,             measurement: length_mm, meaning: "length of the median labial segment"}
+  LAB3: {category: LAB2,             measurement: length_mm, meaning: "length of the apical labial segment"}
+  FL:   {category: whole_wing,       measurement: length_mm, meaning: "forewing length"}
+  FW:   {category: whole_wing,       measurement: height_mm, meaning: "forewing width"}
+  MF:   {category: femura,           measurement: length_mm, meaning: "metafemur length"}
+  MT:   {category: tibia,            measurement: length_mm, meaning: "metatibia length"}
+  MP:   {category: male_proctiger,   measurement: length_mm, meaning: "male proctiger length"}
+  PL:   {category: paramere,         measurement: length_mm, meaning: "paramere length"}
+  DL:   {category: distal_aedeagus,  measurement: length_mm, meaning: "length of distal aedeagal segment"}
+  FP:   {category: female_proctiger, measurement: length_mm, meaning: "female proctiger length"}
+  SP:   {category: subgenital_plate, measurement: length_mm, meaning: "female subgenital plate length", sex: female}
+  CRL:  {category: circumanal_ring,  measurement: length_mm, meaning: "circumanal ring length"}
+
+# Standard proportions (collaborator's list). id is used in feature IDs.
+ratios:
+  - {id: "VL/VW",          num: VL,          den: VW,   sex: all,    words: "vertex length / vertex width"}
+  - {id: "AL/HW",          num: AL,          den: HW,   sex: all,    words: "antenna length / head width"}
+  - {id: "LAB2/LAB3",      num: LAB2,        den: LAB3, sex: all,    words: "median labial segment length / apical labial segment length"}
+  - {id: "(LAB2+LAB3)/HW", num: "LAB2+LAB3", den: HW,   sex: all,    words: "combined length of median and apical labial segments / head width"}
+  - {id: "MF/MT",          num: MF,          den: MT,   sex: all,    words: "metafemur length / metatibia length"}
+  - {id: "MT/HW",          num: MT,          den: HW,   sex: all,    words: "metatibia length / head width"}
+  - {id: "FL/HW",          num: FL,          den: HW,   sex: all,    words: "forewing length / head width"}
+  - {id: "FL/FW",          num: FL,          den: FW,   sex: all,    words: "forewing length / forewing width"}
+  - {id: "MP/HW",          num: MP,          den: HW,   sex: male,   words: "male proctiger length / head width"}
+  - {id: "MP/PL",          num: MP,          den: PL,   sex: male,   words: "male proctiger length / paramere length"}
+  - {id: "MP/DL",          num: MP,          den: DL,   sex: male,   words: "male proctiger length / distal aedeagal segment length"}
+  - {id: "FP/HW",          num: FP,          den: HW,   sex: female, words: "female proctiger length / head width"}
+  - {id: "CRL/FP",         num: CRL,         den: FP,   sex: female, words: "circumanal ring length / female proctiger length"}
+  - {id: "SP/FP",          num: SP,          den: FP,   sex: female, words: "female subgenital plate length / female proctiger length"}
+
+# Landmark sets (COCO keypoint categories). reference_pair: "auto" uses the
+# pair with the largest median distance (the longest span) as the denominator
+# of the scale-free landmark ratios.
+landmark_sets:
+  forewing_keypoints:
+    term: "forewing"
+    ontology: AISM:0000037
+    landmark_name: "vein junction"
+    reference_pair: auto
+    figure_note: "landmark positions are shown in the forewing mean-shape figure (Diaphorina_landmark_gpa_forewing/forewing_keypoints/forewing_keypoints_mean_shape.png)"
+  head_keypoints:
+    term: "head"
+    ontology: UBERON:0000033
+    landmark_name: "head landmark"
+    reference_pair: auto
+
+# Taxonomist questions (per body region) — plain text, one question per line,
+# section headings on their own line. Path is relative to this profile file
+# unless absolute.
+# resolved against this file's own directory, so the questions travel with the
+# prompts wherever they are installed rather than only working from gui/measure
+questions_file: "../diaphorina_user_prompts.txt"
+
+# Key builder preferences (taxon-specific judgement, all optional).
+key:
+  feature_type_weights:
+    ratio: 1.00           # standard proportions (size-independent)
+    landmark_ratio: 0.95  # landmark distance / longest landmark span
+    aspect_ratio: 0.90    # length/width of one structure
+    length: 0.80          # absolute size in mm
+    landmark_mm: 0.75
+    colour: 0.55          # uncalibrated photographs: use as support only
+  min_specimens_primary: 2   # a primary key character needs >= this many specimens per species where possible
+  max_secondary_characters: 3

@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "descriptron-core"
+version = "2.0.0"
+description = "Evidence-tiered species descriptions, keys and audits from phenomic matrices"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex R. Van Dam" }]
+keywords = ["taxonomy", "morphometrics", "phenomics", "species description", "COCO"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+# Derived from the imports of the 62 programs in this package, not from memory:
+# `python -m descriptron_core.cli --list` names them. No torch, no CUDA, no
+# compiler — this installs in about a minute on Linux, macOS and Windows, and
+# with the deposited COCO files it reproduces every analysis in the methods paper.
+dependencies = [
+  "numpy>=1.23",
+  "pandas>=1.5",
+  "scipy>=1.9",
+  "matplotlib>=3.6",
+  "scikit-learn>=1.2",
+  "scikit-image>=0.20",
+  "opencv-python-headless>=4.7",   # headless: the analysis half never opens a window
+  "pillow>=9",
+  "pycocotools>=2.0.6",
+  "seaborn>=0.12",
+  "statsmodels>=0.14",
+  "scikit-posthocs>=0.7",
+  "umap-learn>=0.5",
+  "networkx>=3",
+  "pyefd>=1.6",
+  "biopython>=1.81",
+  "PyYAML>=6",
+  "lxml>=4.9",
+  "openpyxl>=3.1",
+  "python-docx>=1.0",              # treatment and monograph .docx export
+]
+
+[project.optional-dependencies]
+# Only needed to *write* treatments. The audit, key, matrix, novelty scoring and
+# delimitation are all deterministic and need no model at all.
+llm = ["anthropic>=0.40"]
+dev = ["pytest>=7", "build>=1", "twine>=5"]
+
+[project.scripts]
+descriptron        = "descriptron_core.cli:main"
+biorag-pipeline    = "descriptron_core.cli:run_pipeline"
+biorag-key         = "descriptron_core.cli:run_key_builder"
+biorag-audit       = "descriptron_core.cli:run_confabulation_checker"
+biorag-novelty     = "descriptron_core.cli:run_novelty_score"
+biorag-calibrate   = "descriptron_core.cli:run_calibrate"
+
+[project.urls]
+Homepage = "https://github.com/alexrvandam/Descriptron"
+Repository = "https://github.com/alexrvandam/Descriptron"
+Issues = "https://github.com/alexrvandam/Descriptron/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/descriptron_core"]
+
+# tools/ and data/ sit inside the package directory, so `packages` already ships
+# them; a force-include here would add every file a second time and the build
+# fails with "a second file is being added to the wheel archive at the same path".
+[tool.hatch.build]
+artifacts = ["src/descriptron_core/tools/**", "src/descriptron_core/data/**"]

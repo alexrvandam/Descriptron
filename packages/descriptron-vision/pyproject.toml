@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "descriptron-vision"
+version = "2.0.0"
+description = "Mask and landmark prediction for Descriptron: torchvision detectors, SAM2-PAL propagation, DINOv3 landmark transfer"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex R. Van Dam" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+# torch and torchvision are ordinary wheels on Linux, macOS and Windows, so this
+# installs without a compiler. On a Mac the torchvision detectors can use the
+# Apple GPU through PyTorch's MPS device; Detectron2 cannot, which is why the
+# torchvision backend exists.
+#
+# For CUDA, install torch from PyTorch's own index FIRST, then this package:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+dependencies = [
+  "descriptron-core==2.0.0",
+  "torch>=2.1",
+  "torchvision>=0.16",
+  "transformers>=4.38",   # Florence-2 scale-bar reading
+  "timm>=0.9",
+  "einops>=0.7",
+  "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+# SAM2 is not on PyPI and PyPI rejects a git dependency in package metadata, so
+# it cannot be declared here. It is imported lazily and the error message gives
+# the install command:
+#   pip install git+https://github.com/facebookresearch/segment-anything-2
+# Detectron2 is the same story, and additionally needs a compiler; see the
+# Docker image if you would rather not build it.
+ocr = ["easyocr>=1.7"]
+dev = ["pytest>=7", "build>=1", "twine>=5"]
+
+[project.scripts]
+descriptron-train      = "descriptron_vision.cli:train"
+descriptron-predict    = "descriptron_vision.cli:predict"
+descriptron-sweep      = "descriptron_vision.cli:sweep"
+descriptron-sam2pal    = "descriptron_vision.cli:sam2_pal"
+descriptron-dinoland   = "descriptron_vision.cli:dinoland"
+descriptron-measure    = "descriptron_vision.cli:measure"
+
+[project.urls]
+Homepage = "https://github.com/alexrvandam/Descriptron"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/descriptron_vision"]
