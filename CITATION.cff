@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: >-
+  If you use Descriptron or any software derived from it, cite this software
+  AND the first Descriptron paper (listed under references), and the
+  Descriptron v2 paper once it is published. See NOTICE.
+type: software
+title: "Descriptron: morphology-driven species descriptions, keys and delimitation for dark taxa"
+authors:
+  - family-names: "Van Dam"
+    given-names: "Alex R."
+    orcid: "https://orcid.org/0000-0002-1966-0338"
+repository-code: "https://github.com/alexrvandam/Descriptron"
+url: "https://github.com/alexrvandam/Descriptron"
+license: Apache-2.0
+version: "2.0.0"
+date-released: "2026-09-23"
+keywords:
+  - taxonomy
+  - morphometrics
+  - phenomics
+  - species description
+  - dark taxa
+  - computer vision
+references:
+  - type: article
+    title: "Descriptron: Artificial intelligence for automating taxonomic species descriptions with a user-friendly software package"
+    authors:
+      - family-names: "Van Dam"
+        given-names: "Alex R."
+        orcid: "https://orcid.org/0000-0002-1966-0338"
+      - family-names: "Štarhová Serbina"
+        given-names: "Liliya"
+    journal: "Systematic Entomology"
+    volume: 51
+    issue: 1
+    start: "e70005"
+    year: 2026
+    doi: "10.1111/syen.70005"
+    url: "https://doi.org/10.1111/syen.70005"

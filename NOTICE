@@ -1,0 +1,52 @@
+Descriptron
+Copyright 2024-2026 Alex R. Van Dam (ORCID 0000-0002-1966-0338)
+
+This product includes software developed by Alex R. Van Dam
+https://github.com/alexrvandam/Descriptron
+
+Licensed under the Apache License, Version 2.0 (see LICENSE). Under Section
+4(d) of that licence, this NOTICE file must be included with any
+redistribution of this software or of any work derived from it.
+
+REQUIRED CITATION
+-----------------
+Anyone who uses Descriptron, or any software derived from it (including
+descriptron-core, descriptron-vision, descriptron-gui and descriptron-mcp), in
+work that is published, presented or distributed must cite:
+
+  1. The software (Descriptron v2):
+     Van Dam, A. R. Descriptron (version used). GitHub repository.
+     https://github.com/alexrvandam/Descriptron
+
+  2. The first Descriptron paper:
+     Van Dam, A. R. & Štarhová Serbina, L. (2026). Descriptron: Artificial
+     intelligence for automating taxonomic species descriptions with a
+     user-friendly software package. Systematic Entomology, 51(1), e70005.
+     https://doi.org/10.1111/syen.70005
+
+  3. Once it is published, the Descriptron v2 paper as well. Its reference
+     will be added here and in CITATION.cff on publication.
+
+BibTeX:
+
+@misc{vandam_descriptron_software,
+  author       = {Van Dam, Alex R.},
+  title        = {Descriptron},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/alexrvandam/Descriptron}
+}
+
+@article{vandam2026descriptron,
+  author  = {Van Dam, Alex R. and Štarhová Serbina, Liliya},
+  title   = {Descriptron: Artificial intelligence for automating taxonomic species
+             descriptions with a user-friendly software package},
+  journal = {Systematic Entomology},
+  volume  = {51},
+  number  = {1},
+  pages   = {e70005},
+  year    = {2026},
+  doi     = {10.1111/syen.70005}
+}
+
+The same information is in CITATION.cff, which GitHub shows as
+"Cite this repository".

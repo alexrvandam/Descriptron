@@ -89,14 +89,28 @@ cp "$SRC/segment-anything-2/gui/torchvision_det/README.md" \
 
 # --- packaging, container, environments, docs ------------------------------
 cp -r "$SRC/packages" "$DST/packages"
-# descriptron-mcp is private and is developed elsewhere; it must never be published here
+# descriptron-mcp is published here, but its master copy lives in its own folder
+# (with its own .venv); bring in the current version on every rebuild
+MCP_SRC="${MCP_SRC:-$HOME/Desktop/descriptron-mcp}"
 rm -rf "$DST/packages/descriptron-mcp"
+if [ -d "$MCP_SRC" ]; then
+  mkdir -p "$DST/packages/descriptron-mcp"
+  rsync -a --exclude '.venv/' --exclude 'dist/' --exclude '__pycache__/' --exclude '*.egg-info/' \
+        --exclude '.pytest_cache/' --exclude '.git/' --exclude '*.txt' --exclude 'copy_into_descriptron_repo.sh' \
+        "$MCP_SRC/" "$DST/packages/descriptron-mcp/"
+fi
 rm -rf "$DST"/packages/*/dist "$DST"/packages/*/src/*/tools "$DST"/packages/*/src/*/data
 find "$DST/packages" -name '*.egg-info' -type d -exec rm -rf {} + 2>/dev/null || true
 cp "$SRC/docker/"{Dockerfile,descriptron,README.md,build_descriptron.sh} "$DST/docker/"
 cp "$SRC/docker/"requirements-*.txt "$SRC/docker/"constraints-*.txt "$DST/docker/"
 cp "$SRC/environments/"*.yml "$SRC/environments/"*.txt "$DST/environments/" 2>/dev/null || true
 cp "$SRC/README.md" "$DST/" 2>/dev/null || true
+# licence, attribution and citation: the release must never go out without them
+for f in LICENSE NOTICE CITATION.cff; do
+  cp "$SRC/$f" "$DST/" || { echo "missing $SRC/$f — refusing to build a release without it" >&2; exit 1; }
+done
+# each distributable package carries them too (hatchling puts LICENSE*/NOTICE* in the wheel)
+for p in "$DST"/packages/*/; do cp "$SRC/LICENSE" "$SRC/NOTICE" "$p"; done
 cp "$SRC/docs/"* "$DST/docs/" 2>/dev/null || true
 cp "$SRC/.dockerignore" "$DST/" 2>/dev/null || true
 cp "$0" "$DST/" 2>/dev/null || true
