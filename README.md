@@ -12,7 +12,10 @@ every claim in the output is checked against the data it came from.
 > descriptions by handing measurements to GPT-4o. v2 replaces that with an
 > evidence-tiered pipeline (**BioRAG**) in which the key, the matrix, the
 > delimitation and the audits are computed, and a language model is used only to
-> write prose from numbers it is not allowed to invent.
+> write prose from numbers it is not allowed to invent. The model's context is
+> retrieved first and foremost from **the measured data matrix**, which is the
+> primary retrieval and the basis of every analysis; **the literature**
+> (BioSysLit and your own PDFs) is a secondary, optional source.
 
 ---
 
@@ -21,7 +24,7 @@ every claim in the output is checked against the data it came from.
 - [What v2 adds](#what-v2-adds)
 - [Installing](#installing) — pip · Docker · conda
 - [The workflow](#the-workflow)
-- [Literature retrieval (the RAG in BioRAG)](#literature-retrieval-the-rag-in-biorag)
+- [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
 - [What the programs produce](#what-the-programs-produce)
 - [Reproducing an analysis](#reproducing-an-analysis)
 - [Provenance and auditing](#provenance-and-auditing)
@@ -78,7 +81,7 @@ pip install descriptron
 Writing treatments is the only step that calls a language model:
 `pip install "descriptron-core[llm]"`. Literature retrieval from BioSysLit and
 your own PDFs: `pip install "descriptron-core[rag]"` (see
-[Literature retrieval](#literature-retrieval-the-rag-in-biorag)).
+[What BioRAG retrieves](#what-biorag-retrieves-the-data-matrix-and-the-literature)).
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
@@ -149,9 +152,27 @@ interchangeable.
 
 ---
 
-## Literature retrieval (the RAG in BioRAG)
+## What BioRAG retrieves: the data matrix and the literature
 
-Before the model describes each structure from the images, BioRAG can give it
+BioRAG is retrieval-augmented generation: the model writes only from context
+that is retrieved for it, never from its own memory. The **data matrix is the
+primary retrieval** and by far the most important: the key, the delimitation,
+the audits and every number in a treatment rest on it. The literature is a
+secondary, optional source of terminology and context.
+
+### 1. The data matrix (primary, always used)
+
+For each species, BioRAG retrieves that species' measurements from the
+character matrix: for every feature, the number of specimens, the minimum,
+maximum and mean, and the range across all species beside it, grouped by
+evidence tier. This evidence sheet is the only source of numbers the model may
+use. Every number in a treatment must come from it, and the independent audit
+(`biorag_confabulation_checker_v2`) checks each one against the specimen matrix
+afterwards. This retrieval is what makes the numbers in a description accurate.
+
+### 2. The literature (secondary, optional)
+
+Before the model describes each structure from the images, BioRAG can also give it
 passages from **published treatments of the group**: the terminology taxonomists
 use, and the characters they have found informative. The retrieved text is
 reference only. The prompt tells the model not to copy a character state unless
