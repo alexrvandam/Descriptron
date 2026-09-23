@@ -79,6 +79,8 @@ Writing treatments is the only step that calls a language model:
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
+docker pull ghcr.io/alexrvandam/descriptron:2.0.0
+
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
 
