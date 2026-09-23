@@ -1,7 +1,11 @@
 # Descriptron v2 with BioRAG - 
 ## Production use ready - installable with pip, Docker or MCP (eg. Claude-Code)
  
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22918056.svg)](https://doi.org/10.5281/zenodo.22918056)
+<p>
+  <a href="https://doi.org/10.5281/zenodo.22918056"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.22918056.svg" alt="DOI 10.5281/zenodo.22918056" align="middle"></a>
+  &nbsp;<img src="docs/marmot_icon.png" alt="Descriptron marmot" height="40" align="middle">
+  &nbsp;<a href="#mcp-server"><img src="docs/claude_code_crab.png" alt="Works with Claude Code (MCP server)" height="40" align="middle"></a>
+</p>
 
 **Morphology-driven species descriptions, keys and delimitation for dark taxa.**
 
@@ -295,6 +299,8 @@ every comparison — a value that is correct but attached to the wrong structure
 fails, which is exactly what a generator checking its own output cannot catch.
 
 ---
+<a id="mcp-server"></a>
+
 ## Use Descriptron from Claude (MCP server) (waiting on pypi but Docker is live!)
 
 Descriptron can also be driven by an AI assistant. `descriptron-mcp` is an
