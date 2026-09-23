@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-mcp"
-version = "0.1.0.dev1"
+version = "0.1.0"
 description = "The Descriptron programs as tools for Claude and any other MCP client"
 readme = "README.md"
 # the MCP SDK needs 3.10; the programs themselves may run in an older
@@ -39,3 +39,8 @@ Homepage = "https://github.com/alexrvandam/Descriptron"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/descriptron_mcp"]
+
+# the source archive: the package, its tests and the licence files only (not the
+# local .venv, notes or the helper that copies this folder into the repository)
+[tool.hatch.build.targets.sdist]
+include = ["src/", "tests/", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
