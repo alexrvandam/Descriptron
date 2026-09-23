@@ -32,7 +32,10 @@ INVENTORY="${INVENTORY:-/home/localuser/Desktop/Descriptron/docs/FigS1_script_in
 ALL="${ALL:-0}"
 LIVE_LIST=""
 if [ "$ALL" = "0" ] && [ -f "$INVENTORY" ]; then
-  LIVE_LIST="$(awk -F'\t' 'NR>1 && $2 != "" {print $2}' "$INVENTORY")"
+  # column 1 is "(left out)" for programs the inventory deliberately retires — the
+  # outline miner, its figures, and the superseded instrument comparison. They are
+  # kept in the working tree to reproduce old tables, and must not be published.
+  LIVE_LIST="$(awk -F'\t' 'NR>1 && $2 != "" && $1 != "(left out)" {print $2}' "$INVENTORY")"
 fi
 
 is_live() {  # is_live <basename>
@@ -52,8 +55,17 @@ copy_py() {  # copy_py <from> <to>  — .py/.sh only, no backups, live versions 
 }
 
 # --- the programs ----------------------------------------------------------
-copy_py "$GUI" "$DST/descriptron"
+# measure/ first: three analysis programs also have a stale copy at the gui/ root,
+# and publishing both leaves a reader unable to tell which one runs
 copy_py "$GUI/measure" "$DST/descriptron/measure"
+copy_py "$GUI" "$DST/descriptron"
+for f in "$DST/descriptron"/*.py; do
+  b="$(basename "$f")"
+  if [ -f "$DST/descriptron/measure/$b" ]; then
+    rm -f "$f"
+    echo "  dropped duplicate at descriptron/: $b (kept measure/$b)"
+  fi
+done
 # these two directories are shipped whole: torchvision_det is new in v2 and every
 # file in it is live; from detectron2/ only the two scripts the GUI calls, plus the
 # fixed-budget copy used for the backend comparison
