@@ -202,9 +202,16 @@ descriptron biosyslit_rag_retrieval_v2 retrieve \
 
 # 3. use it: pass the index to the image-based descriptions ...
 descriptron biosyslit_rag_retrieval_v2 describe-biorag --index diaphorina_index.json ...
-#    ... or give the whole pipeline a folder of PDFs
+#    ... or give the whole pipeline the index (BioSysLit + PDFs) or just a folder of PDFs
+descriptron run_full_pipeline_v2 --rag_index diaphorina_index.json ...
 descriptron run_full_pipeline_v2 --pdf_dir literature/ ...
 ```
+
+The literature is used by the step that describes each structure from the
+images, which needs a language model (`--llm_backend claude-code` or `api`).
+With `--llm_backend none` that step is skipped and everything computed from the
+data matrix still runs. If both `--rag_index` and `--pdf_dir` are given, only the
+index is used, so index the PDFs into it.
 
 Retrieval is by keyword and metadata by default (taxon, family, section type),
 which needs nothing beyond `[rag]`. For retrieval by meaning, build the index

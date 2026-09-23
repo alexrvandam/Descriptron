@@ -570,6 +570,14 @@ def step_biorag(cfg: Dict, python: str, log_dir: Path) -> bool:
         cmd += ["--api-key-file", cfg["api_key_file"]]
     if cfg.get("pdf_dir"):
         cmd += ["--pdf-dir", cfg["pdf_dir"]]
+    if cfg.get("rag_index"):
+        # a prebuilt literature index (BioSysLit and/or PDFs); describe-biorag uses it
+        # INSTEAD of --pdf-dir, so PDFs wanted as well must be indexed into it
+        cmd += ["--index", cfg["rag_index"]]
+        if cfg.get("pdf_dir"):
+            logger.warning("  --rag_index and --pdf_dir both given: only the index is used. "
+                           "Add the PDFs to the index with: biosyslit_rag_retrieval_v2 index "
+                           "--pdf-dir <dir> --taxon <taxon> --output <index.json>")
     if cfg.get("user_prompts"):
         cmd += ["--user-prompts", cfg["user_prompts"]]
     if cfg.get("species"):
@@ -581,8 +589,13 @@ def step_biorag(cfg: Dict, python: str, log_dir: Path) -> bool:
         cmd += ["--matrix-dir", str(base / "compiled_key_tier")] + \
             [a for a in _v2_backend_args(cfg) if a != "none"]
         if cfg.get("llm_backend") == "none":
-            logger.error("  step 'biorag' needs an LLM backend (api or claude-code)")
-            return False
+            # no model: skip the image descriptions rather than halt the pipeline. Everything
+            # computed (matrix, key, delimitation, audits) still runs, and describe_v2 writes
+            # the evidence sheets without prose, as it already does under 'none'.
+            logger.warning("  --llm_backend none: skipping the image-based descriptions "
+                           "(this step needs a model: api or claude-code)"
+                           + ("; the literature given is not used" if cfg.get("pdf_dir") or cfg.get("rag_index") else ""))
+            return True
     else:
         cmd += ["--generate-key"]
 
@@ -1712,6 +1725,10 @@ def parse_args():
                         "landmarks); each gets its own GPA in landmark_gpa_<file stem> and is compiled with the rest")
     p.add_argument("--pdf_dir", default=None,
                     help="Literature PDFs directory (for BioRAG RAG)")
+    p.add_argument("--rag_index", default=None,
+                    help="Prebuilt literature index JSON (BioSysLit and/or PDFs), from "
+                         "'biosyslit_rag_retrieval_v2 index --taxon <taxon> [--pdf-dir <dir>] --output <file>'; "
+                         "used instead of --pdf_dir")
     p.add_argument("--user_prompts", default=None,
                     help="User prompt questions file (.docx/.csv)")
     p.add_argument("--exclude_list", default=None,
@@ -1819,7 +1836,7 @@ def parse_args():
 
 
 _PATH_ARGS = ("coco_json", "image_dir", "group_labels", "output_base", "api_key_file", "keypoints_json",
-              "pdf_dir", "user_prompts", "exclude_list", "grouping_file", "label_dir", "ratio_config",
+              "pdf_dir", "rag_index", "user_prompts", "exclude_list", "grouping_file", "label_dir", "ratio_config",
               "taxon_profile", "system_prompts", "compiled_dir", "prior_cache", "localities", "plates_dir",
               "descriptive_retest", "novelty_dir", "type_designations")
 

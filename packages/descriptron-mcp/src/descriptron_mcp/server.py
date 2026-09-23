@@ -49,9 +49,12 @@ matrix, audits and delimitation need no model. For single programs, pass
 couplets; you can write prose yourself from species_evidence).
 For run_full_pipeline_v2, ASK the user which backend to use before starting:
 claude-code (their Claude subscription; not available inside the Docker image) or
-api (an API key). Its 'biorag' step writes the image descriptions, and is where
-literature given with --pdf_dir is used; without a model that step stops the
-pipeline, so for a numbers-only run pass --llm_backend none --skip_steps biorag.
+api (an API key), or none for a numbers-only run (the image-description step is
+then skipped; everything computed from the data matrix still runs).
+Literature is used only in that image-description step: --pdf_dir <folder of PDFs>,
+or --rag_index <index.json> for BioSysLit (build it first with
+biosyslit_rag_retrieval_v2 index --taxon <taxon> [--pdf-dir <dir>] --output <file>).
+If both are given only the index is used, so index the PDFs into it.
 
 When writing a species treatment yourself: get the numbers from species_evidence,
 never from memory; put each number next to the structure it measures; keep
@@ -298,8 +301,8 @@ WORKFLOW = """\
 2. Run the data pipeline: run_full_pipeline_v2 (start_job; needs --coco_json,
    --image_dir, --group_labels, --output_base, --taxon_profile). The description
    steps need a model: --llm_backend claude-code (Claude subscription) or api (key).
-   Numbers only: --llm_backend none --skip_steps biorag. Literature for the
-   descriptions: --pdf_dir <folder of PDFs>.
+   Numbers only: --llm_backend none. Literature for the descriptions:
+   --pdf_dir <folder of PDFs> or --rag_index <BioSysLit/PDF index>.
 3. The Tier-1 matrix (compiled_key_tier/) holds species_feature_summary.csv,
    specimen_matrix_long.csv and feature_dictionary.tsv.
 4. Key: biorag_key_builder_v1 --matrix_dir <matrix> --output_dir <key>. The tree is
