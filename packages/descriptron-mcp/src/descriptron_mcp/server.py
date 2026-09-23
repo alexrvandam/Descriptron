@@ -49,8 +49,9 @@ matrix, audits and delimitation need no model. For single programs, pass
 couplets; you can write prose yourself from species_evidence).
 For run_full_pipeline_v2, ASK the user which backend to use before starting:
 claude-code (their Claude subscription; not available inside the Docker image) or
-api (an API key), or none for a numbers-only run (the image-description step is
-then skipped; everything computed from the data matrix still runs).
+api (an API key). Descriptions REQUIRE a vision-language model. With none the run
+stops at the data matrix, key, delimitation and per-species evidence sheets:
+useful for checking the data, but it produces no species descriptions.
 Literature is used only in that image-description step: --pdf_dir <folder of PDFs>,
 or --rag_index <index.json> for BioSysLit (build it first with
 biosyslit_rag_retrieval_v2 index --taxon <taxon> [--pdf-dir <dir>] --output <file>).
@@ -301,7 +302,7 @@ WORKFLOW = """\
 2. Run the data pipeline: run_full_pipeline_v2 (start_job; needs --coco_json,
    --image_dir, --group_labels, --output_base, --taxon_profile). The description
    steps need a model: --llm_backend claude-code (Claude subscription) or api (key).
-   Numbers only: --llm_backend none. Literature for the descriptions:
+   Data matrix and key only (no descriptions): --llm_backend none. Literature:
    --pdf_dir <folder of PDFs> or --rag_index <BioSysLit/PDF index>.
 3. The Tier-1 matrix (compiled_key_tier/) holds species_feature_summary.csv,
    specimen_matrix_long.csv and feature_dictionary.tsv.

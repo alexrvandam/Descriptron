@@ -208,9 +208,10 @@ descriptron run_full_pipeline_v2 --pdf_dir literature/ ...
 ```
 
 The literature is used by the step that describes each structure from the
-images, which needs a language model (`--llm_backend claude-code` or `api`).
-With `--llm_backend none` that step is skipped and everything computed from the
-data matrix still runs. If both `--rag_index` and `--pdf_dir` are given, only the
+images, which needs a vision-language model (`--llm_backend claude-code` or
+`api`). **Species descriptions cannot be produced without one.** With
+`--llm_backend none` the run stops at what can be computed (the data matrix, the
+key, delimitation and the per-species evidence sheets) and writes no descriptions. If both `--rag_index` and `--pdf_dir` are given, only the
 index is used, so index the PDFs into it.
 
 Retrieval is by keyword and metadata by default (taxon, family, section type),

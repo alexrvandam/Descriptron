@@ -1613,6 +1613,13 @@ def step_treatments_docx(cfg: Dict, python: str, log_dir: Path) -> bool:
     if not _require_profile(cfg):
         return False
     base = Path(cfg["output_base"])
+    if not any((base / "descriptions_v2").glob("*/*_treatment.json")):
+        # descriptions are written by a vision-language model; without one (--llm_backend none)
+        # the run ends at the data matrix, key and evidence sheets, and there is nothing to typeset
+        logger.warning("  no species treatments to build: descriptions need a vision-language model "
+                       "(--llm_backend claude-code or api). The data matrix, key and per-species "
+                       "evidence sheets (descriptions_v2/<species>/) are complete.")
+        return True
     out = base / "treatments" / "monograph_treatments.docx"
     cmd = [python, str(SCRIPT_DIR / "build_species_treatment_docx_v2.py"),
            "--descriptions-dir", str(base / "descriptions_v2"),

@@ -330,6 +330,11 @@ def main():
         (tj.parent / f"{code}_ontology.jsonld").write_text(json.dumps(jl, indent=1, ensure_ascii=False),
                                                            encoding="utf-8")
     df = pd.DataFrame(all_rows)
+    if df.empty:
+        # no treatments written (e.g. a --llm-backend none run writes evidence sheets only):
+        # keep the columns the summary reads, so coverage reports zero instead of a KeyError
+        df = pd.DataFrame(columns=["kind", "value", "entity_curie", "entity_match",
+                                   "quality_curie", "quality_match"])
     df.to_csv(out / "ontology_annotations.tsv", sep="\t", index=False)
     # structure -> term table (supplement)
     st_rows = [{"category": cat, "curie": (e or {}).get("curie", ""), "term": (e or {}).get("label", ""),

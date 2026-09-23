@@ -17,7 +17,7 @@ PACKAGES_DIR="${PACKAGES_DIR:-$HERE/../packages}"
 MCP_SRC="${MCP_SRC:-$HOME/Desktop/descriptron-mcp}"
 GUI_DIR="${GUI_DIR:-$HERE/../segment-anything-2/gui}"
 # programs changed since the base image, relative to gui/ (space-separated)
-OVERLAY="${OVERLAY:-measure/biosyslit_rag_retrieval_v2.py measure/run_full_pipeline_v2.py}"
+OVERLAY="${OVERLAY:-measure/biosyslit_rag_retrieval_v2.py measure/run_full_pipeline_v2.py measure/biorag_ontology_annotator_v2.py}"
 
 CTX="$(mktemp -d)"; trap 'rm -rf "$CTX"' EXIT
 mkdir -p "$CTX/wheels" "$CTX/descriptron-mcp" "$CTX/overlay"
