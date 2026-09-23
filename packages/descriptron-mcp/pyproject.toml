@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "descriptron-mcp"
+version = "0.1.0.dev1"
+description = "The Descriptron programs as tools for Claude and any other MCP client"
+readme = "README.md"
+# the MCP SDK needs 3.10; the programs themselves may run in an older
+# interpreter (DESCRIPTRON_CORE_PYTHON / DESCRIPTRON_VISION_PYTHON)
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex R. Van Dam" }]
+keywords = ["taxonomy", "morphometrics", "MCP", "model context protocol", "species description"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "mcp>=1.2",              # 1.x (FastMCP) and 2.x (MCPServer) are both supported
+  "pillow>=9",
+  "descriptron-core>=2.0.0,<3",
+]
+
+[project.optional-dependencies]
+vision = ["descriptron-vision>=2.0.0,<3"]
+dev = ["pytest>=7", "build>=1", "twine>=5"]
+
+[project.scripts]
+descriptron-mcp = "descriptron_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/alexrvandam/Descriptron"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/descriptron_mcp"]
