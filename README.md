@@ -294,7 +294,7 @@ every comparison — a value that is correct but attached to the wrong structure
 fails, which is exactly what a generator checking its own output cannot catch.
 
 ---
-## Use Descriptron from Claude (MCP server)
+## Use Descriptron from Claude (MCP server) (waiting on pypi but Docker is live!)
 
 Descriptron can also be driven by an AI assistant. `descriptron-mcp` is an
 [MCP](https://modelcontextprotocol.io) (Model Context Protocol) server: it lets
