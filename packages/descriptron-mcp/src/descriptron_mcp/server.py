@@ -42,11 +42,16 @@ Use list_programs to see the programs and program_help before running one; run
 short programs with run_program and anything long (pipelines, SAM2-PAL, DINOLand,
 detector training) with start_job, then poll job_status.
 
-Programs that can call a language model take --llm-backend (default claude-code,
-which needs the Claude Code CLI and is absent in the Docker image). Pass
---llm-backend none unless the user asks for a model: the key tree, matrix, audits
-and delimitation are computed without one (a model only rewords key couplets), and
-you can write any prose yourself from species_evidence.
+Programs that can call a language model take --llm-backend (run_full_pipeline_v2
+spells it --llm_backend and defaults to api, which needs an API key). The key tree,
+matrix, audits and delimitation need no model. For single programs, pass
+--llm-backend none unless the user asks for a model (a model only rewords key
+couplets; you can write prose yourself from species_evidence).
+For run_full_pipeline_v2, ASK the user which backend to use before starting:
+claude-code (their Claude subscription; not available inside the Docker image) or
+api (an API key). Its 'biorag' step writes the image descriptions, and is where
+literature given with --pdf_dir is used; without a model that step stops the
+pipeline, so for a numbers-only run pass --llm_backend none --skip_steps biorag.
 
 When writing a species treatment yourself: get the numbers from species_evidence,
 never from memory; put each number next to the structure it measures; keep
@@ -291,8 +296,10 @@ WORKFLOW = """\
    tv_train_v1 / tv_predict_v1, sam2_pal_batch_v21, dinov3_landmark_transfer_v51).
    Check the COCO file with coco_summary; zero width/height images must be fixed.
 2. Run the data pipeline: run_full_pipeline_v2 (start_job; needs --coco_json,
-   --image_dir, --group_labels, --output_base; --llm_backend none keeps it fully
-   deterministic, claude-code uses the Claude Code CLI).
+   --image_dir, --group_labels, --output_base, --taxon_profile). The description
+   steps need a model: --llm_backend claude-code (Claude subscription) or api (key).
+   Numbers only: --llm_backend none --skip_steps biorag. Literature for the
+   descriptions: --pdf_dir <folder of PDFs>.
 3. The Tier-1 matrix (compiled_key_tier/) holds species_feature_summary.csv,
    specimen_matrix_long.csv and feature_dictionary.tsv.
 4. Key: biorag_key_builder_v1 --matrix_dir <matrix> --output_dir <key>. The tree is
