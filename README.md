@@ -343,15 +343,14 @@ Python 3.10 or newer is needed for the server.
 python -m venv descriptron-mcp-env
 source descriptron-mcp-env/bin/activate        # Windows: descriptron-mcp-env\Scripts\activate
 
-pip install https://github.com/alexrvandam/Descriptron/releases/download/v2.0.1/descriptron_core-2.0.1-py3-none-any.whl
+pip install descriptron-core
 pip install "git+https://github.com/alexrvandam/Descriptron#subdirectory=packages/descriptron-mcp"
 
 descriptron-mcp --check                        # lists the programs it found
 ```
 
-For the GPU programs (torchvision detectors, SAM2-PAL, DINOLand), also install
-`descriptron_vision-2.0.1-py3-none-any.whl` from the
-[v2.0.1 release page](https://github.com/alexrvandam/Descriptron/releases/tag/v2.0.1).
+For the GPU programs (torchvision detectors, SAM2-PAL, DINOLand), also
+`pip install descriptron-vision`.
 
 **With Docker instead** (no Python setup; includes the GPU programs):
 

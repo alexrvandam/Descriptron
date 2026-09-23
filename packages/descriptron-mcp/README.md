@@ -17,22 +17,21 @@ is uploaded anywhere except what the assistant itself reads through the tools.
 Python ≥ 3.10 is needed for the server itself. The programs can run in a
 different environment. See *Configuration* below.
 
-**Now (from GitHub).** The Descriptron packages are attached to the
-[v2.0.1 release](https://github.com/alexrvandam/Descriptron/releases/tag/v2.0.1).
-Install the analysis package first, then the server:
+**Now.** Install the analysis package from PyPI, then the server from GitHub
+(until the server is on PyPI too):
 
 ```bash
 python -m venv descriptron-mcp-env
 source descriptron-mcp-env/bin/activate        # Windows: descriptron-mcp-env\Scripts\activate
 
-pip install https://github.com/alexrvandam/Descriptron/releases/download/v2.0.1/descriptron_core-2.0.1-py3-none-any.whl
+pip install descriptron-core
 pip install "git+https://github.com/alexrvandam/Descriptron#subdirectory=packages/descriptron-mcp"
 
 descriptron-mcp --check                        # shows what it found
 ```
 
-For the GPU programs (detectors, SAM2-PAL, DINOLand) also install
-`descriptron_vision-2.0.1-py3-none-any.whl` from the same release page.
+For the GPU programs (detectors, SAM2-PAL, DINOLand) also
+`pip install descriptron-vision`.
 
 **Later (from PyPI):**
 
