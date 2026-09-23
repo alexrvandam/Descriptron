@@ -1,4 +1,4 @@
-# Descriptron v2
+# Descriptron v2 with BioRAG
 
 **Morphology-driven species descriptions, keys and delimitation for dark taxa.**
 
