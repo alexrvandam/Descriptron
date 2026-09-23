@@ -1,4 +1,4 @@
-# Descriptron v2 with BioRAG
+# Descriptron v2 with BioRAG - Production scale ready
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22918056.svg)](https://doi.org/10.5281/zenodo.22918056)
 
