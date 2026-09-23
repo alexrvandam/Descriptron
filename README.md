@@ -1,5 +1,6 @@
-# Descriptron v2 with BioRAG - Production scale ready
-
+# Descriptron v2 with BioRAG - 
+## Production use ready - installable with pip, Docker or MCP (eg. Claude-Code)
+ 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22918056.svg)](https://doi.org/10.5281/zenodo.22918056)
 
 **Morphology-driven species descriptions, keys and delimitation for dark taxa.**
