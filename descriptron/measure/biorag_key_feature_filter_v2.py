@@ -216,6 +216,7 @@ def drop_flagged(df: pd.DataFrame, flags: pd.DataFrame, report: dict,
     """Remove flagged image x structure rows; remove the whole image when
     >= whole_image_min of its structures are flagged (wrong-scale signature)."""
     if flags is None or not len(flags):
+        report["flagged_rows_removed"] = {"whole_images": [], "rows_removed": 0}
         return df
     per_img = flags.groupby("image_base")["category"].nunique()
     bad_imgs = set(per_img[per_img >= whole_image_min].index)

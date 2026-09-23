@@ -11,6 +11,11 @@
 # exactly the live programs, not every historical script under gui/. The
 # programs themselves run in the image's existing environments.
 #
+# With `--user "$(id -u):$(id -g)"` (so output files belong to the user, not root)
+# the pipeline must still write its logs where it runs, inside gui/: directories
+# are made writable (metadata only, no file copies), plus the ontology releases
+# the pipeline refreshes.
+#
 # It also adds the literature-RAG dependencies (requests: BioSysLit on Zenodo;
 # pdfplumber: your own PDFs) to measure_env, which the base image lacked.
 #
@@ -35,14 +40,24 @@ RUN /opt/conda/envs/samm/bin/python -m venv /opt/descriptron-mcp \
  && /opt/conda/envs/measure_env/bin/pip install --no-cache-dir "requests>=2.28" "pdfplumber>=0.10" \
  && rm -rf /tmp/mcp-build \
  && chmod 755 /usr/local/bin/descriptron \
- && chmod -R a+rX /opt/descriptron-mcp
+ && chmod -R a+rX /opt/descriptron-mcp \
+ && mkdir -p /weights/torch /weights/huggingface /weights/easyocr && chmod -R a+rwX /weights \
+ && find /opt/descriptron/gui -type d -exec chmod a+rwx {} + \
+ && chmod -R a+rw /opt/descriptron/gui/measure/biorag_prompts/ontologies
 
-# the programs run in the environments the image already has; every cache goes
-# to /tmp so the server also works with --user (a non-root uid has no writable HOME)
+# the programs run in the environments the image already has; scratch caches go to
+# /tmp so everything also works with --user (a non-root uid has no writable HOME).
+# Model weights stay in /weights (TORCH_HOME, HF_HOME from the base image), made
+# world-writable above: a new named volume copies these permissions, so weights
+# download once into `-v descriptron-weights:/weights` and are reused.
 ENV DESCRIPTRON_CORE_PYTHON=/opt/conda/envs/measure_env/bin/python \
     DESCRIPTRON_VISION_PYTHON=/opt/conda/envs/samm/bin/python \
     DESCRIPTRON_MCP_STATE=/tmp/descriptron-mcp-state \
     MPLCONFIGDIR=/tmp/matplotlib \
     NUMBA_CACHE_DIR=/tmp/numba \
     XDG_CACHE_HOME=/tmp/cache \
-    HF_HOME=/tmp/huggingface
+    EASYOCR_MODULE_PATH=/weights/easyocr \
+    HOME=/tmp
+# EasyOCR (scale-bar reading) otherwise writes to $HOME/.EasyOCR; under --user there
+# is no home directory (HOME=/), the measurements lose their mm calibration and
+# every later step fails. Its models now live with the other weights.

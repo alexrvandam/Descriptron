@@ -103,6 +103,9 @@ docker pull ghcr.io/alexrvandam/descriptron:2.0.1
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
 
+**Step-by-step recipe** (project folder, the full pipeline, Linux and Windows
+commands, where the results go): [docs/DOCKER_RECIPE.md](docs/DOCKER_RECIPE.md).
+
 ```bash
 docker pull ghcr.io/alexrvandam/descriptron:latest
 
