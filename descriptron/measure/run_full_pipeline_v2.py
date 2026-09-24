@@ -1871,6 +1871,19 @@ def main():
         ],
     )
 
+    # v2.0.4: the API key comes from the environment, the credentials file, or (first use, interactive
+    # only) a prompt; asked here once so every step inherits it. Never logged.
+    if args.llm_backend == "api":
+        try:
+            import descriptron_credentials as _creds
+            _creds.load_into_environment()
+            if not _creds.ensure_key("ANTHROPIC_API_KEY"):
+                logger.warning("  --llm_backend api but no ANTHROPIC_API_KEY (environment, %s, or prompt): "
+                               "the description steps will fail; use --llm_backend none for the data-only "
+                               "outputs", _creds.credentials_path())
+        except ImportError:
+            pass
+
     logger.info("=" * 70)
     logger.info("Descriptron → BioRAG Full Pipeline")
     logger.info("=" * 70)

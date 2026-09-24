@@ -14461,6 +14461,10 @@ def open_biorag_popup():
             if not _sh.which("claude"):
                 messagebox.showerror("Error", "Claude Code CLI ('claude') not found on PATH. Install and log in, or choose the 'api' backend.")
                 return
+        if llm_backend_var.get() == "api" and not _descriptron_key_gui("ANTHROPIC_API_KEY", parent=popup):   # v2.0.4
+            if not messagebox.askyesno("No API key", "No ANTHROPIC_API_KEY is set, so the species descriptions "
+                                       "cannot be written. Run anyway (matrix, key and evidence sheets only)?"):
+                return
 
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "measure",
                               "run_full_pipeline_v2.py" if workflow_var.get() == "v2" else "run_full_pipeline.py")
@@ -15492,6 +15496,45 @@ next_image_button.grid(row=2, column=13, padx=0, pady=0)
 DINOLAND_ENV = os.environ.get("DINOLAND_ENV", "biorag")
 
 
+def _descriptron_key_gui(name, parent=None, model_id=None):
+    """v2.0.4: make sure `name` (ANTHROPIC_API_KEY or HF_TOKEN) is available to the programs this GUI
+    launches: environment, then ~/.config/descriptron/credentials, then — first use only — a dialog.
+    For HF_TOKEN nothing is asked when the DINOv3 weights are already cached (or cannot be checked).
+    Switched off entirely by DESCRIPTRON_NO_KEY_PROMPT=1. Keys are never logged."""
+    import sys as _sys
+    here = os.path.dirname(os.path.abspath(__file__))
+    if os.path.join(here, "measure") not in _sys.path:
+        _sys.path.append(os.path.join(here, "measure"))
+    try:
+        import descriptron_credentials as _c
+    except ImportError:
+        try:
+            from descriptron_core.cli import tools_dir as _td
+            _sys.path.append(str(_td()))
+            import descriptron_credentials as _c
+        except Exception:
+            return None
+    _c.load_into_environment()
+    if name == "HF_TOKEN":
+        if not model_id or os.path.isdir(os.path.expanduser(model_id)) or os.environ.get("HF_HUB_OFFLINE") == "1":
+            return None
+        try:
+            from huggingface_hub import try_to_load_from_cache
+            if isinstance(try_to_load_from_cache(model_id, "config.json"), str):
+                return None
+        except Exception:
+            return None
+
+    def _ask(n, purpose, where):
+        from tkinter import simpledialog
+        return simpledialog.askstring(
+            "Descriptron: key needed",
+            f"{n} is needed for {purpose}.\n\nGet one at:\n{where}\n\n"
+            f"It is saved, readable by you only, in\n{_c.credentials_path()}\n"
+            f"so you are asked only once. Leave empty to skip.", show="*", parent=parent)
+    return _c.ensure_key(name, ask=_ask)
+
+
 def _dinoland_build_cmd(v, script_path, env=None):
     """Turn the DINOLand dialog values into the dinov3_landmark_transfer_v51.py command.
     Kept separate from the Tk code so it can be unit-tested without a display."""
@@ -15675,6 +15718,7 @@ def run_dinoland_script():
         if not dinoland_script.is_file():
             messagebox.showerror("Script Error", f"DINOLand script not found at: {dinoland_script}")
             return
+        _descriptron_key_gui("HF_TOKEN", parent=input_window, model_id=v.get("model"))   # v2.0.4
         cmd = _dinoland_build_cmd(v, dinoland_script)
         out_path = Path(v["outdir"]); out_path.mkdir(parents=True, exist_ok=True)
         log_path = out_path / "dinoland_run.log"

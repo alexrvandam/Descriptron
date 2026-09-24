@@ -612,6 +612,51 @@ def fig_transfer(imgA, imgB, lm, pred, accepted, outdir, name, truth=None):
     plt.close(fig)
 
 
+def _credentials_module():
+    """descriptron_credentials lives in measure/ (source tree, Docker) or in descriptron-core (pip)."""
+    import sys as _sys
+    try:
+        import descriptron_credentials as c
+        return c
+    except ImportError:
+        pass
+    here = os.path.dirname(os.path.abspath(__file__))
+    for d in (os.path.join(here, "measure"), here):
+        if os.path.exists(os.path.join(d, "descriptron_credentials.py")):
+            _sys.path.append(d)
+            import descriptron_credentials as c
+            return c
+    try:
+        from descriptron_core.cli import tools_dir
+        _sys.path.append(str(tools_dir()))
+        import descriptron_credentials as c
+        return c
+    except Exception:
+        return None
+
+
+def _hf_token_if_needed(model_id: str):
+    """v2.0.4: DINOv3 weights are gated on Hugging Face. Only when they are NOT already cached (and the
+    model is not a local folder, and we are not offline) is a token needed: environment, credentials
+    file, or a first-use prompt. Cached weights never trigger anything."""
+    if os.path.isdir(os.path.expanduser(model_id)) or os.environ.get("HF_HUB_OFFLINE") == "1":
+        return
+    try:
+        from huggingface_hub import try_to_load_from_cache
+        if isinstance(try_to_load_from_cache(model_id, "config.json"), str):
+            return
+    except Exception:
+        pass
+    c = _credentials_module()
+    if c is None:
+        return
+    c.load_into_environment()
+    if not c.ensure_key("HF_TOKEN"):
+        print(f"note: {model_id} is not downloaded yet and no HF_TOKEN is set; if the download is refused, "
+              f"accept the licence on huggingface.co and set HF_TOKEN (or save it: python "
+              f"descriptron_credentials.py --set HF_TOKEN)")
+
+
 # ──────────────────────────────── main ───────────────────────────────────────
 def main():
     ap = argparse.ArgumentParser()
@@ -665,6 +710,7 @@ def main():
 
     global ALIGN_MODE
     ALIGN_MODE = a.align
+    _hf_token_if_needed(a.model)
     bb = Backbone(a.model, a.dim)
     print(f"model={a.model} patch={bb.patch} grid={bb.grid} "
           f"dim={bb.img_dim} layers={bb.n_layers} device={bb.device}")

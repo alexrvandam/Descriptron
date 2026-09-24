@@ -19,6 +19,9 @@
 # It pins transformers 4.57.6 in samm: the base image's transformers 5.17 needs torch >= 2.5 but samm has
 # 2.4, so every model loaded as a placeholder and DINOLand could not run (4.57.6 = measure_env's version).
 #
+# Keys (v2.0.4): DESCRIPTRON_CREDENTIALS=/config/credentials. Mount your own folder there to keep them
+# between runs: -v "$HOME/.config/descriptron:/config". Environment variables (-e HF_TOKEN) still win.
+#
 # It also adds the literature-RAG dependencies (requests: BioSysLit on Zenodo;
 # pdfplumber: your own PDFs) to measure_env, which the base image lacked.
 #
@@ -46,6 +49,7 @@ RUN /opt/conda/envs/samm/bin/python -m venv /opt/descriptron-mcp \
  && chmod 755 /usr/local/bin/descriptron \
  && chmod -R a+rX /opt/descriptron-mcp \
  && mkdir -p /weights/torch /weights/huggingface /weights/easyocr && chmod -R a+rwX /weights \
+ && mkdir -p /config && chmod 1777 /config \
  && find /opt/descriptron/gui -type d -exec chmod a+rwx {} + \
  && chmod -R a+rw /opt/descriptron/gui/measure/biorag_prompts/ontologies
 
@@ -62,6 +66,7 @@ ENV DESCRIPTRON_CORE_PYTHON=/opt/conda/envs/measure_env/bin/python \
     XDG_CACHE_HOME=/tmp/cache \
     EASYOCR_MODULE_PATH=/weights/easyocr \
     DINOLAND_ENV=samm \
+    DESCRIPTRON_CREDENTIALS=/config/credentials \
     HOME=/tmp
 # EasyOCR (scale-bar reading) otherwise writes to $HOME/.EasyOCR; under --user there
 # is no home directory (HOME=/), the measurements lose their mm calibration and

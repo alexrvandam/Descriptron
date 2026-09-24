@@ -96,13 +96,17 @@ pip install descriptron
 ```
 
 Writing treatments is the only step that calls a language model:
-`pip install "descriptron-core[llm]"`. Literature retrieval from BioSysLit and
+`pip install "descriptron-core[llm]"`. **Keys** (an Anthropic API key for
+descriptions with `--llm_backend api`; a Hugging Face token the first time DINOLand
+downloads DINOv3) are read from the environment or from
+`~/.config/descriptron/credentials`; if neither has one, you are asked the first
+time it is needed, and it is saved there (`descriptron-keys --set NAME` to change). Literature retrieval from BioSysLit and
 your own PDFs: `pip install "descriptron-core[rag]"` (see
 [What BioRAG retrieves](#what-biorag-retrieves-the-data-matrix-and-the-literature)).
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
-docker pull ghcr.io/alexrvandam/descriptron:2.0.3
+docker pull ghcr.io/alexrvandam/descriptron:2.0.4
 
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
@@ -381,7 +385,7 @@ descriptron-mcp --check                        # lists the programs it found
 ```bash
 claude mcp add descriptron -- docker run -i --rm --gpus all \
   --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
-  ghcr.io/alexrvandam/descriptron:2.0.3 mcp
+  ghcr.io/alexrvandam/descriptron:2.0.4 mcp
 ```
 
 Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start

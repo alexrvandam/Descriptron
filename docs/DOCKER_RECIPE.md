@@ -36,7 +36,7 @@ Desktop; Linux: Docker Engine).
 
 Then, in a terminal:
 
-    docker pull ghcr.io/alexrvandam/descriptron:2.0.3
+    docker pull ghcr.io/alexrvandam/descriptron:2.0.4
 
 This downloads 32 GB, so it takes a while.
 
@@ -76,7 +76,7 @@ Open a terminal **in your project folder**.
     docker run --rm --user "$(id -u):$(id -g)" \
       -e ANTHROPIC_API_KEY \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.0.3 pipeline \
+      ghcr.io/alexrvandam/descriptron:2.0.4 pipeline \
         --coco_json /data/annotations.json \
         --image_dir /data/images \
         --group_labels /data/group_labels.csv \
@@ -90,7 +90,7 @@ Open a terminal **in your project folder**.
 
     docker run --rm -e ANTHROPIC_API_KEY `
       -v "${PWD}:/data" -v descriptron-weights:/weights `
-      ghcr.io/alexrvandam/descriptron:2.0.3 pipeline `
+      ghcr.io/alexrvandam/descriptron:2.0.4 pipeline `
         --coco_json /data/annotations.json `
         --image_dir /data/images `
         --group_labels /data/group_labels.csv `
@@ -117,6 +117,21 @@ What the parts mean:
   add `--pdf_dir /data/literature`. Scanned PDFs without a text layer contribute
   nothing; run OCR on them first (e.g. `ocrmypdf scan.pdf text.pdf`).
 - **Stopped part-way?** Run the same command again: finished steps are skipped.
+
+**Keys, saved once (instead of `export` in every terminal).** Descriptron looks for
+a key first in the environment, then in a small private file, and otherwise asks
+the first time it needs it. To save them in that file:
+
+    docker run -it --rm -v "$HOME/.config/descriptron:/config" \
+      ghcr.io/alexrvandam/descriptron:2.0.4 keys --set ANTHROPIC_API_KEY
+    docker run -it --rm -v "$HOME/.config/descriptron:/config" \
+      ghcr.io/alexrvandam/descriptron:2.0.4 keys --set HF_TOKEN
+
+Then add `-v "$HOME/.config/descriptron:/config"` to your runs and leave out the
+`export` and `-e` parts. `keys` alone shows which keys are set (never their
+values); `keys --remove NAME` deletes one. With `docker run -it`, a run that needs a
+missing key asks for it and saves it the same way. Or write the file yourself:
+`~/.config/descriptron/credentials`, one `NAME=value` per line.
 
 
 ## 5. Where the results are
@@ -156,7 +171,7 @@ then download once into the `descriptron-weights` volume.
 
     docker run --rm --gpus all --user "$(id -u):$(id -g)" \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.0.3 sam2-pal \
+      ghcr.io/alexrvandam/descriptron:2.0.4 sam2-pal \
         --template_image /data/refs/template.png --template_json /data/refs/annotations.json \
         --training_json /data/refs/annotations.json --training_images_dir /data/refs \
         --image_dir /data/images --output_dir /data/out_sam2pal \
@@ -169,7 +184,7 @@ then download once into the `descriptron-weights` volume.
     export HF_TOKEN=hf_...
     docker run --rm --user "$(id -u):$(id -g)" -e HF_TOKEN \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.0.3 dinoland \
+      ghcr.io/alexrvandam/descriptron:2.0.4 dinoland \
         --imgA /data/refs/ref1.tif \
         --landmarks /data/refs/ref1.json,/data/refs/ref2.json,/data/refs/ref3.json \
         --ref_dir /data/refs --batch_glob "/data/images/*.tif" --batch_n 999 \
@@ -190,8 +205,8 @@ checking and correcting, and that the pipeline above measures.
 
 ## 7. Other commands
 
-    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.3 help
-    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.3 pipeline --help
+    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.4 help
+    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.4 pipeline --help
 
 Training detectors and the annotation GUI are described in the GitHub README.
 **Hosting Descriptron for a group** on one institutional machine with a shared

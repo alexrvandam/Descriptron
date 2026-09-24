@@ -67,7 +67,7 @@ docker run --rm --gpus all ubuntu nvidia-smi
 
 ```bash
 # the image (about 33 GB on disk); pin a version for reproducible projects
-docker pull ghcr.io/alexrvandam/descriptron:2.0.3
+docker pull ghcr.io/alexrvandam/descriptron:2.0.4
 
 # shared folders
 sudo mkdir -p /srv/descriptron/{weights,checkpoints,projects}
@@ -89,8 +89,8 @@ sudo mkdir -p /srv/descriptron/{weights,checkpoints,projects}
 **Smoke test:**
 
 ```bash
-docker run --rm ghcr.io/alexrvandam/descriptron:2.0.3 help
-docker run --rm ghcr.io/alexrvandam/descriptron:2.0.3 mcp --check     # lists 62 + 11 programs
+docker run --rm ghcr.io/alexrvandam/descriptron:2.0.4 help
+docker run --rm ghcr.io/alexrvandam/descriptron:2.0.4 mcp --check     # lists 62 + 11 programs
 ```
 
 ---
@@ -108,7 +108,8 @@ docker run --rm --gpus all --user "$(id -u):$(id -g)" \
   -v /srv/descriptron/projects/mygroup:/data \
   -v /srv/descriptron/checkpoints:/ckpt:ro \
   -v /srv/descriptron/weights:/weights \
-  ghcr.io/alexrvandam/descriptron:2.0.3 sam2-pal \
+  -v "$HOME/.config/descriptron:/config" \
+  ghcr.io/alexrvandam/descriptron:2.0.4 sam2-pal \
     --template_image /data/refs/template.png --template_json /data/refs/annotations.json \
     --image_dir /data/targets --output_dir /data/out_sam2pal \
     --sam2_checkpoint /ckpt/sam2_hiera_large.pt --sam2_config sam2_hiera_l.yaml
@@ -132,7 +133,7 @@ from that desktop:
 docker run --rm --gpus all --user "$(id -u):$(id -g)" \
   -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /srv/descriptron/projects/mygroup:/data -v /srv/descriptron/weights:/weights \
-  ghcr.io/alexrvandam/descriptron:2.0.3 gui
+  ghcr.io/alexrvandam/descriptron:2.0.4 gui
 ```
 
 We run the GUI on local Linux desktops; a remote-desktop setup is standard
@@ -156,8 +157,13 @@ pipeline flag is `--llm-backend`:
 The published descriptions were generated with Claude (Sonnet 5). Other models can
 be connected through `--api-base-url` but have not been validated.
 
-Keys belong to users or projects, never in the image or in shared scripts: pass
-them per run (`-e ANTHROPIC_API_KEY`) from the user's own environment.
+Keys belong to users or projects, never in the image or in shared scripts. Each user
+keeps their own in `~/.config/descriptron/credentials` (created readable by that user
+only): add `-v "$HOME/.config/descriptron:/config"` to the wrapper script and users
+either run `descriptron keys --set ANTHROPIC_API_KEY` once, or are asked the first time
+a step needs a key (interactive runs only; batch jobs never prompt). The same applies
+to `HF_TOKEN` for DINOLand when the shared weights cache does not already hold DINOv3.
+Environment variables (`-e ANTHROPIC_API_KEY`) still take precedence.
 
 ---
 
@@ -175,7 +181,7 @@ them per run (`-e ANTHROPIC_API_KEY`) from the user's own environment.
 
 ## 9. Updates and reproducibility
 
-- New versions are published as new image tags (`2.0.3`, …) and `latest`.
+- New versions are published as new image tags (`2.0.4`, …) and `latest`.
   `docker pull` fetches only the changed layers.
 - Pin the tag in each project's scripts and note it with the results, so an
   analysis can be rerun with the exact image it used.

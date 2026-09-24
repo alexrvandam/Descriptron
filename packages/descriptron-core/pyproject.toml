@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-core"
-version = "2.0.3"
+version = "2.0.4"
 description = "Evidence-tiered species descriptions, keys and audits from phenomic matrices"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -65,6 +65,7 @@ biorag-key         = "descriptron_core.cli:run_key_builder"
 biorag-audit       = "descriptron_core.cli:run_confabulation_checker"
 biorag-novelty     = "descriptron_core.cli:run_novelty_score"
 biorag-calibrate   = "descriptron_core.cli:run_calibrate"
+descriptron-keys   = "descriptron_core.cli:run_keys"
 
 [project.urls]
 Homepage = "https://github.com/alexrvandam/Descriptron"

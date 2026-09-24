@@ -32,7 +32,7 @@ descriptron-mcp --check                        # shows what it found
 ```bash
 claude mcp add descriptron -- docker run -i --rm --gpus all \
   --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
-  ghcr.io/alexrvandam/descriptron:2.0.3 mcp
+  ghcr.io/alexrvandam/descriptron:2.0.4 mcp
 ```
 
 Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start

@@ -41,7 +41,8 @@ EXTRA_VISION = ["torchvision_det",                   # whole directory
 # biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
 # because it CAN use Florence-2, which it loads lazily), and that imports
 # descriptron_rosetta. Without these the literature RAG dies on import in core.
-EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py"]
+EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py",
+              "measure/descriptron_credentials.py"]      # v2.0.4: API keys / tokens (core + DINOLand + GUI)
 EXTRA_GUI = ["marmot.jpg", "icons"]
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 

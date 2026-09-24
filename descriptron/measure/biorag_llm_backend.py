@@ -288,6 +288,12 @@ def client_from_args(args, log_path: Optional[str] = None):
     --api-base-url, or no model at all."""
     import os
     key_env = getattr(args, "api_key_env", None) or "ANTHROPIC_API_KEY"
+    if (getattr(args, "llm_backend", "") or "").lower() == "api" and not os.environ.get(key_env):
+        try:                                             # v2.0.4: credentials file / first-use prompt
+            import descriptron_credentials as _creds
+            _creds.ensure_key(key_env)
+        except ImportError:
+            pass
     return make_llm_client(getattr(args, "llm_backend", "claude-code"),
                            api_key=os.environ.get(key_env),
                            claude_bin=getattr(args, "claude_bin", None),
