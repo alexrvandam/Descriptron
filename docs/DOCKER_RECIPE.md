@@ -34,7 +34,7 @@ Desktop; Linux: Docker Engine).
 
 Then, in a terminal:
 
-    docker pull ghcr.io/alexrvandam/descriptron:2.0.2
+    docker pull ghcr.io/alexrvandam/descriptron:2.0.3
 
 This downloads 32 GB, so it takes a while.
 
@@ -74,7 +74,7 @@ Open a terminal **in your project folder**.
     docker run --rm --user "$(id -u):$(id -g)" \
       -e ANTHROPIC_API_KEY \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.0.2 pipeline \
+      ghcr.io/alexrvandam/descriptron:2.0.3 pipeline \
         --coco_json /data/annotations.json \
         --image_dir /data/images \
         --group_labels /data/group_labels.csv \
@@ -88,7 +88,7 @@ Open a terminal **in your project folder**.
 
     docker run --rm -e ANTHROPIC_API_KEY `
       -v "${PWD}:/data" -v descriptron-weights:/weights `
-      ghcr.io/alexrvandam/descriptron:2.0.2 pipeline `
+      ghcr.io/alexrvandam/descriptron:2.0.3 pipeline `
         --coco_json /data/annotations.json `
         --image_dir /data/images `
         --group_labels /data/group_labels.csv `
@@ -134,8 +134,8 @@ Everything is written to `my_project/output/`:
 
 ## 6. Other commands
 
-    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.2 help
-    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.2 pipeline --help
+    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.3 help
+    docker run --rm ghcr.io/alexrvandam/descriptron:2.0.3 pipeline --help
 
 Training detectors, SAM2-PAL, DINOLand and the annotation GUI are described in
 the GitHub README.

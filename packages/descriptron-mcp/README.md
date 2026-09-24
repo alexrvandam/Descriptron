@@ -45,7 +45,7 @@ pip install "descriptron-mcp[vision]"  # + detectors, SAM2-PAL, DINOLand (GPU)
 ```bash
 claude mcp add descriptron -- docker run -i --rm --gpus all \
   --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
-  ghcr.io/alexrvandam/descriptron:2.0.2 mcp
+  ghcr.io/alexrvandam/descriptron:2.0.3 mcp
 ```
 
 Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start

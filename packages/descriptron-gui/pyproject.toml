@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-gui"
-version = "2.0.2"
+version = "2.0.3"
 description = "The Descriptron annotation GUI: SAM2-assisted segmentation, keypoints and COCO export"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -24,8 +24,8 @@ classifiers = [
 # fails to start. The GUI drives the analysis scripts directly, so it needs core
 # as well as vision — it is not a thin front end.
 dependencies = [
-  "descriptron-core==2.0.2",
-  "descriptron-vision==2.0.2",
+  "descriptron-core==2.0.3",
+  "descriptron-vision==2.0.3",
 ]
 
 [project.optional-dependencies]

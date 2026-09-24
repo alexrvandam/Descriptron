@@ -37,6 +37,7 @@ every claim in the output is checked against the data it came from.
 - [What v2 adds](#what-v2-adds)
 - [Installing](#installing) — pip · Docker · conda
   - **[Docker how-to](docs/DOCKER_RECIPE.md)** — step-by-step recipe: project folder, full pipeline, Linux and Windows
+  - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -101,7 +102,7 @@ your own PDFs: `pip install "descriptron-core[rag]"` (see
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
-docker pull ghcr.io/alexrvandam/descriptron:2.0.2
+docker pull ghcr.io/alexrvandam/descriptron:2.0.3
 
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
@@ -383,7 +384,7 @@ For the GPU programs (torchvision detectors, SAM2-PAL, DINOLand), also
 ```bash
 claude mcp add descriptron -- docker run -i --rm --gpus all \
   --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
-  ghcr.io/alexrvandam/descriptron:2.0.2 mcp
+  ghcr.io/alexrvandam/descriptron:2.0.3 mcp
 ```
 
 Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start
