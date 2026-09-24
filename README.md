@@ -343,7 +343,7 @@ fails, which is exactly what a generator checking its own output cannot catch.
 ---
 <a id="mcp-server"></a>
 
-## Use Descriptron from Claude (MCP server) (waiting on pypi but Docker is live!)
+## Use Descriptron from Claude (MCP server)
 
 Descriptron can also be driven by an AI assistant. `descriptron-mcp` is an
 [MCP](https://modelcontextprotocol.io) (Model Context Protocol) server: it lets
@@ -370,14 +370,11 @@ Python 3.10 or newer is needed for the server.
 python -m venv descriptron-mcp-env
 source descriptron-mcp-env/bin/activate        # Windows: descriptron-mcp-env\Scripts\activate
 
-pip install descriptron-core
-pip install "git+https://github.com/alexrvandam/Descriptron#subdirectory=packages/descriptron-mcp"
+pip install descriptron-mcp                    # analysis programs (CPU)
+pip install "descriptron-mcp[vision]"          # + detectors, SAM2-PAL, DINOLand (GPU)
 
 descriptron-mcp --check                        # lists the programs it found
 ```
-
-For the GPU programs (torchvision detectors, SAM2-PAL, DINOLand), also
-`pip install descriptron-vision`.
 
 **With Docker instead** (no Python setup; includes the GPU programs):
 
