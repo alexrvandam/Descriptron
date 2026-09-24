@@ -13200,6 +13200,9 @@ def open_pal_popup():
     chunk_size_var = tk.StringVar(value="0")
     iou_threshold_var = tk.StringVar(value="0.5")
     load_checkpoint_var = tk.StringVar(value="")
+    # v21 opt-in robustness options (both OFF by default; image in the template's orientation when possible)
+    orientation_search_var = tk.BooleanVar(value=False)
+    flip_augment_var = tk.BooleanVar(value=False)
     
     # Create scrollable frame for the popup
     main_canvas = tk.Canvas(popup)
@@ -13226,12 +13229,12 @@ def open_pal_popup():
     
     # Version and status info
     status_parts = [f"Script: {pal_script_name}"]
-    if version_str in ["v17", "v18"]:
+    if version_str in ["v17", "v18", "v19", "v20", "v21"]:
         status_parts.append("Multi-mask: [OK]")
-    if version_str == "v18":
+    if version_str in ["v18", "v19", "v20", "v21"]:
         status_parts.append("OOM-fix: [OK]")
         status_parts.append("Cycle-consistency: [OK]")
-    if version_str in ["v16", "v17"]:
+    if version_str in ["v16", "v17", "v18", "v19", "v20", "v21"]:
         status_parts.append(f"LoRA: {'[OK] Available' if lora_available else 'Install peft'}")
     status_text = " | ".join(status_parts)
     tk.Label(scrollable_popup, text=status_text, fg="blue", font=("Arial", 9)).grid(row=row, column=0, columnspan=3, pady=(0, 5))
@@ -13286,7 +13289,7 @@ This forces the model to learn REAL tracking, not just memorization."""
     tk.Button(json_frame, text="Browse", command=lambda: browse_file_pal(template_json_var, "Select Template COCO JSON", [("JSON Files", "*.json")])).grid(row=0, column=2, padx=5, pady=3)
     
     # Info about multi-mask
-    if version_str == "v17":
+    if version_str in ["v17", "v18", "v19", "v20", "v21"]:
         tk.Label(json_frame, text="v17: Multiple masks (e.g., scape, antenna, eye) will ALL be trained and predicted", 
                  fg="green", font=("Arial", 8)).grid(row=1, column=0, columnspan=3, sticky='w', padx=5)
     else:
@@ -13370,7 +13373,7 @@ This forces the model to learn REAL tracking, not just memorization."""
     row += 1
     
     # === LoRA Section (v16/v17 only) ===
-    if version_str in ["v16", "v17"]:
+    if version_str in ["v16", "v17", "v18", "v19", "v20", "v21"]:
         lora_frame = tk.LabelFrame(scrollable_popup, text="LoRA Fine-tuning (v16+ - Optional)", padx=5, pady=5)
         lora_frame.grid(row=row, column=0, columnspan=3, padx=10, pady=5, sticky='ew')
         
@@ -13404,7 +13407,7 @@ This forces the model to learn REAL tracking, not just memorization."""
     tk.Entry(output_frame, textvariable=num_points_var, width=5).grid(row=2, column=2, sticky='w', padx=2)
 
     # V18 inference strategy options
-    if version_str in ["v18"]:
+    if version_str in ["v18", "v19", "v20", "v21"]:
         v18_frame = tk.LabelFrame(output_frame, text="v18 Inference Strategy", padx=3, pady=3)
         v18_frame.grid(row=3, column=0, columnspan=3, sticky='ew', padx=5, pady=5)
 
@@ -13435,6 +13438,15 @@ This forces the model to learn REAL tracking, not just memorization."""
         tk.Button(v18_frame, text="Browse", command=_browse_load_ckpt, width=8).grid(row=3, column=2, padx=2)
         tk.Label(v18_frame, text="(skip training, use existing .pt for inference only)",
                   fg="gray", font=("Arial", 8)).grid(row=4, column=0, columnspan=3, sticky='w', padx=5)
+        if version_str == "v21":
+            tk.Checkbutton(v18_frame, text="Orientation search (specimens may be rotated; 4x slower)",
+                           variable=orientation_search_var).grid(row=5, column=0, columnspan=3, sticky='w')
+            tk.Label(v18_frame, text="(tries 0/90/180/270 deg per image, keeps the most confident; cannot fix mirrored "
+                                     "imaging - best practice is to image in the template's orientation)",
+                     fg="gray", font=("Arial", 8), wraplength=520, justify='left').grid(row=6, column=0, columnspan=3,
+                                                                                         sticky='w', padx=5)
+            tk.Checkbutton(v18_frame, text="Flip augmentation during fine-tuning (original + h + v + hv copies)",
+                           variable=flip_augment_var).grid(row=7, column=0, columnspan=3, sticky='w')
 
     row += 1
     
@@ -13498,7 +13510,7 @@ This forces the model to learn REAL tracking, not just memorization."""
         do_finetune = enable_finetune_var.get()
         if do_finetune:
             # === FIX: Allow COCO JSON mode for fine-tuning in v17 ===
-            if mode == "json" and version_str not in ["v17", "v18"]:
+            if mode == "json" and version_str not in ["v17", "v18", "v19", "v20", "v21"]:
                 messagebox.showerror("Error", "PAL fine-tuning with COCO JSON requires v17.\nPlease use Binary Mask mode or upgrade to sam2_pal_batch_v17.py")
                 return
             # For mask mode, still require a mask file
@@ -13569,7 +13581,7 @@ This forces the model to learn REAL tracking, not just memorization."""
                 command.extend(['--training_images_dir', training_images_dir_var.get()])
         
         # LoRA options (v16/v17 only)
-        if version_str in ["v16", "v17", "v18"] and use_lora_var.get() and lora_available:
+        if version_str in ["v16", "v17", "v18", "v19", "v20", "v21"] and use_lora_var.get() and lora_available:
             command.append('--use_lora')
             command.extend(['--lora_rank', lora_rank_var.get()])
         
@@ -13584,7 +13596,7 @@ This forces the model to learn REAL tracking, not just memorization."""
             command.append('--interleave_template')
         
         # V18 inference strategy options
-        if version_str in ["v18"]:
+        if version_str in ["v18", "v19", "v20", "v21"]:
             if load_checkpoint_var.get() and os.path.exists(load_checkpoint_var.get()):
                 command.extend(['--load_checkpoint', load_checkpoint_var.get()])
             if cycle_consistency_var.get():
@@ -13595,6 +13607,11 @@ This forces the model to learn REAL tracking, not just memorization."""
             iou_thr = float(iou_threshold_var.get() or "0.5")
             if iou_thr != 0.5:
                 command.extend(['--iou_threshold', str(iou_thr)])
+        if version_str == "v21":
+            if orientation_search_var.get():
+                command.extend(['--orientation_search', 'rot4'])
+            if do_finetune and flip_augment_var.get():
+                command.extend(['--flip_augment', 'all'])
         
         # === FIX: Save settings to YAML file ===
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -13636,6 +13653,8 @@ This forces the model to learn REAL tracking, not just memorization."""
                 'chunk_size': chunk_size_var.get(),
                 'iou_threshold': iou_threshold_var.get(),
                 'load_checkpoint': load_checkpoint_var.get(),
+                'orientation_search': orientation_search_var.get(),
+                'flip_augment': flip_augment_var.get(),
             },
             'command': ' '.join(command),
         }
@@ -15491,6 +15510,8 @@ def _dinoland_build_cmd(v, script_path, env=None):
             cmd += ["--batch_n", str(int(v["batch_n"]))]
         if v.get("emit_refs"):
             cmd.append("--emit_refs")
+        if v.get("mirror_refs"):
+            cmd.append("--mirror_refs")
     else:  # pair
         cmd += ["--imgB", v["imgB"]]
         if v.get("maskB"):
@@ -15542,6 +15563,7 @@ def run_dinoland_script():
     facet = tk.StringVar(value="token"); align = tk.StringVar(value="mask")
     preview = tk.StringVar(value="original"); fig_per_page = tk.StringVar(value="12")
     emit_refs = tk.BooleanVar(value=True); extra = tk.StringVar()
+    mirror_refs = tk.BooleanVar(value=False)
 
     IMG_TYPES = [("Images", "*.jpg *.jpeg *.png *.tif *.tiff"), ("All Files", "*.*")]
     JSON_TYPES = [("COCO keypoints JSON", "*.json"), ("All Files", "*.*")]
@@ -15607,6 +15629,14 @@ def run_dinoland_script():
     tk.OptionMenu(of, align, "mask", "feature").pack(side=tk.LEFT)
     tk.OptionMenu(of, preview, "original", "letterbox").pack(side=tk.LEFT)
     tk.Checkbutton(of, text="emit per-image COCO + refs_confirmed.txt", variable=emit_refs).pack(side=tk.LEFT, padx=8)
+    row += 1
+    tk.Checkbutton(input_window, variable=mirror_refs,
+                   text="Batch: specimens may be mirror images (wings, legs, left/right parts) - "
+                        "also use a flipped copy of every reference").grid(row=row, column=1, sticky='w', padx=5, pady=3)
+    row += 1
+    tk.Label(input_window, text="Tip: 5 or more references from different species transfer best "
+                                "(Diaphorina wings: 61% -> 70% of landmarks within 5% of wing length).",
+             fg="gray30").grid(row=row, column=1, sticky='w', padx=5)
     add_row("Extra arguments:", extra)
 
     def submit():
@@ -15617,7 +15647,8 @@ def run_dinoland_script():
                  mask_dir=mask_dir.get().strip(), outdir=outdir.get().strip() or "lm_out",
                  model=model_id.get(), layers=layers.get(), n_lm=n_lm.get(), radius=radius.get(),
                  dim=dim.get(), facet=facet.get(), align=align.get(), preview=preview.get(),
-                 fig_per_page=fig_per_page.get(), emit_refs=emit_refs.get(), extra=extra.get())
+                 fig_per_page=fig_per_page.get(), emit_refs=emit_refs.get(), extra=extra.get(),
+                 mirror_refs=mirror_refs.get())
         if not v["imgA"]:
             messagebox.showerror("Input Error", "Please select the reference image A.")
             return

@@ -1520,7 +1520,8 @@ class SAM2PAL:
                      num_epochs: int = 50, learning_rate: float = 1e-5,
                      max_images_per_epoch: int = 10,
                      additional_templates: Optional[List[Dict]] = None,
-                     use_lora: bool = False, lora_rank: int = 16):
+                     use_lora: bool = False, lora_rank: int = 16,
+                     flip_augment: str = "none"):
         """
         PAL (Palindrome) fine-tuning with correct OC-CCL per arxiv.org/abs/2501.06749.
         
@@ -1568,6 +1569,18 @@ class SAM2PAL:
         # Add additional templates if provided
         if additional_templates:
             all_templates.extend(additional_templates)
+
+        # Flip augmentation of the LABELLED templates only (unlabelled targets stay as they are),
+        # so the model learns to propagate from a mirrored template to an unmirrored specimen.
+        # h = left-right, v = top-bottom, hv = both (= 180 deg); 'all' gives 4x: original, h, v, hv.
+        _flip_modes = {"none": [], "h": ["h"], "v": ["v"], "hv": ["h", "v"], "all": ["h", "v", "hv"]}
+        if flip_augment not in _flip_modes:
+            raise ValueError(f"flip_augment must be one of {list(_flip_modes)}, got {flip_augment!r}")
+        if _flip_modes[flip_augment]:
+            _base = list(all_templates)
+            all_templates.extend(dict(t, flip=f) for t in _base for f in _flip_modes[flip_augment])
+            logger.info(f"Flip augmentation '{flip_augment}': {len(_base)} labelled templates -> "
+                        f"{len(all_templates)} (added {', '.join(_flip_modes[flip_augment])} copies)")
         
         logger.info("="*60)
         if use_lora:
@@ -1604,6 +1617,9 @@ class SAM2PAL:
                 logger.warning(f"Could not load: {template['image_path']}")
                 continue
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            _flip_code = {"h": 1, "v": 0, "hv": -1}.get(template.get('flip'))
+            if _flip_code is not None:
+                img_rgb = np.ascontiguousarray(cv2.flip(img_rgb, _flip_code))
             
             orig_h, orig_w = img_rgb.shape[:2]
             scale = img_size / max(orig_h, orig_w)
@@ -1613,6 +1629,8 @@ class SAM2PAL:
             mask = template['mask']
             if mask.shape[:2] != (orig_h, orig_w):
                 mask = cv2.resize(mask.astype(np.uint8), (orig_w, orig_h), interpolation=cv2.INTER_NEAREST)
+            if _flip_code is not None:
+                mask = np.ascontiguousarray(cv2.flip(mask.astype(np.uint8), _flip_code))
             
             mask_resized = cv2.resize(mask.astype(np.uint8), (new_w, new_h), interpolation=cv2.INTER_NEAREST)
             
@@ -1629,6 +1647,7 @@ class SAM2PAL:
                 'mask_tensor': gt_mask_tensor,
                 'orig_size': (orig_h, orig_w),
                 'name': os.path.basename(template['image_path'])
+                        + (f" [{template['flip']}-flip]" if template.get('flip') else "")
             })
         
         if not preprocessed_templates:
@@ -2934,6 +2953,129 @@ class SAM2PAL:
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
+# =============================================================================
+# Orientation search (opt-in, off by default)
+# SAM2-PAL is anchored to the template's orientation: on 14 held-out ant heads mean IoU fell from 0.78 upright
+# to 0.35 upside-down and 0.14 sideways, and flip-augmented training did not fix it. Orientation search runs
+# every target at 0/90/180/270 degrees, keeps the rotation with the highest mean SAM2 object confidence
+# (obj_conf; picked the right rotation 14/14, 14/14, 28/28 on that test and restored sideways heads to 0.78)
+# and rotates the masks back onto the original image. The palindrome cycle IoU is NOT used to choose: it
+# was 0.996 for every orientation. Rotations never change handedness, so left_/right_ labels stay valid; a
+# specimen photographed MIRRORED cannot be detected this way - image in the template's orientation.
+# =============================================================================
+_ORIENT_ROT = {90: cv2.ROTATE_90_CLOCKWISE, 180: cv2.ROTATE_180, 270: cv2.ROTATE_90_COUNTERCLOCKWISE}
+_ORIENT_UNROT = {90: cv2.ROTATE_90_COUNTERCLOCKWISE, 180: cv2.ROTATE_180, 270: cv2.ROTATE_90_CLOCKWISE}
+
+
+def run_orientation_search(pal, template_image_path: str, template_masks: List[Dict],
+                           target_image_paths: List[str], output_dir: str, save_masks: bool = True,
+                           save_vis: bool = False, output_timestamp: bool = False,
+                           output_category_prefix: bool = False, **batch_kwargs) -> Dict:
+    """Predict every target at 0/90/180/270 deg (clockwise), keep the most confident rotation per image and
+    write its masks, rotated back, as a normal pal_predictions JSON for the ORIGINAL images."""
+    from datetime import datetime
+    work = os.path.join(output_dir, 'orientation_search')
+    var_dir, raw_dir = os.path.join(work, 'variants'), os.path.join(work, 'raw_predictions')
+    os.makedirs(var_dir, exist_ok=True)
+    variants, meta = [], {}
+    for p in target_image_paths:
+        img = cv2.imread(p, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+        if img is None:
+            logger.warning(f"Orientation search: cannot read {p}; skipped")
+            continue
+        for k in (0, 90, 180, 270):
+            vname = f"{os.path.basename(p)}__o{k:03d}.png"
+            vpath = os.path.join(var_dir, vname)
+            if not os.path.exists(vpath):
+                cv2.imwrite(vpath, img if k == 0 else cv2.rotate(img, _ORIENT_ROT[k]))
+            variants.append(vpath)
+            meta[vname] = (p, k)
+    logger.info(f"Orientation search: {len(target_image_paths)} images x 4 rotations = {len(variants)} predictions")
+
+    raw = pal.process_batch(template_image_path=template_image_path, template_masks=template_masks,
+                            target_image_paths=variants, output_dir=raw_dir, save_masks=False, save_vis=False,
+                            output_timestamp=False, output_category_prefix=output_category_prefix, **batch_kwargs)
+    rc = raw['coco_output']
+    anns_by_img = {}
+    for a in rc['annotations']:
+        anns_by_img.setdefault(a['image_id'], []).append(a)
+    per_orig = {}
+    for im in rc['images']:
+        p, k = meta[im['file_name']]
+        anns = anns_by_img.get(im['id'], [])
+        conf = [a.get('obj_conf', a.get('score', 0.0)) for a in anns]
+        per_orig.setdefault(p, {})[k] = (float(np.mean(conf)) if conf else -1.0, im, anns)
+
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S") if output_timestamp else ""
+    coco_output = {'images': [], 'annotations': [], 'categories': rc['categories']}
+    stats = {'success': 0, 'failed': 0, 'total': len(target_image_paths), 'total_masks': 0}
+    confidence, report, ann_id = {}, {}, 1
+    if save_masks:
+        os.makedirs(os.path.join(output_dir, 'masks'), exist_ok=True)
+    if save_vis:
+        os.makedirs(os.path.join(output_dir, 'visualizations'), exist_ok=True)
+    for idx, p in enumerate(target_image_paths):
+        if p not in per_orig:
+            stats['failed'] += 1
+            continue
+        scores = per_orig[p]
+        best = max(scores, key=lambda r: scores[r][0])
+        _, vim, anns = scores[best]
+        orig = cv2.imread(p, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+        h, w = orig.shape[:2]
+        fname = os.path.basename(p)
+        entry = {'id': idx + 1, 'file_name': fname, 'height': h, 'width': w, 'orientation_used': best,
+                 'orientation_confidence': {str(r): round(scores[r][0], 4) for r in sorted(scores)}}
+        if 'cycle_iou' in vim:
+            entry['cycle_iou'] = vim['cycle_iou']
+            confidence[idx] = vim['cycle_iou']
+        coco_output['images'].append(entry)
+        report[fname] = {'orientation_used': best, **entry['orientation_confidence']}
+        if best != 0:
+            logger.info(f"Orientation search: {fname} predicted at {best} deg clockwise (masks rotated back)")
+        vis_masks = []
+        for a in anns:
+            m = np.zeros((vim['height'], vim['width']), np.uint8)
+            for poly in a['segmentation']:
+                cv2.fillPoly(m, [np.array(poly, np.int32).reshape(-1, 2)], 1)
+            if best:
+                m = cv2.rotate(m, _ORIENT_UNROT[best])
+            if m.shape[:2] != (h, w):
+                m = cv2.resize(m, (w, h), interpolation=cv2.INTER_NEAREST)
+            new = pal.mask_to_coco_annotation(m, ann_id, idx + 1, a['category_id'])
+            if not new:
+                continue
+            for key in ('score', 'obj_score', 'obj_conf'):
+                if key in a:
+                    new[key] = a[key]
+            coco_output['annotations'].append(new)
+            stats['total_masks'] += 1
+            ann_id += 1
+            cat_name = pal.categories.get(a['category_id'], {}).get('name', f"cat_{a['category_id']}")
+            vis_masks.append((m, cat_name, a['category_id']))
+            if save_masks:
+                base = os.path.splitext(fname)[0]
+                mf = f"{cat_name}_{base}_mask.png" if output_category_prefix else f"{base}_{cat_name}_mask.png"
+                cv2.imwrite(os.path.join(output_dir, 'masks', f"{timestamp_str}_{mf}" if timestamp_str else mf), m * 255)
+        if save_vis and vis_masks:
+            vis = orig.copy()
+            for m, _, cid in vis_masks:
+                vis[m > 0] = (vis[m > 0] * 0.5 + np.array(_v21_colour_bgr(cid)) * 0.5).astype(np.uint8)
+            vis = np.vstack([vis, _v21_legend(vis.shape[1], [(nm, _v21_colour_bgr(cid)) for _, nm, cid in vis_masks])])
+            cv2.imwrite(os.path.join(output_dir, 'visualizations', f"vis_{fname}"), vis)
+        stats['success'] += 1
+
+    out = os.path.join(output_dir, f'pal_predictions_{timestamp_str}.json' if timestamp_str else 'pal_predictions.json')
+    with open(out, 'w') as f:
+        json.dump(coco_output, f, indent=2)
+    with open(os.path.join(output_dir, 'orientation_search_report.json'), 'w') as f:
+        json.dump({'selector': 'mean obj_conf', 'rotations_cw': [0, 90, 180, 270], 'per_image': report}, f, indent=2)
+    turned = sum(1 for r in report.values() if r['orientation_used'] != 0)
+    logger.info(f"Orientation search: {turned}/{len(report)} images predicted in a rotated orientation; "
+                f"report -> orientation_search_report.json")
+    return {'coco_output': coco_output, 'output_path': out, 'stats': stats, 'confidence': confidence}
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='SAM2-PAL: Palindrome-based Mask Propagation',
@@ -3005,6 +3147,10 @@ Examples:
                                 help='Enable PAL fine-tuning (video tracker backprop - most powerful)')
     finetune_group.add_argument('--finetune_occcl', action='store_true', 
                                 help='Alias for --pal_finetuning (deprecated name)')
+    finetune_group.add_argument('--flip_augment', default='none', choices=['none', 'h', 'v', 'hv', 'all'],
+                                help='PAL fine-tuning: add flipped copies of the labelled training images '
+                                     '(h = left-right, v = top-bottom, hv = both, all = original+h+v+hv = 4x). '
+                                     'For specimens photographed as mirror images. Default none.')
     finetune_group.add_argument('--use_lora', action='store_true',
                                 help='Use LoRA fine-tuning (requires peft library, per paper)')
     finetune_group.add_argument('--lora_rank', type=int, default=16,
@@ -3038,6 +3184,11 @@ Examples:
                                  help='Process images in chunks of N (0=disabled, all at once with CPU offloading)')
     inference_group.add_argument('--iou_threshold', type=float, default=0.5,
                                  help='IoU threshold for cycle consistency flagging (default 0.5)')
+    inference_group.add_argument('--orientation_search', default='none', choices=['none', 'rot4'],
+                                 help='OFF by default. rot4: predict each target at 0/90/180/270 deg, keep the most '
+                                      'confident rotation and map its masks back (4x slower). A fallback for '
+                                      'specimens imaged turned relative to the template; cannot correct mirrored '
+                                      'imaging. Best practice: image every specimen in the template orientation.')
     inference_group.add_argument('--load_checkpoint',
                                  help='Load an existing fine-tuned .pt checkpoint for inference-only '
                                       '(skip training, use this model for propagation)')
@@ -3211,7 +3362,8 @@ Examples:
             max_images_per_epoch=args.max_images_per_epoch,
             additional_templates=additional_templates,
             use_lora=args.use_lora,
-            lora_rank=args.lora_rank
+            lora_rank=args.lora_rank,
+            flip_augment=args.flip_augment
         )
     
     elif args.finetune:
@@ -3252,8 +3404,19 @@ Examples:
             logger.warning(f"Checkpoint not found: {load_ckpt} — using original SAM2 weights")
         else:
             logger.info("No fine-tuning or checkpoint specified — using original SAM2 weights")
-    
-    results = pal.process_batch(
+
+    if getattr(args, 'orientation_search', 'none') == 'rot4':
+        results = run_orientation_search(
+            pal, args.template_image, template_masks, target_images, args.output_dir,
+            save_masks=args.save_masks, save_vis=args.save_vis, output_timestamp=args.output_timestamp,
+            output_category_prefix=args.output_category_prefix,
+            multi_mask=args.multi_mask, interleave_template=args.interleave_template,
+            reanchor_every=args.reanchor_every, area_growth_limit=args.area_growth_limit,
+            area_clamp_pad=args.area_clamp_pad, num_points=args.num_points,
+            cycle_consistency=args.cycle_consistency, chunk_size=args.chunk_size,
+            iou_threshold=args.iou_threshold)
+    else:
+      results = pal.process_batch(
         template_image_path=args.template_image,
         template_masks=template_masks,
         target_image_paths=target_images,

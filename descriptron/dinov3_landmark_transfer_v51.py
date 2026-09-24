@@ -639,6 +639,12 @@ def main():
                          "padding) or on the 512x512 letterboxed tensor the model saw")
     ap.add_argument("--fig_per_page", type=int, default=12,
                     help="panels per preview page; 170 targets in one figure is unusable")
+    ap.add_argument("--mirror_refs", action="store_true",
+                    help="mirror-aware transfer: add a left-right flipped copy of every reference "
+                         "(image flipped, landmark x mirrored, landmark numbers kept) and, per target, "
+                         "keep only the handedness group whose references match best (share of "
+                         "landmarks accepted). Needed when some specimens are photographed as mirror "
+                         "images; the two handednesses are never mixed in one vote.")
     ap.add_argument("--emit_refs", action="store_true",
                     help="also write one COCO file per target under <outdir>/per_image/ and "
                          "list the fully-confirmed ones in refs_confirmed.txt, so a checked "
@@ -688,6 +694,26 @@ def main():
             print(f"reference {fname}: {len(present)}/{len(ids)} landmarks present")
         print(f"{len(refs)} reference(s); landmark ids {slot_ids}")
 
+        # ---- mirror-aware mode: handedness of each reference, plus flipped copies ----
+        # Handedness = sign of the signed area (shoelace) of the landmarks in their fixed
+        # numbering order: a mirror image reverses it. A flipped reference keeps its landmark
+        # numbers, so its votes stay in the same slots.
+        def _handedness(pts):
+            x, y = pts[:, 0], pts[:, 1]
+            return 1 if 0.5 * np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y) >= 0 else -1
+        ref_hand = [_handedness(r[3]) for r in refs]
+        if a.mirror_refs:
+            for (rname, _fa, mk, pts, present, im), hnd in list(zip(refs, ref_hand)):
+                im_f = im.transpose(Image.FLIP_LEFT_RIGHT)
+                pts_f = pts.copy()
+                pts_f[:, 0] = bb.img_dim - pts_f[:, 0]
+                refs.append((rname + " [flipped]", bb.embed(im_f, LAYER, "none", a.facet),
+                             mk[:, ::-1].copy(), pts_f, present, im_f))
+                ref_hand.append(-hnd)
+            print(f"mirror-aware: {len(refs)} references "
+                  f"({ref_hand.count(1)} one handedness, {ref_hand.count(-1)} the other)")
+        two_hands = a.mirror_refs and len(set(ref_hand)) == 2
+
         targets = sorted(_glob.glob(a.batch_glob))
         ref_names = {os.path.basename(r[0]).replace('_keypoints.json', '') for r in refs}
         targets = [t for t in targets if os.path.abspath(t) != os.path.abspath(a.imgA)]
@@ -701,16 +727,24 @@ def main():
                 bb, rawB, LAYER, tp, a.mask_dir)
             fb = bb.embed(imgB, LAYER, "none", a.facet)
 
-            votes = {k: [] for k in range(len(slot_ids))}   # slot -> [(xy, accepted)]
-            for rname, fa, maskA_r, pts, present, _im in refs:
+            group_votes, group_score = {}, {}
+            for gi, ((rname, fa, maskA_r, pts, present, _im), hnd) in enumerate(zip(refs, ref_hand)):
+                g = hnd if two_hands else 0
+                votes = group_votes.setdefault(g, {k: [] for k in range(len(slot_ids))})
                 A = None
                 if a.align == "feature":
                     A = feature_affine(fa, fb, maskA_r, maskB, bb.patch, bb.grid)
                 if A is None:
                     A = pca_affine(maskA_r, maskB)
                 r = transfer(fa, fb, pts, A, bb.patch, bb.grid, radius_patches=a.radius)
+                group_score.setdefault(g, []).append(float(np.mean(r.accepted)))
                 for j, slot in enumerate(present):
                     votes[slot].append((r.pred[j], bool(r.accepted[j])))
+            # RANSAC fits rotation/scale/shift only, never a reflection, so references of the
+            # wrong handedness get most landmarks rejected: the higher mean accepted share wins
+            chosen = max(group_votes, key=lambda g: np.mean(group_score[g]))
+            votes = group_votes[chosen]
+            hand_used = chosen if two_hands else None
 
             # ---- consensus: median of the votes, spread = agreement ------------
             cons = {}
@@ -726,7 +760,7 @@ def main():
 
             results.append((os.path.basename(tp).rsplit('.', 1)[0], imgB, maskB,
                             cons, (W0, H0), os.path.basename(tp),
-                            (tscale, tox, toy, tcx, tcy), tp))
+                            (tscale, tox, toy, tcx, tcy), tp, hand_used))
             agree = sum(1 for k in cons if cons[k][0] is not None and cons[k][1] > 0)
             print(f"{os.path.basename(tp)[:44]:<46} confirmed {agree}/{len(slot_ids)}")
 
@@ -745,7 +779,7 @@ def main():
             os.makedirs(per_image_dir, exist_ok=True)
         confirmed_refs = []
         anns_by_name = {}                     # name -> annotation, for the preview
-        for nm, imgB, mkB, cons, (W0, H0), fname, (tscale, tox, toy, tcx, tcy), tp in results:
+        for nm, imgB, mkB, cons, (W0, H0), fname, (tscale, tox, toy, tcx, tcy), tp, hand_used in results:
             kp, nvis, detail = [], 0, []
             xs, ys = [], []
             for k, sid in enumerate(slot_ids):
@@ -770,6 +804,7 @@ def main():
                    "bbox": bbox, "iscrowd": 0,
                    "point_order": slot_ids,
                    "n_references": len(refs),
+                   "handedness_used": hand_used,
                    "landmark_detail": detail}
             coco["images"].append(img_entry)
             coco["annotations"].append(ann)
@@ -807,7 +842,7 @@ def main():
             n = len(page); cols = min(3, n); rows = int(np.ceil(n / cols))
             fig, axes = plt.subplots(rows, cols, figsize=(4.0 * cols, 4.2 * rows), dpi=150)
             axes = np.atleast_1d(axes).ravel()
-            for ax_, (nm, imgB, mkB, cons, (W0, H0), _fn, _lb, tp) in zip(axes, page):
+            for ax_, (nm, imgB, mkB, cons, (W0, H0), _fn, _lb, tp, _hand) in zip(axes, page):
                 if a.preview == "original":
                     ax_.imshow(Image.open(tp).convert("RGB"))
                     kpx = anns_by_name[nm]["keypoints"]

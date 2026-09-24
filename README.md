@@ -166,6 +166,24 @@ them for you. Every step that calls a model takes the same flags
 a subscription, an API key, another provider, or **no model at all** are
 interchangeable.
 
+### Image specimens in one orientation
+
+SAM2-PAL and DINOLand transfer masks and landmarks from reference images, and
+both work best when every specimen is photographed in the **same orientation as
+the references**. On 14 held-out ant heads, SAM2-PAL's mean mask IoU was 0.78
+upright, 0.35 upside-down and 0.14 turned 90°. Two opt-in fallbacks exist for
+collections where this cannot be controlled; both are **off by default**:
+
+| option | tool | what it does | tested gain |
+|---|---|---|---|
+| `--orientation_search rot4` (GUI: *Orientation search*) | SAM2-PAL | predicts each image at 0/90/180/270°, keeps the most confident rotation (mean SAM2 object confidence) and maps the masks back; 4× slower | turned heads 0.14 → 0.78; right rotation chosen 56/56 |
+| `--flip_augment all` (GUI: *Flip augmentation*) | SAM2-PAL training | adds h, v and hv flipped copies of the labelled images | upright heads 0.76 → 0.78; does **not** fix turned specimens |
+| `--mirror_refs` (GUI: *specimens may be mirror images*) | DINOLand | adds a flipped copy of every reference; each target uses whichever handedness matches | mirrored psyllid wings failing 16/17 → 1–2/17 |
+
+Neither tool can tell which side is anatomically left on a bilaterally
+symmetric structure photographed mirrored, so `left_`/`right_` names follow the
+image as taken.
+
 ---
 
 ## What BioRAG retrieves: the data matrix and the literature
