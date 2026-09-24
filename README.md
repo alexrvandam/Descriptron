@@ -36,11 +36,14 @@ every claim in the output is checked against the data it came from.
 
 - [What v2 adds](#what-v2-adds)
 - [Installing](#installing) — pip · Docker · conda
+  - **[Docker how-to](docs/DOCKER_RECIPE.md)** — step-by-step recipe: project folder, full pipeline, Linux and Windows
 - [The workflow](#the-workflow)
+  - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
 - [What the programs produce](#what-the-programs-produce)
 - [Reproducing an analysis](#reproducing-an-analysis)
 - [Provenance and auditing](#provenance-and-auditing)
+- [Use Descriptron from Claude (MCP server)](#mcp-server)
 - [Licence](#licence)
 - [Citation](#citation)
 
@@ -178,12 +181,16 @@ collections where this cannot be controlled; all are **off by default**:
 |---|---|---|---|
 | `--orientation_search rot4` (GUI: *Orientation search*) | SAM2-PAL | predicts each image at 0/90/180/270°, keeps the most confident rotation (mean SAM2 object confidence) and maps the masks back; 4× slower | turned heads 0.14 → 0.78; right rotation chosen 56/56 |
 | `--flip_augment all` (GUI: *Flip augmentation*) | SAM2-PAL training | adds h, v and hv flipped copies of the labelled images | upright heads 0.76 → 0.78; does **not** fix turned specimens |
-| `--orientation_search rot4` (GUI: *specimens may be turned or upside-down*) | DINOLand (v52) | adds copies of every reference rotated 90/180/270° and keeps, per target, the orientation whose landmarks are accepted most often; 4× slower | psyllid wings turned 90/180/270°: median error 27–43% → 3.1–3.2% of wing length, wings failing 48/60 → 3/60 |
+| `--orientation_search rot4` (GUI: *specimens may be turned or upside-down*) | DINOLand (v52) | adds copies of every reference rotated 90/180/270° and keeps, per target, the orientation whose landmarks are accepted most often; little extra time | psyllid wings turned 90/180/270°: median error 27–43% → 3.1–3.2% of wing length, wings failing 48/60 → 3/60 |
 | `--mirror_refs` (GUI: *specimens may be mirror images*) | DINOLand | adds a flipped copy of every reference; each target uses whichever handedness matches | mirrored psyllid wings failing 16/17 → 1–2/17 |
+| both DINOLand options together | DINOLand (v52) | covers all 8 rotation/mirror combinations; use when you do not know how specimens were imaged; little extra time (80 wings: 3.6 → 3.9 min) | mixed mirrored + turned wings: failing 53/80 → 0/80, median error 2.5% |
 
 Neither tool can tell which side is anatomically left on a bilaterally
 symmetric structure photographed mirrored, so `left_`/`right_` names follow the
 image as taken.
+
+The full recipe — imaging, how many references to draw, commands, and how to
+check the output — is in the **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)**.
 
 ---
 

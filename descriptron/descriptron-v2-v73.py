@@ -15640,7 +15640,7 @@ def run_dinoland_script():
     if (Path(__file__).parent / 'dinov3_landmark_transfer_v52.py').is_file():
         tk.Checkbutton(input_window, variable=rotate_refs,
                        text="Batch: specimens may be turned or upside-down - orientation search over "
-                            "0/90/180/270 deg (4x slower; image in the references' orientation when you can)"
+                            "0/90/180/270 deg (not sure how specimens were imaged? tick both boxes)"
                        ).grid(row=row, column=1, sticky='w', padx=5, pady=3)
         row += 1
     tk.Label(input_window, text="Tip: 5 or more references from different species transfer best "

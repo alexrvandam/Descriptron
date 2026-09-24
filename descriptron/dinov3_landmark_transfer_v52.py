@@ -650,7 +650,7 @@ def main():
                          "(landmarks rotated with the image, numbers kept) and, per target, keep only "
                          "the orientation group whose references match best (share of landmarks "
                          "accepted). For specimens photographed turned or upside-down; combine with "
-                         "--mirror_refs for all 8 rotation/flip combinations. 4x slower. Off by default: "
+                         "--mirror_refs for all 8 rotation/flip combinations (both on: mixed wings failing 53/80 -> 0/80). Off by default: "
                          "image specimens in the references' orientation when you can.")
     ap.add_argument("--orientation_search", default="none", choices=["none", "rot4"],
                     help="same name as in SAM2-PAL: rot4 = --rotate_refs (off by default)")

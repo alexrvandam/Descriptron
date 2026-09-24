@@ -16,6 +16,9 @@
 # are made writable (metadata only, no file copies), plus the ontology releases
 # the pipeline refreshes.
 #
+# It pins transformers 4.57.6 in samm: the base image's transformers 5.17 needs torch >= 2.5 but samm has
+# 2.4, so every model loaded as a placeholder and DINOLand could not run (4.57.6 = measure_env's version).
+#
 # It also adds the literature-RAG dependencies (requests: BioSysLit on Zenodo;
 # pdfplumber: your own PDFs) to measure_env, which the base image lacked.
 #
@@ -38,6 +41,7 @@ RUN /opt/conda/envs/samm/bin/python -m venv /opt/descriptron-mcp \
  && /opt/descriptron-mcp/bin/pip install --no-cache-dir --no-deps /tmp/mcp-build/wheels/*.whl \
  && /opt/descriptron-mcp/bin/pip install --no-cache-dir --no-deps /tmp/mcp-build/descriptron-mcp \
  && /opt/conda/envs/measure_env/bin/pip install --no-cache-dir "requests>=2.28" "pdfplumber>=0.10" \
+ && /opt/conda/envs/samm/bin/pip install --no-cache-dir "transformers==4.57.6" \
  && rm -rf /tmp/mcp-build \
  && chmod 755 /usr/local/bin/descriptron \
  && chmod -R a+rX /opt/descriptron-mcp \
@@ -57,6 +61,7 @@ ENV DESCRIPTRON_CORE_PYTHON=/opt/conda/envs/measure_env/bin/python \
     NUMBA_CACHE_DIR=/tmp/numba \
     XDG_CACHE_HOME=/tmp/cache \
     EASYOCR_MODULE_PATH=/weights/easyocr \
+    DINOLAND_ENV=samm \
     HOME=/tmp
 # EasyOCR (scale-bar reading) otherwise writes to $HOME/.EasyOCR; under --user there
 # is no home directory (HOME=/), the measurements lose their mm calibration and

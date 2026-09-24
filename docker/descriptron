@@ -90,7 +90,7 @@ case "$cmd" in
     exec $CONDA_RUN samm python "$GUI/sam2_pal_batch_v21.py" "$@" ;;
   dinoland)
     need_env samm
-    exec $CONDA_RUN samm python "$GUI/dinov3_landmark_transfer_v51.py" "$@" ;;
+    exec $CONDA_RUN samm python "$GUI/dinov3_landmark_transfer_v52.py" "$@" ;;
   measure)
     need_env measure_env
     exec $CONDA_RUN measure_env python \
