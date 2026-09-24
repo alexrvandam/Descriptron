@@ -146,7 +146,7 @@ def run_program(name: str, args: list[str] | None = None, workdir: str | None = 
 def start_job(name: str, args: list[str] | None = None, workdir: str | None = None) -> dict:
     """Start a long program in the background and return a job id at once.
 
-    Use for run_full_pipeline_v2, sam2_pal_batch_v21, dinov3_landmark_transfer_v51,
+    Use for run_full_pipeline_v2, sam2_pal_batch_v21, dinov3_landmark_transfer_v52,
     detector training and anything else that runs for more than a few minutes.
     The job keeps running if the client disconnects. Poll with job_status.
     """
@@ -297,7 +297,7 @@ WORKFLOW = """\
 # Descriptron workflow (v2, BioRAG)
 
 1. Annotate structures (Descriptron GUI, or predict with descriptron-vision:
-   tv_train_v1 / tv_predict_v1, sam2_pal_batch_v21, dinov3_landmark_transfer_v51).
+   tv_train_v1 / tv_predict_v1, sam2_pal_batch_v21, dinov3_landmark_transfer_v52).
    Check the COCO file with coco_summary; zero width/height images must be fixed.
 2. Run the data pipeline: run_full_pipeline_v2 (start_job; needs --coco_json,
    --image_dir, --group_labels, --output_base, --taxon_profile). The description

@@ -35,7 +35,8 @@ TARGETS = {
 }
 
 # things the inventory does not list but the packages need
-EXTRA_VISION = ["torchvision_det"]                    # whole directory
+EXTRA_VISION = ["torchvision_det",                   # whole directory
+                "dinov3_landmark_transfer_v52.py"]    # v52 (orientation search) is not in the inventory yet
 # modules a core program imports that the inventory files elsewhere or does not list:
 # biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
 # because it CAN use Florence-2, which it loads lazily), and that imports
@@ -101,6 +102,10 @@ def main():
             n = len(list(dst.rglob("*.py")))
             counts["descriptron-vision"] += n
             print(f"  + {extra}/ ({n} modules) -> descriptron-vision")
+        elif src.is_file():
+            shutil.copy2(src, vis_tools / extra)
+            counts["descriptron-vision"] += 1
+            print(f"  + {extra} -> descriptron-vision")
 
     core_tools = HERE / "descriptron-core" / "src" / "descriptron_core" / "tools"
     for extra in EXTRA_CORE:

@@ -171,13 +171,14 @@ interchangeable.
 SAM2-PAL and DINOLand transfer masks and landmarks from reference images, and
 both work best when every specimen is photographed in the **same orientation as
 the references**. On 14 held-out ant heads, SAM2-PAL's mean mask IoU was 0.78
-upright, 0.35 upside-down and 0.14 turned 90°. Two opt-in fallbacks exist for
-collections where this cannot be controlled; both are **off by default**:
+upright, 0.35 upside-down and 0.14 turned 90°. Opt-in fallbacks exist for
+collections where this cannot be controlled; all are **off by default**:
 
 | option | tool | what it does | tested gain |
 |---|---|---|---|
 | `--orientation_search rot4` (GUI: *Orientation search*) | SAM2-PAL | predicts each image at 0/90/180/270°, keeps the most confident rotation (mean SAM2 object confidence) and maps the masks back; 4× slower | turned heads 0.14 → 0.78; right rotation chosen 56/56 |
 | `--flip_augment all` (GUI: *Flip augmentation*) | SAM2-PAL training | adds h, v and hv flipped copies of the labelled images | upright heads 0.76 → 0.78; does **not** fix turned specimens |
+| `--orientation_search rot4` (GUI: *specimens may be turned or upside-down*) | DINOLand (v52) | adds copies of every reference rotated 90/180/270° and keeps, per target, the orientation whose landmarks are accepted most often; 4× slower | psyllid wings turned 90/180/270°: median error 27–43% → 3.1–3.2% of wing length, wings failing 48/60 → 3/60 |
 | `--mirror_refs` (GUI: *specimens may be mirror images*) | DINOLand | adds a flipped copy of every reference; each target uses whichever handedness matches | mirrored psyllid wings failing 16/17 → 1–2/17 |
 
 Neither tool can tell which side is anatomically left on a bilaterally

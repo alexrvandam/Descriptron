@@ -15512,6 +15512,8 @@ def _dinoland_build_cmd(v, script_path, env=None):
             cmd.append("--emit_refs")
         if v.get("mirror_refs"):
             cmd.append("--mirror_refs")
+        if v.get("rotate_refs"):
+            cmd += ["--orientation_search", "rot4"]        # v52+ (same flag name as SAM2-PAL)
     else:  # pair
         cmd += ["--imgB", v["imgB"]]
         if v.get("maskB"):
@@ -15564,6 +15566,7 @@ def run_dinoland_script():
     preview = tk.StringVar(value="original"); fig_per_page = tk.StringVar(value="12")
     emit_refs = tk.BooleanVar(value=True); extra = tk.StringVar()
     mirror_refs = tk.BooleanVar(value=False)
+    rotate_refs = tk.BooleanVar(value=False)
 
     IMG_TYPES = [("Images", "*.jpg *.jpeg *.png *.tif *.tiff"), ("All Files", "*.*")]
     JSON_TYPES = [("COCO keypoints JSON", "*.json"), ("All Files", "*.*")]
@@ -15634,6 +15637,12 @@ def run_dinoland_script():
                    text="Batch: specimens may be mirror images (wings, legs, left/right parts) - "
                         "also use a flipped copy of every reference").grid(row=row, column=1, sticky='w', padx=5, pady=3)
     row += 1
+    if (Path(__file__).parent / 'dinov3_landmark_transfer_v52.py').is_file():
+        tk.Checkbutton(input_window, variable=rotate_refs,
+                       text="Batch: specimens may be turned or upside-down - orientation search over "
+                            "0/90/180/270 deg (4x slower; image in the references' orientation when you can)"
+                       ).grid(row=row, column=1, sticky='w', padx=5, pady=3)
+        row += 1
     tk.Label(input_window, text="Tip: 5 or more references from different species transfer best "
                                 "(Diaphorina wings: 61% -> 70% of landmarks within 5% of wing length).",
              fg="gray30").grid(row=row, column=1, sticky='w', padx=5)
@@ -15648,7 +15657,7 @@ def run_dinoland_script():
                  model=model_id.get(), layers=layers.get(), n_lm=n_lm.get(), radius=radius.get(),
                  dim=dim.get(), facet=facet.get(), align=align.get(), preview=preview.get(),
                  fig_per_page=fig_per_page.get(), emit_refs=emit_refs.get(), extra=extra.get(),
-                 mirror_refs=mirror_refs.get())
+                 mirror_refs=mirror_refs.get(), rotate_refs=rotate_refs.get())
         if not v["imgA"]:
             messagebox.showerror("Input Error", "Please select the reference image A.")
             return
@@ -15660,7 +15669,9 @@ def run_dinoland_script():
             return
 
         script_dir = Path(__file__).parent
-        dinoland_script = script_dir / 'dinov3_landmark_transfer_v51.py'
+        dinoland_script = script_dir / 'dinov3_landmark_transfer_v52.py'   # v52 = v51 + --rotate_refs
+        if not dinoland_script.is_file():
+            dinoland_script = script_dir / 'dinov3_landmark_transfer_v51.py'
         if not dinoland_script.is_file():
             messagebox.showerror("Script Error", f"DINOLand script not found at: {dinoland_script}")
             return

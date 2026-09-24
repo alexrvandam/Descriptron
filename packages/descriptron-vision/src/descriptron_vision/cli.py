@@ -61,6 +61,6 @@ def train():      _run("tv_train_v1.py", sys.argv[1:], "torchvision_det")
 def predict():    _run("tv_predict_v1.py", sys.argv[1:], "torchvision_det")
 def sweep():      _run("tv_sweep_v1.py", sys.argv[1:], "torchvision_det")
 def sam2_pal():   _run("sam2_pal_batch_v21.py", sys.argv[1:])
-def dinoland():   _run("dinov3_landmark_transfer_v51.py", sys.argv[1:])
+def dinoland():   _run("dinov3_landmark_transfer_v52.py", sys.argv[1:])   # v52 = v51 + --orientation_search
 def measure():
     _run("measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py", sys.argv[1:])
