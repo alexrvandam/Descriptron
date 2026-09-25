@@ -234,6 +234,12 @@ curved structure, whose curved length a straight measurement under-reads.
 
 ![Length, width and centre line of a pterostigma](docs/tutorial/showcase_measurements.jpg)
 
+Measurements are not limited to masks. From your own keypoints (here 17 vein junctions of a psyllid forewing)
+the measurement step gives every pairwise distance in millimetres, 136 of them, alongside the landmark
+geometric morphometrics.
+
+![Every pairwise distance between 17 forewing keypoints, in mm](docs/tutorial/showcase_keypoint_distances.jpg)
+
 **Geometric morphometrics** of wing outlines: where along the outline the shape varies, and the specimens in
 shape space.
 
