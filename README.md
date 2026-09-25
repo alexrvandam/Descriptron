@@ -219,6 +219,7 @@ reference wings to new psyllid forewings, whichever way up and whichever side th
 (`--orientation_search rot4 --mirror_refs`). Each landmark is marked as agreed by the references (filled green)
 or to be checked (open gold), so you look only where it is needed. On 80 test wings, turned copies and mirror
 images included, the median error was 2.3 % of wing size, with 78 % of landmarks within 5 % and 90 % within 10 %.
+Psyllidae images are from Liliya Serbina (LIB Hamburg).
 
 ![DINOLand landmarks on psyllid forewings](docs/tutorial/showcase_dinoland.jpg)
 
