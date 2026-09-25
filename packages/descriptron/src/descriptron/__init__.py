@@ -5,4 +5,4 @@ There is no code here on purpose. Import from the distributions themselves:
     from descriptron_core.cli import data_path, available
     from descriptron_vision.cli import require
 """
-__version__ = "2.1.0"
+__version__ = "2.1.1"

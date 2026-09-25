@@ -184,6 +184,12 @@ images included, the median error was 2.3 % of wing size, with 78 % of landmarks
 
 ![DINOLand landmarks on psyllid forewings](docs/tutorial/showcase_dinoland.jpg)
 
+How much work that saves: in the test run below, DINOLand placed 1,360 landmarks (20 wings, each in four
+orientations) in about four minutes on a laptop without a GPU. By hand that is 1,360 careful clicks; with
+DINOLand you look at the gold points and move the ones that are off.
+
+![DINOLand on 20 psyllid forewings](docs/tutorial/showcase_dinoland_wall.jpg)
+
 **Measurements** in millimetres, with the scale bar read from the image, and the centre line of a thin,
 curved structure, whose curved length a straight measurement under-reads.
 
@@ -202,6 +208,14 @@ mask, then colour measured in homologous cells, so the same cell covers the same
 **Texture**: ant heads placed by the texture of their head capsule, measured in homologous cells.
 
 ![Ant heads in texture space](docs/tutorial/showcase_texture_ant_heads.jpg)
+
+**Statistics from your metadata.** Import a specimen table or a Darwin Core download, mark the columns, and one
+command runs the analyses the metadata support. Below, 96 psyllid forewings: species explain 72 % of forewing
+shape and sex nothing; size has a small effect with the same slope in every species; and the 12 wings of
+species outside the reference set are all flagged as unlike every known species rather than forced into the
+nearest one.
+
+![Shape statistics from specimen metadata](docs/tutorial/showcase_stats.jpg)
 
 ---
 
@@ -245,7 +259,7 @@ your own PDFs: `pip install "descriptron-core[rag]"` (see
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
-docker pull ghcr.io/alexrvandam/descriptron:2.1.0
+docker pull ghcr.io/alexrvandam/descriptron:2.1.1
 
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
@@ -524,7 +538,7 @@ descriptron-mcp --check                        # lists the programs it found
 ```bash
 claude mcp add descriptron -- docker run -i --rm --gpus all \
   --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
-  ghcr.io/alexrvandam/descriptron:2.1.0 mcp
+  ghcr.io/alexrvandam/descriptron:2.1.1 mcp
 ```
 
 Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start

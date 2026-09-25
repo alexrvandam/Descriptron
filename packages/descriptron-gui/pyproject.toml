@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-gui"
-version = "2.1.0"
+version = "2.1.1"
 description = "The Descriptron annotation GUI: SAM2-assisted segmentation, keypoints and COCO export"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -24,8 +24,8 @@ classifiers = [
 # fails to start. The GUI drives the analysis scripts directly, so it needs core
 # as well as vision — it is not a thin front end.
 dependencies = [
-  "descriptron-core==2.1.0",
-  "descriptron-vision==2.1.0",
+  "descriptron-core==2.1.1",
+  "descriptron-vision==2.1.1",
   # coloured buttons on macOS (Aqua ignores tk.Button bg); pure Python, Mac only
   "tkmacosx>=1.0.5; sys_platform == 'darwin'",
 ]

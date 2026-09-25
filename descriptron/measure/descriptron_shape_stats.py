@@ -618,33 +618,52 @@ def main(argv=None):
 
     def safe_name(c):
         return re.sub(r"\W+", "_", c)
+
+    # specimens with a value for every variable of a model: a blank group (an unidentified specimen) or a blank
+    # factor must not become a level of its own. The GPA above still uses every specimen; unidentified ones are
+    # what the assignment is for.
+    def complete(cols):
+        return [i for i in range(len(meta))
+                if all(str(data[c][i]).strip().lower() not in ("", "na", "nan", "none") for c in cols if c in data)]
+
+    def sub(idx):
+        return {c: [v[i] for i in idx] for c, v in data.items()}
+
+    def left_out(idx):
+        n = len(meta) - len(idx)
+        return [f"{n} specimen(s) without a value for a model variable left out of this analysis."] if n else []
     if "anova" in a.analyses:
         default = " + ".join([c for c in [group_col] + factors + conts if c])
         f = a.formula or default
         if f:
-            design = Design(f, data, kinds)
-            tab = procrustes_anova(Y, design, a.iterations, rng)
+            used = [c for c in kinds if c != "logCS" and re.search(r"(?<![\w])" + re.escape(c) + r"(?![\w])", f)]
+            idx = complete(used)
+            design = Design(f, sub(idx), kinds)
+            tab = procrustes_anova(Y[idx], design, a.iterations, rng)
             write_rows(out / "procrustes_anova.csv", tab)
-            report += ["## Procrustes ANOVA (RRPP, type I SS)", f"shape ~ {f}", _md(tab), ""]
+            report += ["## Procrustes ANOVA (RRPP, type I SS)", f"shape ~ {f}", *left_out(idx), _md(tab), ""]
     if "allometry" in a.analyses and group_col:
-        design = Design(f"logCS*{group_col}", data, kinds)
-        tab = procrustes_anova(Y, design, a.iterations, rng)
+        idx = complete([group_col])
+        design = Design(f"logCS*{group_col}", sub(idx), kinds)
+        tab = procrustes_anova(Y[idx], design, a.iterations, rng)
         write_rows(out / "allometry_homogeneity_of_slopes.csv", tab)
         inter = next(r for r in tab if r["term"] == f"logCS:{group_col}")
         report += ["## Allometry: homogeneity of slopes", f"shape ~ logCS * {group_col}; the interaction tests whether groups "
-                   f"differ in allometric slope (P = {inter['P']:.3g}).", _md(tab), ""]
+                   f"differ in allometric slope (P = {inter['P']:.3g}).", *left_out(idx), _md(tab), ""]
     if "trajectory" in a.analyses and group_col and (a.trajectory_levels or factors):
         lev = a.trajectory_levels or factors[0]
-        tr = trajectory(Y, data[group_col], [m.get(lev, "") for m in meta], a.iterations, rng)
+        idx = [i for i in complete([group_col]) if str(meta[i].get(lev, "")).strip()]
+        tr = trajectory(Y[idx], [data[group_col][i] for i in idx], [meta[i].get(lev, "") for i in idx], a.iterations, rng)
         if tr:
             write_rows(out / "trajectory_pairwise.csv", tr["pairs"])
             report += ["## Phenotypic trajectories", f"{group_col} across levels of {lev}: {tr['levels']}", _md(tr["pairs"]), ""]
         else:
             report += ["## Phenotypic trajectories", f"skipped: needs >= 2 groups each observed at every level of {lev}", ""]
     if "disparity" in a.analyses and group_col:
-        pv, prs = disparity(Y, data[group_col], a.iterations, rng)
+        idx = complete([group_col])
+        pv, prs = disparity(Y[idx], [data[group_col][i] for i in idx], a.iterations, rng)
         write_rows(out / "disparity_by_group.csv", pv); write_rows(out / "disparity_pairwise.csv", prs)
-        report += ["## Morphological disparity (Procrustes variance)", _md(pv), _md(prs), ""]
+        report += ["## Morphological disparity (Procrustes variance)", *left_out(idx), _md(pv), _md(prs), ""]
     if "pls" in a.analyses and conts:
         E = np.column_stack([np.array(data[c], float) for c in conts]); E = (E - E.mean(0)) / np.where(E.std(0) > 0, E.std(0), 1)
         r = two_block_pls(Y, E, a.iterations, rng)

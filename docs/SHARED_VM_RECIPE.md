@@ -67,7 +67,7 @@ docker run --rm --gpus all ubuntu nvidia-smi
 
 ```bash
 # the image (about 33 GB on disk); pin a version for reproducible projects
-docker pull ghcr.io/alexrvandam/descriptron:2.1.0
+docker pull ghcr.io/alexrvandam/descriptron:2.1.1
 
 # shared folders
 sudo mkdir -p /srv/descriptron/{weights,checkpoints,projects}
@@ -89,8 +89,8 @@ sudo mkdir -p /srv/descriptron/{weights,checkpoints,projects}
 **Smoke test:**
 
 ```bash
-docker run --rm ghcr.io/alexrvandam/descriptron:2.1.0 help
-docker run --rm ghcr.io/alexrvandam/descriptron:2.1.0 mcp --check     # lists 77 + 12 programs
+docker run --rm ghcr.io/alexrvandam/descriptron:2.1.1 help
+docker run --rm ghcr.io/alexrvandam/descriptron:2.1.1 mcp --check     # lists 77 + 12 programs
 ```
 
 ---
@@ -109,7 +109,7 @@ docker run --rm --gpus all --user "$(id -u):$(id -g)" \
   -v /srv/descriptron/checkpoints:/ckpt:ro \
   -v /srv/descriptron/weights:/weights \
   -v "$HOME/.config/descriptron:/config" \
-  ghcr.io/alexrvandam/descriptron:2.1.0 sam2-pal \
+  ghcr.io/alexrvandam/descriptron:2.1.1 sam2-pal \
     --template_image /data/refs/template.png --template_json /data/refs/annotations.json \
     --image_dir /data/targets --output_dir /data/out_sam2pal \
     --sam2_checkpoint /ckpt/sam2_hiera_large.pt --sam2_config sam2_hiera_l.yaml
@@ -133,7 +133,7 @@ from that desktop:
 docker run --rm --gpus all --user "$(id -u):$(id -g)" \
   -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /srv/descriptron/projects/mygroup:/data -v /srv/descriptron/weights:/weights \
-  ghcr.io/alexrvandam/descriptron:2.1.0 gui
+  ghcr.io/alexrvandam/descriptron:2.1.1 gui
 ```
 
 We run the GUI on local Linux desktops; a remote-desktop setup is standard
@@ -181,7 +181,7 @@ Environment variables (`-e ANTHROPIC_API_KEY`) still take precedence.
 
 ## 9. Updates and reproducibility
 
-- New versions are published as new image tags (`2.1.0`, …) and `latest`.
+- New versions are published as new image tags (`2.1.1`, …) and `latest`.
   `docker pull` fetches only the changed layers.
 - Pin the tag in each project's scripts and note it with the results, so an
   analysis can be rerun with the exact image it used.

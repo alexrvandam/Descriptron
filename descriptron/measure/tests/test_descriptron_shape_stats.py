@@ -101,3 +101,29 @@ def test_effect_size_matches_rrpp_formula_shape():
     rand = rng.gamma(2, 0.5, 999)
     assert ss.effect_size(np.median(rand), rand) == pytest.approx(0, abs=0.2)
     assert ss.effect_size(rand.max() * 5, rand) > 3
+
+
+def test_unidentified_specimens_are_not_a_group(tmp_path):
+    """A blank group value (an unidentified specimen) must not become a level of the ANOVA or disparity."""
+    import csv, json
+    rng = np.random.default_rng(9)
+    imgs, anns, rows = [], [], []
+    for i in range(24):
+        g = ["a", "b", ""][i % 3]                                   # every third specimen unidentified
+        P = BASE + (2.0 if g == "b" else 0.0) * np.eye(8, 2) + rng.normal(0, 0.5, BASE.shape)
+        P = (rot(rng.uniform(0, 6)) @ P.T).T + 300
+        kp = [float(v) for xy in P for v in (*xy, 2)]
+        imgs.append({"id": i + 1, "file_name": f"spec{i}.jpg", "width": 800, "height": 800})
+        anns.append({"id": i + 1, "image_id": i + 1, "category_id": 1, "keypoints": kp, "num_keypoints": 8})
+        rows.append({"image": f"spec{i}.jpg", "species": g})
+    js = tmp_path / "s.json"; js.write_text(json.dumps({"images": imgs, "annotations": anns,
+                                                         "categories": [{"id": 1, "name": "keypoints"}]}))
+    with open(tmp_path / "m.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["image", "species"]); w.writeheader(); w.writerows(rows)
+    (tmp_path / "schema.json").write_text(json.dumps({"image": "image", "species": "group"}))
+    ss.main([str(js), "--metadata", str(tmp_path / "m.csv"), "--schema", str(tmp_path / "schema.json"),
+             "--out-dir", str(tmp_path / "o"), "--analyses", "anova", "disparity", "--iterations", "49"])
+    tab = {r["term"]: r for r in csv.DictReader(open(tmp_path / "o" / "procrustes_anova.csv"))}
+    assert float(tab["species"]["Df"]) == 1                          # a, b -- not a third, blank level
+    groups = [r["group"] for r in csv.DictReader(open(tmp_path / "o" / "disparity_by_group.csv"))]
+    assert sorted(groups) == ["a", "b"]
