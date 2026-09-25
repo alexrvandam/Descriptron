@@ -220,7 +220,11 @@ nearest one.
 ### From traits to species descriptions (BioRAG)
 
 The traits of every specimen become a character matrix, and from it a key, species descriptions and a check
-on whether a specimen belongs to a known species at all. Results on 29 *Diaphorina* species (148 specimens):
+on whether a specimen belongs to a known species at all. The whole workflow, with the numbers from the run:
+
+![BioRAG workflow](docs/tutorial/showcase_biorag_workflow.jpg)
+
+Results on 29 *Diaphorina* species (148 specimens):
 
 **Naming a specimen, and recognising a species never seen.** Each specimen's own record is withheld before it is
 named. The character matrix names 132 of 148 correctly, and of the three instruments it best recognises a
