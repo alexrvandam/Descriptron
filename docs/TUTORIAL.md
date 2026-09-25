@@ -154,6 +154,13 @@ texture homology steps use them to measure every specimen in the same anatomical
 
 ![Semilandmarks vs geomorph](tutorial/validation_semilandmarks_vs_geomorph.png)
 
+The outline shape PCA of the Semi-Landmarking step is computed on the covariance of the Procrustes
+coordinates, as geomorph's `gm.prcomp` (earlier versions standardised every coordinate first, which gives
+points that barely vary the same weight as the rest; `--shape_pca standardized` reproduces them). Landmark GPA,
+the homology frames, and the colour and texture homology cells were checked the same way:
+
+![Pipeline steps vs geomorph](tutorial/validation_pipeline_gm_vs_geomorph.png)
+
 On identical Procrustes-aligned data the statistics also agree with RRPP to 5 x 10^-12 (trajectory analysis
 included), the permutation P-values within sampling noise.
 

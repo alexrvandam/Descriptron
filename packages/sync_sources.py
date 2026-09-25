@@ -53,7 +53,8 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/landmark_gpa_V2.py",      # V2: mirror-image specimens reflected before GPA
               "measure/semi_landmark_and_kpts_procrustesV42_GPA.py",   # V42: same for outlines
               "measure/validation/validate_shape_stats_vs_geomorph.py",
-              "measure/validation/validate_semilandmarks_vs_geomorph.py"]
+              "measure/validation/validate_semilandmarks_vs_geomorph.py",
+              "measure/validation/validate_pipeline_gm_vs_geomorph.py"]
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py"]   # v2.1.0 GUI (binder tabs); cli.py runs the newest descriptron-v2-*.py
 DATA_FOR_CORE = ["measure/biorag_prompts"]

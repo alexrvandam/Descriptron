@@ -89,6 +89,13 @@ specimen, something geomorph does not do.
 
 ![Descriptron outline semilandmarks vs geomorph](docs/tutorial/validation_semilandmarks_vs_geomorph.png)
 
+The pipeline's other geometric-morphometric steps get the same check: landmark GPA, the outline shape PCA
+(now on the covariance of the Procrustes coordinates, as geomorph's `gm.prcomp`; earlier versions standardised
+every coordinate first) and the homology frames all agree with geomorph, and the colour and texture measured
+in homologous cells land on the same anatomy for mirror-image specimens once they are reflected.
+
+![Descriptron pipeline steps vs geomorph, and the mirror-image fix](docs/tutorial/validation_pipeline_gm_vs_geomorph.png)
+
 The checks found, and 2.1 fixes, one problem worth knowing about: **mirror-image specimens** (a wing
 photographed from the other side) cannot be superimposed without reflection, and dominated the first
 principal component (19 of 96 Diaphorina forewings: PC1 95.7 % -> 30.0 % once reflected). Landmark and

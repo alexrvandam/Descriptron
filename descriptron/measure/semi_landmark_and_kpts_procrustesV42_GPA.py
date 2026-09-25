@@ -119,6 +119,9 @@ def parse_args():
                              'spline bending energy (ProcD = FALSE, geomorph\'s default). none (default) = fixed '
                              'semilandmarks at equal arc length. (--slide_semilandmarks is the older keypoint-'
                              'anchored option.)')
+    parser.add_argument('--shape_pca', choices=['covariance', 'standardized'], default='covariance',
+                        help='V42: shape PCA on the covariance of the Procrustes coordinates (default, as geomorph '
+                             'gm.prcomp) or on standardised coordinates (V34 behaviour)')
     parser.add_argument('--slide_max_iter', type=int, default=10, help='V42 sliding: at most this many rounds (geomorph 10)')
     parser.add_argument('--slide_tol', type=float, default=1e-4, help='V42 sliding: convergence tolerance (geomorph 1e-4)')
 
@@ -1066,11 +1069,15 @@ def mk_thumb(img, mask, sz=(80,80)):
     ni.paste(pi, ((sz[0]-pi.size[0])//2, (sz[1]-pi.size[1])//2))
     return np.array(ni)
 
-def do_pca(shapes, nc=2):
+def do_pca(shapes, nc=2, standardize=False):
+    """V42: shape PCA on the covariance of the Procrustes coordinates, as geomorph's gm.prcomp (V34 first
+    standardised every coordinate to unit variance -- a correlation PCA, which inflates points that barely vary
+    and loses the Procrustes-distance meaning of the PCs; --shape_pca standardized reproduces it). The
+    standardised matrix is still returned for UMAP / DBSCAN / clustering, which are tuned to that scale."""
     data = np.array([s.flatten() for s in shapes])
     sc = StandardScaler(); ds = sc.fit_transform(data)
     nc = min(nc, data.shape[0], data.shape[1])  # clamp to min(n_samples, n_features)
-    pca = PCA(n_components=nc); pc = pca.fit_transform(ds)
+    pca = PCA(n_components=nc); pc = pca.fit_transform(ds if standardize else data)
     return pc, pca, ds
 
 def do_umap(X, nn=15, md=0.1):
@@ -2218,7 +2225,7 @@ def main():
         # --- DOWNSTREAM ANALYSES ---
         ns = len(aligned)
         csizes = [np.sqrt(np.sum((s - s.mean(axis=0))**2)) for s in eq]
-        pc, pca_obj, ds = do_pca(aligned, max(1, ns-1))
+        pc, pca_obj, ds = do_pca(aligned, max(1, ns-1), standardize=(args.shape_pca == 'standardized'))
         pc2 = np.hstack([pc[:,:2], np.zeros((len(pc), max(0, 2-pc.shape[1])))]) if pc.shape[1] < 2 else pc[:,:2]
         plot_emb(pc2, imgs, msks, od, cat_name, 'PCA')
         ur = None; nnb = min(args.umap_n_neighbors, ns-1)
