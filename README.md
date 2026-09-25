@@ -40,7 +40,7 @@ every claim in the output is checked against the data it came from.
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
 - [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
-  - [Checked against geomorph](#checked-against-geomorph) · [An alternative to geomorph for 2D work](#an-alternative-to-geomorph-for-2d-work)
+  - [Checked against geomorph](#checked-against-geomorph) · [An alternative to geomorph for 2D work](#an-alternative-to-geomorph-for-2d-work) · [Examples](#what-it-produces-examples)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -162,6 +162,36 @@ regions. You can stay in one Python workflow from photograph to statistics.
 
 For these, and for any analysis we have not listed, use geomorph: Descriptron's converters write TPS and
 MorphoJ files, and its aligned coordinates are plain tables.
+
+### What it produces: examples
+
+Assembled from the programs' output (panel titles added; the animation is drawn from SAM2-PAL's
+predictions file).
+
+**Annotate one, predict the rest.** SAM2-PAL carried 18 head structures from one annotated *Tetramorium*
+head to 317 unannotated ones (examples drawn at random from the colour photographs whose 18 structures were
+all predicted; you check and correct the rest in the GUI).
+
+![SAM2-PAL predictions on ant heads](docs/tutorial/showcase_sam2pal_heads.gif)
+
+**Measurements** in millimetres, with the scale bar read from the image, and the centre line of a thin,
+curved structure, whose curved length a straight measurement under-reads.
+
+![Length, width and centre line of a pterostigma](docs/tutorial/showcase_measurements.jpg)
+
+**Geometric morphometrics** of wing outlines: where along the outline the shape varies, and the specimens in
+shape space.
+
+![Semilandmark PC heat maps and shape space](docs/tutorial/showcase_shape.jpg)
+
+**Colour and colour pattern**: shine removal and illumination normalisation, colour classes and the pattern
+mask, then colour measured in homologous cells, so the same cell covers the same anatomy on every wing.
+
+![Colour pipeline and homologous cells](docs/tutorial/showcase_colour.jpg)
+
+**Texture**: ant heads placed by the texture of their head capsule, measured in homologous cells.
+
+![Ant heads in texture space](docs/tutorial/showcase_texture_ant_heads.jpg)
 
 ---
 
