@@ -146,7 +146,7 @@ your own PDFs: `pip install "descriptron-core[rag]"` (see
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
-docker pull ghcr.io/alexrvandam/descriptron:2.0.4
+docker pull ghcr.io/alexrvandam/descriptron:2.1.0
 
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
@@ -425,7 +425,7 @@ descriptron-mcp --check                        # lists the programs it found
 ```bash
 claude mcp add descriptron -- docker run -i --rm --gpus all \
   --user "$(id -u):$(id -g)" -v "$HOME:$HOME" \
-  ghcr.io/alexrvandam/descriptron:2.0.4 mcp
+  ghcr.io/alexrvandam/descriptron:2.1.0 mcp
 ```
 
 Without an NVIDIA GPU (e.g. on a Mac), leave out `--gpus all`: Docker refuses to start
