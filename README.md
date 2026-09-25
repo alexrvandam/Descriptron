@@ -63,6 +63,17 @@ language model writes the treatments, which an independent audit checks against 
 descriptive words can be trusted, and whether an unseen species can be recognised, are tested on the same
 specimens. The numbers are from the 29-species *Diaphorina* run.
 
+```
+  images ──► ANNOTATE ──► PROPAGATE ──► MEASURE ──► SCREEN ──► MATRIX
+                GUI        SAM2-PAL      mm, GPA,    outliers,   evidence
+             SAM2-assisted  DINOLand     colour,     flips,      tiers
+                                         texture     conflicts      │
+                                                                    ▼
+   treatments ◄── AUDIT ◄── KEY ◄── DELIMIT ◄──────────────────── characters
+    .docx, XML,  numeric   couplets  matrix / key / graph,
+    DwC-A, SDD   + words   + support  calibrated on your own set
+```
+
 ![The Descriptron and BioRAG workflow](docs/tutorial/showcase_biorag_workflow.jpg)
 
 ---
