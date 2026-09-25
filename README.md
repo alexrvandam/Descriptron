@@ -176,6 +176,14 @@ round. The last two frames show two such plates as predicted and after correctio
 
 ![SAM2-PAL predictions on ant heads](docs/tutorial/showcase_sam2pal_heads.gif)
 
+**Landmarks, placed automatically.** DINOLand carries 17 vein-junction landmarks from hand-landmarked
+reference wings to new psyllid forewings, whichever way up and whichever side they were photographed from
+(`--orientation_search rot4 --mirror_refs`). Each landmark is marked as agreed by the references (filled green)
+or to be checked (open gold), so you look only where it is needed. On 80 test wings, turned copies and mirror
+images included, the median error was 2.3 % of wing size, with 78 % of landmarks within 5 % and 90 % within 10 %.
+
+![DINOLand landmarks on psyllid forewings](docs/tutorial/showcase_dinoland.jpg)
+
 **Measurements** in millimetres, with the scale bar read from the image, and the centre line of a thin,
 curved structure, whose curved length a straight measurement under-reads.
 
