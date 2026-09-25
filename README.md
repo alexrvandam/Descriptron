@@ -136,7 +136,7 @@ mirror-image wings' homologous cells then matches the other wings again (r = 0.6
 are in `descriptron/measure/validation/` (R and geomorph are needed only to rerun them); a comparison with
 RRPP on identical aligned data is in the [tutorial](docs/TUTORIAL.md#metadata-and-shape-statistics).
 
-### An alternative to geomorph for 2D work
+### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and
 morphologists use geomorph (and tpsDig, MorphoJ or StereoMorph, whose files it reads and writes) for, gives
