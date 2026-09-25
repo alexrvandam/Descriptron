@@ -40,7 +40,7 @@ every claim in the output is checked against the data it came from.
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
 - [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
-  - [Checked against geomorph](#checked-against-geomorph) · [An alternative to geomorph for 2D work](#an-alternative-to-geomorph-for-2d-work) · [Examples](#what-it-produces-examples)
+  - [Checked against geomorph](#checked-against-geomorph) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -216,6 +216,47 @@ species outside the reference set are all flagged as unlike every known species 
 nearest one.
 
 ![Shape statistics from specimen metadata](docs/tutorial/showcase_stats.jpg)
+
+### From traits to species descriptions (BioRAG)
+
+The traits of every specimen become a character matrix, and from it a key, species descriptions and a check
+on whether a specimen belongs to a known species at all. Results on 29 *Diaphorina* species (148 specimens):
+
+**Naming a specimen, and recognising a species never seen.** Each specimen's own record is withheld before it is
+named. The character matrix names 132 of 148 correctly, and of the three instruments it best recognises a
+species it has never seen (A: every operating point, and the estimate when the threshold is chosen without the
+species being scored).
+
+![Species prediction: key, knowledge graph and character matrix](docs/tutorial/showcase_biorag_species_prediction.jpg)
+
+**What one character is worth.** For each structure, how often its best single character alone points to the
+right species for a withheld specimen, and every character's worth for naming against novelty. Single
+characters rarely suffice; the matrix works because it combines many.
+
+![Character robustness](docs/tutorial/showcase_biorag_character_robustness.jpg)
+
+**How far apart the species are, and which characters hold up.** Species placed by their distances in the
+matrix (a), the gap between every pair (b), and the support for the characters the knowledge graph and the key
+use, each tested on specimens withheld from it (c, d).
+
+![Species distances and character support](docs/tutorial/showcase_biorag_species_distances.jpg)
+
+**A species treatment, written from the data and audited.** A language model writes the sentences; every
+number comes from the matrix and an independent audit re-derives each one (numbers, the structure they
+belong to, and every comparison) before the treatment is accepted. Descriptive words about shape and surface
+come from images read by the model and are reported with their measured repeatability. Excerpt, *Diaphorina*
+sp. 'kenya', collected in Kenya (undescribed species carry working codes until they are named):
+
+![Diaphorina sp. 'kenya': specimens and measured structures](docs/tutorial/showcase_treatment_plate_kenya.jpg)
+
+> **Diagnosis.** Diaphorina sp. 'kenya' differs from most congeners in characters of the distal aedeagal segment, male proctiger and male subgenital plate. Distal aedeagal segment length 0.138–0.163 mm, smaller than in all other species measured (19). Distal aedeagal segment colour L\* 51.0–57.0, darker (lower L\*) than in all other species measured (20) except D. cf. enderleini, D. sp. 1A and D. sp. 3; its palest third L\* 58.8–62.9, darker (lower L\*) than in all other species measured (20) except D. sp. 3. Male proctiger relatively long: MP/PL ratio 1.39–1.50×, greater than in all other species measured (22) except D. cf. carrisae and D. sp. 1A; MP/DL ratio 1.96–2.23×. Male subgenital plate width 0.064–0.193 mm, smaller than in all other species measured (21) except D. sp. 9, D. sp. 19 and D. sp. 21; male subgenital plate length/width 1.34–3.84×, greater than in all other species measured (22) except D. sp. 4, D. sp. 5, D. sp. 9, D. sp. 17, D. turneri and D. virgata. Head and forewing ochreous brown; metafemur orange-brown.
+>
+> **Head.** Head width (HW) 0.339–0.378 mm (mean 0.355; n=6), head length 0.556–0.617 mm (mean 0.580; n=6), head longer than wide (length/width 1.58–1.73×, mean 1.63; n=6). Vertex width 0.191–0.249 mm (mean 0.216; n=6), vertex length 0.357–0.397 mm (mean 0.372; n=6), distinctly longer than wide (VL/VW; see Proportions). Genal processes present, elongate in outline (length/width 1.21–2.28×, mean 1.91; n=6), length 0.164–0.317 mm (mean 0.279; n=6), width 0.125–0.166 mm (mean 0.146; n=6); their length relative to vertex length, precise shape and apex form not assessable from the material examined. Head ochreous brown (L\* 57.3–64.1, a\* 8.0–10.0, b\* 34.3–38.5); vertex slightly paler, ochreous yellow (L\* 64.5–68.1, a\* 5.7–7.4, b\* 34.8–37.9); genal processes ochreous brown (L\* 52.1–64.4, a\* 8.2–13.4, b\* 37.9–41.1).
+>
+> **Metaleg.** Metafemur length (MF) 0.394–0.416 mm (mean 0.403; n=6), width 0.105–0.119 mm (mean 0.113; n=6), length/width 3.42–3.77× (mean 3.58; n=6), orange-brown (L\* 40.7–53.2, a\* 15.3–19.1, b\* 37.8–45.2), with a lightness contrast between its two end thirds (L\* difference 8.4–19.9). Metatibia length (MT) 0.562–0.588 mm (mean 0.574; n=6), width 0.0621–0.0682 mm (mean 0.0656; n=6), length/width 8.32–9.24× (mean 8.76; n=6), ochreous yellow (L\* 71.5–75.8, a\* 2.6–4.5, b\* 30.9–37.8). Metafemur shorter than metatibia (MF/MT; see Proportions); metatibia distinctly longer than head width (MT/HW; see Proportions). Metatarsus colour not assessable from the material examined.
+>
+> *(Excerpt, verbatim. The full treatment covers antenna, rostrum, forewing cells, male and female terminalia,
+> proportions, sexual dimorphism, remarks and what could not be assessed from the material.)*
 
 ---
 
