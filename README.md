@@ -210,8 +210,9 @@ place it in the same spot, and is marked for checking (gold) when they do not.
 
 ![DINOv3 features give the same colour to the same structure on two ant heads, with a homology grid](docs/tutorial/showcase_dinov3_correspondence.jpg)
 
-<sub>From left: ant A with a homology grid (thin-plate spline from the consensus shape); where the model attends;
-its features shown as colour; ant B, where the same colour marks the same structure.</sub>
+<sub>The homology grid is a thin-plate spline from the consensus shape (geometric morphometrics); the colours are the
+first three principal components of DINOv3's patch features, computed jointly for both ants, so the same colour
+marks the same structure.</sub>
 
 **Detectron2** (Meta's Mask R-CNN) is the third route. Once enough images have been annotated and corrected, it
 is trained on them and then segments every structure of new images in one pass, each mask with a confidence
