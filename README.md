@@ -201,6 +201,18 @@ round. The last two frames show two such plates as predicted and after correctio
 
 ![SAM2-PAL predictions on ant heads](docs/tutorial/showcase_sam2pal_heads.gif)
 
+**Video, too.** Load a video (here a rotating micro-CT render of an ant head), mark a structure on a few
+frames, and SAM2 follows it through every frame; the Video Remote Control steps through the frames, shows
+which are annotated and lets you delete bad ones before fine-tuning (clip at 2x speed, earlier GUI layout).
+
+![SAM2 video mode in the GUI](docs/tutorial/showcase_sam2pal_video_gui.gif)
+
+The same region followed through the full rotation of four heads with the fine-tuned model (about 3x speed):
+
+![SAM2-PAL on four rotating ant heads](docs/tutorial/showcase_sam2pal_video_4heads.gif)
+
+<sub>3D models: Francisco Hita Garcia (Sketchfab).</sub>
+
 **Landmarks, placed automatically.** DINOLand carries 17 vein-junction landmarks from hand-landmarked
 reference wings to new psyllid forewings, whichever way up and whichever side they were photographed from
 (`--orientation_search rot4 --mirror_refs`). Each landmark is marked as agreed by the references (filled green)
