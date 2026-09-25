@@ -34,6 +34,7 @@ every claim in the output is checked against the data it came from.
 
 ## Contents
 
+- [The approach at a glance](#the-approach-at-a-glance)
 - [What v2 adds](#what-v2-adds)
 - [Installing](#installing) — pip · Docker · conda
   - **[Docker how-to](docs/DOCKER_RECIPE.md)** — step-by-step recipe: project folder, full pipeline, Linux and Windows
@@ -50,6 +51,19 @@ every claim in the output is checked against the data it came from.
 - [Use Descriptron from Claude (MCP server)](#mcp-server)
 - [Licence](#licence)
 - [Citation](#citation)
+
+---
+
+## The approach at a glance
+
+From specimen images to audited species treatments: (A) a few specimens are annotated and the rest are
+predicted and corrected; (B) every structure is measured, its shape, colour and texture recorded, and the
+features assigned to evidence tiers in a checkable matrix; (C) the key is computed from the matrix, and a
+language model writes the treatments, which an independent audit checks against the matrix; (D) which
+descriptive words can be trusted, and whether an unseen species can be recognised, are tested on the same
+specimens. The numbers are from the 29-species *Diaphorina* run.
+
+![The Descriptron and BioRAG workflow](docs/tutorial/showcase_biorag_workflow.jpg)
 
 ---
 
@@ -220,10 +234,7 @@ nearest one.
 ### From traits to species descriptions (BioRAG)
 
 The traits of every specimen become a character matrix, and from it a key, species descriptions and a check
-on whether a specimen belongs to a known species at all. The whole workflow, with the numbers from the run:
-
-![BioRAG workflow](docs/tutorial/showcase_biorag_workflow.jpg)
-
+on whether a specimen belongs to a known species at all ([the approach at a glance](#the-approach-at-a-glance)).
 Results on 29 *Diaphorina* species (148 specimens):
 
 **Naming a specimen, and recognising a species never seen.** Each specimen's own record is withheld before it is
