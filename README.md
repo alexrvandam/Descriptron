@@ -39,7 +39,8 @@ every claim in the output is checked against the data it came from.
   - **[Docker how-to](docs/DOCKER_RECIPE.md)** — step-by-step recipe: project folder, full pipeline, Linux and Windows
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
-- [Shape statistics checked against geomorph](#shape-statistics-checked-against-geomorph)
+- [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
+  - [Checked against geomorph](#checked-against-geomorph) · [An alternative to geomorph for 2D work](#an-alternative-to-geomorph-for-2d-work)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -70,7 +71,38 @@ delimitation need no model at all.
 
 ---
 
-## Shape statistics checked against geomorph
+## Automated trait collection: measurements, shape, colour and texture
+
+Descriptron turns specimen photographs into a table of traits, specimen by specimen, with every step
+automated after a few annotated examples:
+
+1. **Annotate a few, predict the rest.** Structures are outlined with SAM2 and carried to the rest of the
+   collection by SAM2-PAL; landmarks are carried by DINOLand. You check and correct, not draw.
+2. **Morphometrics.** Lengths, widths, areas and ratios in millimetres, with scale bars read from the images;
+   curved length, width and curvature of thin structures along their centre line (within 0.3 % of the true
+   length on test shapes, where a straight measurement under-reads curved structures by 17–23 %); joint angles
+   from a pose skeleton.
+3. **Geometric morphometrics.** Landmark GPA and outline semilandmarks (fixed, or slid by Procrustes distance
+   or bending energy), mirror-image specimens found and reflected, shape PCA, and shape statistics driven by your
+   specimen metadata: Procrustes ANOVA with permutation (RRPP), allometry, trajectories, disparity,
+   shape vs environment, Mantel, asymmetry, modularity and integration, phylogenetic signal, assignment of
+   unidentified specimens.
+4. **Colour, colour pattern and texture.** CIE L\*a\*b\* and HSV colour with optional background-based correction of
+   the illumination cast, colour classes and markings, and colour and texture measured in a grid of
+   **homologous cells**: after the superimposition the semilandmarks are frozen in their settled
+   correspondence and mapped back onto each photograph, so the same cell covers the same anatomy on every
+   specimen.
+5. **One table.** Everything is joined per specimen, calibrated to millimetres, and feeds the character
+   matrix, the key and the descriptions, or your own analyses.
+
+**How this is checked.** Every number in the geometric-morphometric part was compared with R on the same data:
+with geomorph from raw landmarks (below), and with RRPP on identical aligned data. The comparison scripts are
+in `descriptron/measure/validation/` and can be rerun by anyone with R. The checks found real problems, which
+2.1 fixes and which are described below rather than hidden. The colour and texture values themselves are
+standard measures (CIE L\*a\*b\*, GLCM, LBP); what is checked is that they are taken from homologous places
+(panel g of the third figure).
+
+### Checked against geomorph
 
 Descriptron's geometric morphometrics are written in Python, so we ran the same data through R's
 **geomorph** (4.1.1) and compared every number. Raw landmarks go into both, and each side does its own
@@ -103,6 +135,33 @@ outline GPA now find the mirror images, reflect them before alignment and list t
 mirror-image wings' homologous cells then matches the other wings again (r = 0.69, was 0.36). The comparison scripts
 are in `descriptron/measure/validation/` (R and geomorph are needed only to rerun them); a comparison with
 RRPP on identical aligned data is in the [tutorial](docs/TUTORIAL.md#metadata-and-shape-statistics).
+
+### An alternative to geomorph for 2D work
+
+For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and
+morphologists use geomorph (and tpsDig, MorphoJ or StereoMorph, whose files it reads and writes) for, gives
+the same numbers, and adds the steps those programs leave to you: collecting the landmarks and outlines,
+calibrating to millimetres, finding mirror-image specimens, and measuring colour and texture in homologous
+regions. You can stay in one Python workflow from photograph to statistics.
+
+| | geomorph | Descriptron | checked |
+|---|---|---|---|
+| GPA, landmarks | `gpagen` | `landmark_gpa_V2`, `descriptron_shape_stats` | same numbers |
+| outline semilandmarks, fixed or sliding (Procrustes distance, bending energy) | `gpagen(curves=)` | V42 `--slide_method` | same numbers |
+| shape PCA | `gm.prcomp` | V42, landmark GPA | same numbers |
+| Procrustes ANOVA, allometry | `procD.lm` | `anova`, `allometry` | same numbers |
+| trajectory analysis | `trajectory.analysis` (RRPP) | `trajectory` | same numbers (RRPP) |
+| disparity | `morphol.disparity` | `disparity` | same numbers |
+| 2B-PLS, modularity (CR) | `two.b.pls`, `modularity.test` | `pls`, `modularity` | same numbers |
+| phylogenetic signal | `physignal` | `phylosignal` | same numbers |
+| object symmetry | `bilat.symmetry` | `asymmetry` | same numbers (Descriptron reports half the left-right difference) |
+| posture standardisation | `fixed.angle` | `descriptron_joints standardise` | known-answer tests |
+| Mantel, assignment with typicality | — (vegan, MASS) | `mantel`, `assign` | known-answer tests |
+| collection, mm calibration, mirror images, colour and texture in homologous cells | — | built in | see above |
+| **not (yet) in Descriptron:** 3D landmarks and surface semilandmarks, phylogenetic GLS (`procD.pgls`), evolutionary rate comparisons (`compare.evol.rates`), phylomorphospace | yes | no | — |
+
+For these, and for any analysis we have not listed, use geomorph: Descriptron's converters write TPS and
+MorphoJ files, and its aligned coordinates are plain tables.
 
 ---
 
