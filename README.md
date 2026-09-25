@@ -2,7 +2,7 @@
 ## Production use ready - installable with pip, Docker or MCP (eg. Claude-Code)
  
 <p>
-  <a href="https://doi.org/10.5281/zenodo.22942918"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.22942918.svg" alt="DOI 10.5281/zenodo.22942918" align="middle"></a>
+  <a href="https://doi.org/10.5281/zenodo.22958109"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.22958109.svg" alt="DOI 10.5281/zenodo.22958109" align="middle"></a>
   &nbsp;<img src="docs/marmot_icon.png" alt="Descriptron marmot" height="40" align="middle">
   &nbsp;<a href="#mcp-server"><img src="docs/claude_code_crab.png" alt="Works with Claude Code (MCP server)" height="40" align="middle"></a>
 </p>
@@ -689,8 +689,8 @@ work that is published, presented or distributed, cite:
 
 1. **The software (Descriptron v2)**, by the DOI of the version you used:
    Van Dam, A. R. (2026). Descriptron: morphology-driven species descriptions,
-   keys and delimitation for dark taxa (Version 2.0.4). Zenodo.
-   https://doi.org/10.5281/zenodo.22942918
+   keys and delimitation for dark taxa (Version 2.1.1). Zenodo.
+   https://doi.org/10.5281/zenodo.22958109
    (all versions: https://doi.org/10.5281/zenodo.17077224)
 2. **The first Descriptron paper:**
    Van Dam, A. R. & Štarhová Serbina, L. (2026). Descriptron: Artificial
@@ -701,15 +701,15 @@ work that is published, presented or distributed, cite:
    added here.
 
 ```bibtex
-@software{vandam_2026_descriptron_v204,
+@software{vandam_2026_descriptron_v211,
   author    = {Van Dam, Alex R.},
   title     = {Descriptron: morphology-driven species descriptions, keys and
                delimitation for dark taxa},
-  version   = {v2.0.4},
+  version   = {v2.1.1},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.22942918},
-  url       = {https://doi.org/10.5281/zenodo.22942918}
+  doi       = {10.5281/zenodo.22958109},
+  url       = {https://doi.org/10.5281/zenodo.22958109}
 }
 
 @article{vandam2026descriptron,
