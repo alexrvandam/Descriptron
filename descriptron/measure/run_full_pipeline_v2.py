@@ -292,7 +292,11 @@ def step_semilandmarks(cfg: Dict, python: str, log_dir: Path) -> bool:
         logger.info(f"  Already complete ({len(existing_cats)} categories), skipping")
         return True
 
-    script = SCRIPT_DIR / "semi_landmark_and_kpts_procrustesV34_GPA.py"
+    # V42 (2026-09-25) = V34 + mirror-image outlines reflected before GPA (checked against geomorph); V34 fallback
+    script = SCRIPT_DIR / "semi_landmark_and_kpts_procrustesV42_GPA.py"
+    align = "reflect_mirrored"
+    if not script.is_file():
+        script, align = SCRIPT_DIR / "semi_landmark_and_kpts_procrustesV34_GPA.py", "without_reflection"
     cmd = [
         python, str(script),
         "--json", cfg["coco_json"],
@@ -300,7 +304,8 @@ def step_semilandmarks(cfg: Dict, python: str, log_dir: Path) -> bool:
         "--output_dir", str(out_dir),
         "--num_landmarks", str(cfg.get("num_landmarks", 100)),
         "--anchor_method", "none",
-        "--alignment_method", "without_reflection",
+        "--alignment_method", align,
+        *(["--slide_method", cfg["slide_method"]] if cfg.get("slide_method", "none") != "none" and "V42" in script.name else []),
         "--perform_manova",
     ]
     if cfg.get("group_labels"):
@@ -467,7 +472,10 @@ def step_landmark_gpa(cfg: Dict, python: str, log_dir: Path) -> bool:
         logger.info("  Already complete (*_pc_scores.csv exists), skipping")
         return True
 
-    script = SCRIPT_DIR / "landmark_gpa_V1.py"
+    # V2 (2026-09-25) reflects mirror-image specimens before GPA (V1 let them dominate PC1); V1 as fallback
+    script = SCRIPT_DIR / "landmark_gpa_V2.py"
+    if not script.is_file():
+        script = SCRIPT_DIR / "landmark_gpa_V1.py"
     cmd = [
         python, str(script),
         "--json", kpts_json,
@@ -1747,6 +1755,9 @@ def parse_args():
 
     p.add_argument("--num_landmarks", type=int, default=100,
                     help="Number of semilandmarks (default 100)")
+    p.add_argument("--slide_method", choices=["none", "procd", "bending"], default="none",
+                    help="Semilandmark sliding as in geomorph (V42): none = fixed (default), procd = minimum "
+                         "Procrustes distance, bending = minimum bending energy")
     p.add_argument("--alpha", type=float, default=0.05,
                     help="Significance threshold for diagnostic features (default 0.05)")
     p.add_argument("--model", default="claude-sonnet-4-6",

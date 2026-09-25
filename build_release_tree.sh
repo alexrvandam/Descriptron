@@ -38,8 +38,17 @@ if [ "$ALL" = "0" ] && [ -f "$INVENTORY" ]; then
   LIVE_LIST="$(awk -F'\t' 'NR>1 && $2 != "" && $1 != "(left out)" {print $2}' "$INVENTORY")"
 fi
 
+# live programs the inventory does not (yet) list — without this a rebuild silently drops them
+# (it dropped DINOLand v52 and descriptron_credentials.py, which had been added to the repo by hand)
+EXTRA_LIVE="dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py
+descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descriptron_joints.py
+descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
+coco_combiner_V13.py coco_converter_v24.py
+remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py landmark_gpa_V2.py semi_landmark_and_kpts_procrustesV42_GPA.py"
+
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
+  printf '%s\n' $EXTRA_LIVE | grep -qxF "$1" && return 0
   printf '%s\n' "$LIVE_LIST" | grep -qxF "$1"
 }
 
@@ -71,6 +80,7 @@ done
 # fixed-budget copy used for the backend comparison
 LIVE_LIST="" copy_py "$GUI/torchvision_det" "$DST/descriptron/torchvision_det"
 for f in detectron2_training_and_filterV10_and_kpts-17.py \
+         detectron2_training_and_filterV10_and_kpts-18.py \
          detectron2_predict_and_filterV10_and_kptsV2.py \
          detectron2_training_sweep_v1.py; do
   [ -f "$GUI/detectron2/$f" ] && cp "$GUI/detectron2/$f" "$DST/descriptron/detectron2/"
@@ -79,6 +89,10 @@ mkdir -p "$DST/descriptron/torchvision_det/tests" "$DST/descriptron/measure/test
 cp "$GUI/torchvision_det/tests/"*.py "$DST/descriptron/torchvision_det/tests/" 2>/dev/null || true
 find "$GUI/measure/tests" -maxdepth 1 -name 'test_*.py' ! -name '*.bak*' \
      -exec cp {} "$DST/descriptron/measure/tests/" \; 2>/dev/null || true
+# validation against R (RRPP, geomorph): the scripts that make the docs figures
+mkdir -p "$DST/descriptron/measure/validation"
+find "$GUI/measure/validation" -maxdepth 1 -name 'validate_*.py' ! -name '*.bak*' \
+     -exec cp {} "$DST/descriptron/measure/validation/" \; 2>/dev/null || true
 
 # --- data that is part of the code, not of a dataset -----------------------
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true
@@ -95,7 +109,7 @@ MCP_SRC="${MCP_SRC:-$HOME/Desktop/descriptron-mcp}"
 rm -rf "$DST/packages/descriptron-mcp"
 if [ -d "$MCP_SRC" ]; then
   mkdir -p "$DST/packages/descriptron-mcp"
-  rsync -a --exclude '.venv/' --exclude 'dist/' --exclude '__pycache__/' --exclude '*.egg-info/' \
+  rsync -a --exclude '.venv/' --exclude 'dist/' --exclude 'dist_old*' --exclude '__pycache__/' --exclude '*.egg-info/' \
         --exclude '.pytest_cache/' --exclude '.git/' --exclude '*.txt' --exclude 'copy_into_descriptron_repo.sh' \
         "$MCP_SRC/" "$DST/packages/descriptron-mcp/"
 fi
@@ -111,7 +125,8 @@ for f in LICENSE NOTICE CITATION.cff; do
 done
 # each distributable package carries them too (hatchling puts LICENSE*/NOTICE* in the wheel)
 for p in "$DST"/packages/*/; do cp "$SRC/LICENSE" "$SRC/NOTICE" "$p"; done
-cp "$SRC/docs/"* "$DST/docs/" 2>/dev/null || true
+# -r: docs/tutorial/ holds the tutorial's screenshots and figures; skip editor backups
+rsync -a --exclude '*.bak*' "$SRC/docs/" "$DST/docs/"
 cp "$SRC/.dockerignore" "$DST/" 2>/dev/null || true
 cp "$0" "$DST/" 2>/dev/null || true
 

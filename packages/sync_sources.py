@@ -36,14 +36,26 @@ TARGETS = {
 
 # things the inventory does not list but the packages need
 EXTRA_VISION = ["torchvision_det",                   # whole directory
-                "dinov3_landmark_transfer_v52.py"]    # v52 (orientation search) is not in the inventory yet
+                "dinov3_landmark_transfer_v52.py",    # v52 (orientation search) is not in the inventory yet
+                "descriptron_video_track.py"]         # v2.1.0: video - individuals + pose (SAM2 video)
 # modules a core program imports that the inventory files elsewhere or does not list:
 # biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
 # because it CAN use Florence-2, which it loads lazily), and that imports
 # descriptron_rosetta. Without these the literature RAG dies on import in core.
 EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py",
-              "measure/descriptron_credentials.py"]      # v2.0.4: API keys / tokens (core + DINOLand + GUI)
+              "measure/descriptron_credentials.py",      # v2.0.4: API keys / tokens (core + DINOLand + GUI)
+              # v2.1.0: converters, COCO housekeeping, centre lines, joints, metadata + shape statistics
+              "measure/descriptron_convert.py", "measure/descriptron_coco_tools.py",
+              "measure/descriptron_centerline.py", "measure/descriptron_joints.py",
+              "measure/descriptron_metadata.py", "measure/descriptron_shape_stats.py",
+              "measure/validation/validate_shape_stats_vs_rrpp.py",
+              "coco_combiner_V13.py", "coco_converter_v24.py",   # run by descriptron_coco_tools prepare-d2
+              "measure/landmark_gpa_V2.py",      # V2: mirror-image specimens reflected before GPA
+              "measure/semi_landmark_and_kpts_procrustesV42_GPA.py",   # V42: same for outlines
+              "measure/validation/validate_shape_stats_vs_geomorph.py",
+              "measure/validation/validate_semilandmarks_vs_geomorph.py"]
 EXTRA_GUI = ["marmot.jpg", "icons"]
+EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py"]   # v2.1.0 GUI (binder tabs); cli.py runs the newest descriptron-v2-*.py
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 
 
@@ -139,6 +151,16 @@ def main():
         size = sum(f.stat().st_size for f in (core_pkg / "data" / src.name).rglob("*")
                    if f.is_file())
         print(f"  + {rel} -> core data/ and tools/ ({size/1e6:.1f} MB each)")
+
+    gui_tools = HERE / "descriptron-gui" / "src" / "descriptron_gui" / "tools"
+    for extra in EXTRA_GUI_TOOLS:
+        src = gui / extra
+        if src.is_file():
+            shutil.copy2(src, gui_tools / src.name)
+            counts["descriptron-gui"] += 1
+            print(f"  + {extra} -> descriptron-gui")
+        else:
+            print(f"  ! missing: {extra}")
 
     for extra in EXTRA_GUI:
         src = gui / extra

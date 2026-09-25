@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron"
-version = "2.0.4"
+version = "2.1.0"
 description = "Descriptron: image annotation, phenomics and evidence-tiered species descriptions"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -22,14 +22,14 @@ classifiers = [
 # what people will type, and it should give them the whole system rather than a
 # "no matching distribution" error.
 dependencies = [
-  "descriptron-core==2.0.4",
-  "descriptron-vision==2.0.4",
-  "descriptron-gui==2.0.4",
+  "descriptron-core==2.1.0",
+  "descriptron-vision==2.1.0",
+  "descriptron-gui==2.1.0",
 ]
 
 [project.optional-dependencies]
-llm = ["descriptron-core[llm]==2.0.4"]
-rag = ["descriptron-core[rag]==2.0.4"]
+llm = ["descriptron-core[llm]==2.1.0"]
+rag = ["descriptron-core[rag]==2.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/alexrvandam/Descriptron"

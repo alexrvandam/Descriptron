@@ -68,7 +68,7 @@ case "$cmd" in
       echo "    -v \"\$PWD:/data\" descriptron:latest gui" >&2
       exit 3
     fi
-    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v73.py" "$@" ;;
+    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v74.py" "$@" ;;   # 2.1.0: binder-tab GUI (v73 kept)
   train-masks)
     need_env samm
     exec $CONDA_RUN samm python "$GUI/torchvision_det/tv_train_v1.py" --task masks "$@" ;;
@@ -81,7 +81,7 @@ case "$cmd" in
   train-d2)
     need_env detectron2_env
     exec $CONDA_RUN detectron2_env python \
-      "$GUI/detectron2/detectron2_training_and_filterV10_and_kpts-17.py" "$@" ;;
+      "$GUI/detectron2/detectron2_training_and_filterV10_and_kpts-18.py" "$@" ;;   # 2.1.0: held-out validation (v17 kept)
   predict-d2)
     need_env detectron2_env
     exec $CONDA_RUN detectron2_env python \

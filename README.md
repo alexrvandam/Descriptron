@@ -38,6 +38,8 @@ every claim in the output is checked against the data it came from.
 - [Installing](#installing) — pip · Docker · conda
   - **[Docker how-to](docs/DOCKER_RECIPE.md)** — step-by-step recipe: project folder, full pipeline, Linux and Windows
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
+- **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
+- [Shape statistics checked against geomorph](#shape-statistics-checked-against-geomorph)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -60,9 +62,40 @@ every claim in the output is checked against the data it came from.
 | mask propagation | Detectron2 only | **SAM2-PAL** palindrome propagation, **DINOLand** DINOv3 landmark transfer, torchvision detectors |
 | checking | — | independent confabulation audit, subjective-word checks, ontology annotation |
 | install | eight conda environments | **`pip install descriptron`**, or one Docker image |
+| shape and form (2.1) | GPA, PCA, MANOVA/CVA | + Procrustes ANOVA with metadata (species x locality...), trajectories, disparity, allometry slopes, 2B-PLS, Mantel, asymmetry, modularity, Kmult, assignment; mirror images reflected automatically; the Procrustes statistics checked against geomorph and RRPP (Mantel and assignment by known-answer tests) |
+| more tools (2.1) | — | centre lines of thin structures, joint angles and posture standardisation, pose skeletons, video tracking with pose (DeepLabCut export), TPS / MorphoJ / StereoMorph / VIA converters, Darwin Core metadata import |
 
 Nothing in the analysis half needs a GPU, and the key, matrix, audits and
 delimitation need no model at all.
+
+---
+
+## Shape statistics checked against geomorph
+
+Descriptron's geometric morphometrics are written in Python, so we ran the same data through R's
+**geomorph** (4.1.1) and compared every number. Raw landmarks go into both, and each side does its own
+Procrustes superimposition. Centroid sizes, Procrustes distances, Procrustes ANOVA (SS, R², F),
+disparity, modularity (CR), two-block PLS, phylogenetic signal (Kmult) and asymmetry agree to at most
+5.6 × 10⁻⁴ relative difference, most to 10⁻⁶ or better; permutation P-values differ only by random sampling.
+Real data: 84 Diaphorina forewings plus synthetic designs with known effects.
+
+![Descriptron vs geomorph, same raw landmarks](docs/tutorial/validation_python_vs_geomorph.png)
+
+Outline semilandmarks agree with `gpagen` on the same points, fixed (the default) and with both of geomorph's
+sliding methods, new in 2.1 (`--slide_method procd`: minimum Procrustes distance; `bending`: minimum bending
+energy) to 5 × 10⁻¹¹. After the superimposition the semilandmarks are frozen in their settled correspondence
+and mapped back onto each photograph, so colour and texture are measured in the same anatomical cell of every
+specimen, something geomorph does not do.
+
+![Descriptron outline semilandmarks vs geomorph](docs/tutorial/validation_semilandmarks_vs_geomorph.png)
+
+The checks found, and 2.1 fixes, one problem worth knowing about: **mirror-image specimens** (a wing
+photographed from the other side) cannot be superimposed without reflection, and dominated the first
+principal component (19 of 96 Diaphorina forewings: PC1 95.7 % -> 30.0 % once reflected). Landmark and
+outline GPA now find the mirror images, reflect them before alignment and list them; the colour pattern of the
+mirror-image wings' homologous cells then matches the other wings again (r = 0.69, was 0.36). The comparison scripts
+are in `descriptron/measure/validation/` (R and geomorph are needed only to rerun them); a comparison with
+RRPP on identical aligned data is in the [tutorial](docs/TUTORIAL.md#metadata-and-shape-statistics).
 
 ---
 

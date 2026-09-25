@@ -44,7 +44,7 @@ RUN /opt/conda/envs/samm/bin/python -m venv /opt/descriptron-mcp \
  && /opt/descriptron-mcp/bin/pip install --no-cache-dir --no-deps /tmp/mcp-build/wheels/*.whl \
  && /opt/descriptron-mcp/bin/pip install --no-cache-dir --no-deps /tmp/mcp-build/descriptron-mcp \
  && /opt/conda/envs/measure_env/bin/pip install --no-cache-dir "requests>=2.28" "pdfplumber>=0.10" \
- && /opt/conda/envs/samm/bin/pip install --no-cache-dir "transformers==4.57.6" \
+ && /opt/conda/envs/samm/bin/pip install --no-cache-dir "transformers==4.57.6" "openpyxl>=3.1" \
  && rm -rf /tmp/mcp-build \
  && chmod 755 /usr/local/bin/descriptron \
  && chmod -R a+rX /opt/descriptron-mcp \
