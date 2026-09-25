@@ -188,6 +188,36 @@ regions. You can stay in one Python workflow from photograph to statistics.
 For these, and for any analysis we have not listed, use geomorph: Descriptron's converters write TPS and
 MorphoJ files, and its aligned coordinates are plain tables.
 
+### How the predictions check themselves
+
+Both propagation tools check their own work by going there and back.
+
+**SAM2-PAL** treats the annotated template and each new specimen as a short video that runs forwards and then
+backwards: template, specimen, specimen again, template (a "palindrome"). The masks are carried from the template
+to the specimen and then back; the memory is reset halfway, so the model cannot simply remember the template's
+masks. During fine-tuning, the difference between the masks that come back and the template's own masks is the
+training signal, so the model learns from specimens nobody has annotated. During prediction, the same round trip
+is scored for every specimen. It was high almost everywhere in our runs (mean overlap 0.98 on 317 ant heads), so
+it catches gross failures; every predicted mask also carries the model's own confidence, and a person checks them.
+
+**DINOLand** matches each landmark from a reference specimen to the new one using DINOv3 features (a vision
+transformer whose features give the same colour to the same structure on different specimens, below), searching
+only near where an affine alignment of the two outlines says the landmark should be. The match is then sent back:
+if the point found on the new specimen does not lead back to within 1.5 feature patches of where it started, the
+landmark is rejected. Matches that survive are cleaned of geometric outliers (RANSAC) and refined below patch
+size; with several reference specimens, a landmark counts as agreed (green in the examples) when the references
+place it in the same spot, and is marked for checking (gold) when they do not.
+
+![DINOv3 features give the same colour to the same structure on two ant heads, with a homology grid](docs/tutorial/showcase_dinov3_correspondence.jpg)
+
+<sub>From left: ant A with a homology grid (thin-plate spline from the consensus shape); where the model attends;
+its features shown as colour; ant B, where the same colour marks the same structure.</sub>
+
+**Detectron2** (Meta's Mask R-CNN) is the third route. Once enough images have been annotated and corrected, it
+is trained on them and then segments every structure of new images in one pass, each mask with a confidence
+score; Descriptron's training keeps a held-out validation set, split by specimen. The weevil at the top of this
+page was segmented this way.
+
 ### What it produces: examples
 
 Assembled from the programs' output (panel titles added; the animation is drawn from SAM2-PAL's
