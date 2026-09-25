@@ -168,9 +168,11 @@ MorphoJ files, and its aligned coordinates are plain tables.
 Assembled from the programs' output (panel titles added; the animation is drawn from SAM2-PAL's
 predictions file).
 
-**Annotate one, predict the rest.** SAM2-PAL carried 18 head structures from one annotated *Tetramorium*
-head to 317 unannotated ones (examples drawn at random from the colour photographs whose 18 structures were
-all predicted; you check and correct the rest in the GUI).
+**Annotate one, predict the rest, correct what needs it.** Step 0: one ant head annotated by hand (18
+structures). Step 1: SAM2-PAL carries them to the other heads (examples drawn at random from 317 colour
+photographs). Step 2: on hard plates, with the head small in a wide frame, some structures land in the wrong
+place; they are corrected in the GUI, and the corrected heads can be used to fine-tune SAM2-PAL for the next
+round. The last two frames show two such plates as predicted and after correction.
 
 ![SAM2-PAL predictions on ant heads](docs/tutorial/showcase_sam2pal_heads.gif)
 
