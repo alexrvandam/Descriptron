@@ -654,7 +654,8 @@ descriptron biorag_provenance_v1 --which path/to/some_result.csv --search path/t
 ```
 
 `--which` matches the file's content, not its name, so a result edited after the run is
-reported as not made by the pipeline. Scripts run on their own, outside the pipeline, are not
+reported as not made by the pipeline. Records hold absolute paths, so check them where the run's
+files are (in Docker, with the same `-v` mounts as the run). Scripts run on their own, outside the pipeline, are not
 stamped. Every language-model call is logged separately (`llm_calls.jsonl`: time, the model
 asked for and the model that answered, tokens), because the two can differ.
 
