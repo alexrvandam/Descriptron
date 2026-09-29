@@ -83,12 +83,27 @@ def colour_figure(a, out):
     ax.axhline(1 / 9, ls="--", color="grey", lw=0.8); ax.text(len(methods) - 0.5, 1 / 9 + 0.01, "chance", fontsize=8, ha="right", color="grey")
     ax.set_xticks(x); ax.set_xticklabels([m for m, _, _ in methods], fontsize=9)
     ax.set_ylim(0, 1.12); ax.set_ylabel("leave-one-out 1-NN species accuracy")
-    ax.set_title("Species separation, PC1-5 (95% CI). Overall wing colour alone already separates most species", fontsize=11)
+    ax.set_title("Species identified, PC1-5 (95% CI). Mean wing colour alone identifies most species", fontsize=11)
+    cs = None
+    if getattr(a, "colour_structure_csv", None) and Path(a.colour_structure_csv).exists():
+        cs = pd.read_csv(a.colour_structure_csv).set_index("method")
+    from scipy.spatial import ConvexHull
     for j, (lab, P, col) in enumerate(methods[:3]):
         ax = fig.add_subplot(gs[1, j])
         for s in sorted(set(y)):
-            ax.scatter(P[y == s, 0], P[y == s, 1], s=22, label=s, edgecolor="white", linewidth=0.4)
-        ax.set_title(lab.replace("\n", " ") + ": PC1 vs PC2", fontsize=11); ax.set_xlabel("PC1"); ax.set_ylabel("PC2")
+            pts = ax.scatter(P[y == s, 0], P[y == s, 1], s=22, label=s, edgecolor="white", linewidth=0.4)
+            q = P[y == s][:, :2]
+            if len(q) >= 3:                         # outline each species' cluster
+                h = ConvexHull(q); v = np.r_[h.vertices, h.vertices[:1]]
+                ax.fill(q[v, 0], q[v, 1], color=pts.get_facecolor()[0], alpha=0.12, lw=0)
+                ax.plot(q[v, 0], q[v, 1], color=pts.get_facecolor()[0], lw=0.8, alpha=0.8)
+        key = lab.split("\n")[0]; stats = ""
+        if cs is not None and key in cs.index:
+            r = cs.loc[key]
+            stats = (f"\nPERMANOVA (PC1-10): species R2 {r.species_R2:.2f}, p = {r.p:.4f}"
+                     f"\nbeyond mean colour R2 {r.species_R2_beyond_mean_colour:.2f}, p = {r.p_beyond:.4f}")
+        ax.set_title(lab.replace("\n", " ") + ": PC1 vs PC2" + (stats if cs is not None and key in cs.index else ""),
+                     fontsize=10 if cs is not None else 11); ax.set_xlabel("PC1"); ax.set_ylabel("PC2")
         if j == 0:
             ax.legend(fontsize=7, ncol=2, frameon=False, title="species", title_fontsize=7)
     ax = fig.add_subplot(gs[0, 2])
@@ -106,8 +121,9 @@ def colour_figure(a, out):
             "Colormesh 2.1: 17 landmarks + 55 outline\nsemilandmarks, tps.unwarp, tri.surf x3,\nrgb.measure.\n\n"
             "Accuracy CIs are Wilson 95% (n = 48).\nAbsolute colour alone follows overall\nbrightness (illumination, clearing); the\n"
             "relative features remove it.\n\nOn these psyllid wings the species differ\nmainly in overall colour: the standardised\n"
-            "wing mean (3 numbers) scores 0.81, close\nto every pattern method. This test shows\nthe methods agree and work; it cannot\n"
-            "show that pattern adds much here.", va="top", family="monospace", fontsize=9)
+            "wing mean (3 numbers) identifies 0.81,\nclose to every pattern method. Beyond\nmean colour, species still explain about\n"
+            "half of each method's pattern variation\n(PERMANOVA, bottom panels): the species\ndiffer in pattern too, and all three\n"
+            "methods detect it.", va="top", family="monospace", fontsize=9)
     ax = fig.add_subplot(gs[1, 3]); ax.axis("off")
     fig.tight_layout(rect=(0, 0, 1, 0.96))
     for ext in ("png", "pdf"):
@@ -192,6 +208,8 @@ def main():
     ap.add_argument("--colour_dir", required=True); ap.add_argument("--descriptron_features", required=True)
     ap.add_argument("--texture_script", required=True); ap.add_argument("--image_glob", required=True)
     ap.add_argument("--out_dir", required=True)
+    ap.add_argument("--colour_structure_csv", default=None,
+                    help="colour_species_structure.csv (colour_species_structure_v1.py): adds the PERMANOVA to each scatter")
     a = ap.parse_args(); out = Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
     colour_figure(a, out); texture_figure(a, out); print("wrote figures to", out)
 

@@ -131,6 +131,11 @@ def main(argv=None):
                              "geomorph_slid_procd": float(pc["slid_procd"]),
                              "geomorph_slid_bending": float(pc["slid_bending"])}}
     json.dump(summary, open(out / "semilandmarks_vs_geomorph_summary.json", "w"), indent=2)
+    # Descriptron's side of every pair, in the same order as geomorph_pdist.csv, for figures that plot one against the other
+    with open(out / "descriptron_pdist.csv", "w") as f:
+        f.write('"fixed","slid_procd","slid_bending"\n')
+        for row in zip(dpy["fixed"], dpy["slid_procd"], dpy["slid_bending"]):
+            f.write(",".join(f"{v:.15g}" for v in row) + "\n")
 
     import matplotlib
     matplotlib.use("Agg")

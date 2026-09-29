@@ -168,9 +168,11 @@ homologous grid cells were compared with the R packages **patternize** 0.0.5 (la
 **Colormesh** 2.1 (landmarks + outline semilandmarks, triangulated sampling). Scored by leave-one-out
 nearest-neighbour species accuracy on PC1-5 (chance about 0.11), Descriptron reached 0.83, patternize 0.85
 and Colormesh 0.75 (±0.12 with 48 wings, so Descriptron and patternize do not differ); on all PCs 0.92, 0.71
-and 0.52. A caveat worth stating: the standardised mean wing colour alone (three numbers) reached 0.81, because
-these species differ mainly in overall colour, so this test shows that the three methods work and agree, not
-that pattern adds much here. Absolute colour values follow overall brightness (illumination, slide clearing);
+and 0.52. The standardised mean wing colour alone (three numbers) reached 0.81, because these species differ
+strongly in overall colour, so identification accuracy cannot show a gain from pattern. The species do differ in
+pattern as well: with each wing's mean colour regressed out, species still explained 47%, 48% and 50% of the
+colour-pattern variation of Descriptron, patternize and Colormesh (PERMANOVA on PC1-10, 9,999 permutations,
+p = 0.0001 each), so all three methods detect the same pattern differences. Absolute colour values follow overall brightness (illumination, slide clearing);
 Descriptron's colour relative to the wing's own mean removes it.
 
 ![Descriptron colour features vs patternize and Colormesh](docs/tutorial/validation_colour_vs_patternize_colormesh.png)
@@ -188,7 +190,8 @@ depends on image scale.
 ![Descriptron texture features vs scikit-image, and grey-level invariance](docs/tutorial/validation_texture_glcm.png)
 
 The scripts (`colour_benchmark_v1.py` with `colour_benchmark_patternize.R` and `colour_benchmark_colormesh.R`,
-`validate_texture_glcm.py`, `validation_colour_texture_figures.py`) are in `descriptron/measure/validation/`.
+`colour_species_structure_v1.py`, `validate_texture_glcm.py`, `validation_colour_texture_figures.py`) are in
+`descriptron/measure/validation/`.
 
 ### An alternative to geomorph for 2D images
 
