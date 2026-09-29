@@ -43,6 +43,7 @@ EXTRA_VISION = ["torchvision_det",                   # whole directory
 # because it CAN use Florence-2, which it loads lazily), and that imports
 # descriptron_rosetta. Without these the literature RAG dies on import in core.
 EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py",
+              "measure/biorag_provenance_v1.py",         # v2.1.3: provenance stamps written by run_full_pipeline_v2
               "measure/descriptron_credentials.py",      # v2.0.4: API keys / tokens (core + DINOLand + GUI)
               # v2.1.0: converters, COCO housekeeping, centre lines, joints, metadata + shape statistics
               "measure/descriptron_convert.py", "measure/descriptron_coco_tools.py",

@@ -164,6 +164,118 @@ def _has_keypoints(coco_json_path: str) -> bool:
     return False
 
 
+_OUT_FLAGS = ("--output_dir", "--output-dir", "--out_dir", "--out-dir", "--output_base", "--outdir")
+_MAX_OUTPUT_FILES = 2000        # hash at most this many files written by one step
+
+
+def _dir_manifest(d: Path) -> Dict:
+    """A cheap fingerprint of an input folder (e.g. thousands of images): names, sizes and
+    modification times of its files, hashed together. Contents are not read."""
+    import hashlib
+    h, n = hashlib.sha256(), 0
+    for p in sorted(d.rglob("*")):
+        if p.is_file():
+            st = p.stat()
+            h.update(f"{p.relative_to(d)}\t{st.st_size}\t{int(st.st_mtime)}\n".encode())
+            n += 1
+    return {"files": n, "manifest_sha256": h.hexdigest()}
+
+
+def _prov_import():
+    """biorag_provenance_v1 sits beside this script (working tree, pip package, Docker)."""
+    if str(SCRIPT_DIR) not in sys.path:
+        sys.path.insert(0, str(SCRIPT_DIR))
+    import biorag_provenance_v1
+    return biorag_provenance_v1
+
+
+def _step_pre_state(cmd: List[str]) -> Dict:
+    """Before a step runs: its script and every file or folder named on its command line."""
+    try:
+        sha256 = _prov_import().sha256
+        script = next((c for c in cmd if str(c).endswith(".py")), None)
+        files, folders = {}, {}
+        skip_next = False
+        for c in cmd[1:]:
+            if skip_next:                        # the step's output folder is not an input
+                skip_next = False
+                continue
+            if str(c) in _OUT_FLAGS:
+                skip_next = True
+                continue
+            p = Path(str(c))
+            if str(c).startswith("-") or str(c) == script or len(str(c)) > 4096:
+                continue
+            if p.is_file():
+                files[str(p)] = sha256(p)
+            elif p.is_dir():
+                folders[str(p)] = _dir_manifest(p)
+        return {"script": script, "files": files, "folders": folders}
+    except Exception as e:                                   # never the reason a step fails
+        return {"error": f"{type(e).__name__}: {e}"}
+
+
+def _stamp_step(cmd: List[str], step_name: str, log_dir: Path, pre: Dict,
+                t0: float, elapsed: float, returncode: int) -> None:
+    """Write <log_dir>/<step>.provenance.json (and provenance_<step>.json in the step's output
+    folder): the step script and its SHA-256, git commit if tracked, the command, a SHA-256 of
+    every input file named on the command line (taken BEFORE the step ran; files the step then
+    overwrote are listed under both inputs and outputs), a manifest of every input folder, and a
+    SHA-256 of every file the step wrote. Check later with
+    `descriptron biorag_provenance_v1 --verify <file>` (or `python biorag_provenance_v1.py ...` from the source tree). Never raises."""
+    try:
+        _pv = _prov_import()
+        provenance, sha256 = _pv.provenance, _pv.sha256
+        extra = {"pipeline_step": step_name, "exit_code": returncode,
+                 "seconds": round(elapsed, 1), "python_bin": cmd[0] if cmd else None,
+                 "input_folders": pre.get("folders", {}),
+                 "pipeline_script": Path(__file__).name,
+                 "pipeline_script_sha256": sha256(Path(__file__).resolve())}
+        try:
+            from importlib.metadata import version
+            extra["descriptron_packages"] = {}
+            for dist in ("descriptron", "descriptron-core", "descriptron-vision"):
+                try:
+                    extra["descriptron_packages"][dist] = version(dist)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        rec = provenance(inputs=list(pre.get("files", {})), script=pre.get("script"), extra=extra)
+        rec["command"] = " ".join(str(c) for c in cmd)            # the step's command, not the pipeline's
+        rec["argv"] = [str(c) for c in cmd]
+        rec["inputs"] = pre.get("files", {})                      # hashes as they were before the run
+        if pre.get("error"):
+            rec["pre_state_error"] = pre["error"]
+        out_dir = None
+        for i, c in enumerate(cmd[:-1]):
+            if str(c) in _OUT_FLAGS:
+                out_dir = Path(str(cmd[i + 1]))
+                break
+        outputs = {}
+        if out_dir is not None and out_dir.is_dir():
+            for p in sorted(out_dir.rglob("*")):
+                if len(outputs) >= _MAX_OUTPUT_FILES:
+                    outputs["(truncated)"] = f"more than {_MAX_OUTPUT_FILES} files written"
+                    break
+                # the pipeline's own bookkeeping (its running log, the step logs and every
+                # provenance record) keeps changing after the step and is not the step's output
+                if (p.is_file() and p.stat().st_mtime >= t0 - 1
+                        and not p.name.startswith("provenance_")
+                        and not p.name.endswith(".provenance.json")
+                        and p.name != "pipeline_log.txt"
+                        and log_dir.resolve() not in p.resolve().parents):
+                    outputs[str(p)] = sha256(p)
+        rec["outputs"] = outputs
+        rec["output_dir"] = str(out_dir) if out_dir else None
+        text = json.dumps(rec, indent=2, default=str)
+        (log_dir / f"{step_name}.provenance.json").write_text(text)
+        if out_dir is not None and out_dir.is_dir():
+            (out_dir / f"provenance_{step_name}.json").write_text(text)
+    except Exception as e:
+        logger.warning(f"  (provenance record not written: {type(e).__name__}: {e})")
+
+
 def _run_step(cmd: List[str], step_name: str, log_dir: Path,
               dry_run: bool = False) -> bool:
     cmd_str = " \\\n  ".join(cmd)
@@ -173,6 +285,7 @@ def _run_step(cmd: List[str], step_name: str, log_dir: Path,
         logger.info(f"  [DRY RUN] Skipping execution")
         return True
 
+    pre = _step_pre_state(cmd)          # provenance: hash the inputs before the step can change them
     log_file = log_dir / f"{step_name}.log"
     with open(log_file, "w") as lf:
         lf.write(f"# {step_name}\n# {datetime.now().isoformat()}\n")
@@ -184,6 +297,8 @@ def _run_step(cmd: List[str], step_name: str, log_dir: Path,
             cwd=str(SCRIPT_DIR.parent),
         )
         elapsed = time.time() - t0
+
+    _stamp_step(cmd, step_name, log_dir, pre, t0, elapsed, result.returncode)
 
     if result.returncode != 0:
         logger.error(f"  FAILED (exit code {result.returncode}, {elapsed:.0f}s)")
@@ -1538,7 +1653,7 @@ def step_char_gate(cfg: Dict, python: str, log_dir: Path) -> bool:
     # only what it was told to. "llm" is available and reads better, but measured on the Diaphorina
     # treatments it also deleted statements about characters that had passed, in 47% of its edits —
     # invisible to both the subsequence check and the numeric audit. See BIORAG_V2_README.md §9d.
-    engine = cfg.get("gate_engine", "python")
+    engine = cfg.get("gate_engine") or "python"      # argparse stores None when --gate_engine is not given
     if engine == "llm" and cfg.get("llm_backend") == "none":
         logger.info("  no LLM backend configured — editing by rule instead (--engine python)")
         engine = "python"

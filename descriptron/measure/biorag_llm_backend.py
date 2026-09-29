@@ -82,6 +82,11 @@ class LLMResponse:
 def _log_call(log_path: Optional[str], record: Dict):
     if not log_path:
         return
+    try:                                   # when the call was made, for matching a call to a result
+        from datetime import datetime, timezone
+        record = {"time_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"), **record}
+    except Exception:
+        pass
     with _LOG_LOCK:
         Path(log_path).parent.mkdir(parents=True, exist_ok=True)
         with open(log_path, "a") as f:

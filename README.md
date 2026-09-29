@@ -627,22 +627,36 @@ numbers depends on one.
 
 ## Provenance and auditing
 
-Two mechanisms, both meant for a reader who does not take your word for it.
+Three mechanisms, each meant for a reader who does not take your word for it.
 
 **Every number is traceable.** `manuscript_numbers_v18.tsv` maps each number in
 the manuscript to the report file that produced it, and the manuscript builder
 refuses to typeset a number that no report supplies.
 
-**Every output records how it was made.** `biorag_provenance_v1.py` stamps
-outputs with the script and its SHA-256, the git commit, the full command line,
-**a SHA-256 for every input file**, the interpreter and the time:
+**Every pipeline step records how it was made** (from 2.1.3). Each step run by
+`run_full_pipeline_v2` writes `logs/<step>.provenance.json`, with a copy
+`provenance_<step>.json` in the step's output folder. It records:
+
+- the step's script and its SHA-256, and the git commit when the script is tracked;
+- the full command line and the installed Descriptron package versions;
+- a SHA-256 of every input file named on the command line, taken before the step ran;
+- a fingerprint (names, sizes, dates) of every input folder, such as the image folder;
+- a SHA-256 of every file the step wrote.
+
+Two checks:
 
 ```bash
-descriptron biorag_provenance_v1 --verify path/to/report.json
+# has the script, an input or an output changed since the step ran?
+descriptron biorag_provenance_v1 --verify path/to/logs/step6_landmark_gpa.provenance.json
+
+# which step, script and command wrote this result file?
+descriptron biorag_provenance_v1 --which path/to/some_result.csv --search path/to/output_base
 ```
 
-re-hashes the script and the inputs and tells you whether either has changed
-since the output was written.
+`--which` matches the file's content, not its name, so a result edited after the run is
+reported as not made by the pipeline. Scripts run on their own, outside the pipeline, are not
+stamped. Every language-model call is logged separately (`llm_calls.jsonl`: time, the model
+asked for and the model that answered, tokens), because the two can differ.
 
 **And the text is audited independently of the model that wrote it.**
 `biorag_confabulation_checker_v2.py` recomputes every statistic from the specimen
