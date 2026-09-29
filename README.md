@@ -41,7 +41,7 @@ every claim in the output is checked against the data it came from.
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
 - [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
-  - [Checked against geomorph](#checked-against-geomorph) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
+  - [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -160,6 +160,35 @@ outline GPA now find the mirror images, reflect them before alignment and list t
 mirror-image wings' homologous cells then matches the other wings again (r = 0.69, was 0.36). The comparison scripts
 are in `descriptron/measure/validation/` (R and geomorph are needed only to rerun them); a comparison with
 RRPP on identical aligned data is in the [tutorial](docs/TUTORIAL.md#metadata-and-shape-statistics).
+
+### Colour and texture checked against patternize, Colormesh and scikit-image
+
+**Colour pattern.** On the same 48 Diaphorina forewings (9 species), Descriptron's colour features from 52
+homologous grid cells were compared with the R packages **patternize** 0.0.5 (landmark + k-means route) and
+**Colormesh** 2.1 (landmarks + outline semilandmarks, triangulated sampling). Scored by leave-one-out
+nearest-neighbour species accuracy on PC1-5 (chance about 0.11), Descriptron reached 0.83, patternize 0.85
+and Colormesh 0.75 (±0.12 with 48 wings, so Descriptron and patternize do not differ); on all PCs 0.92, 0.71
+and 0.52. A caveat worth stating: the standardised mean wing colour alone (three numbers) reached 0.81, because
+these species differ mainly in overall colour, so this test shows that the three methods work and agree, not
+that pattern adds much here. Absolute colour values follow overall brightness (illumination, slide clearing);
+Descriptron's colour relative to the wing's own mean removes it.
+
+![Descriptron colour features vs patternize and Colormesh](docs/tutorial/validation_colour_vs_patternize_colormesh.png)
+
+**Texture.** Descriptron computes its grey-level co-occurrence matrix (GLCM) itself, because it counts only
+pixel pairs with both pixels inside the mask. Checked against scikit-image's `graycomatrix` on 180 masked
+matrices from 15 wing images, every entry is identical (difference 0). Contrast and homogeneity use the
+grey-level invariant formulas of Löfstedt et al. (2019, *PLOS ONE* 14: e0212110): quantising the same image
+to 32 instead of 8 grey levels changes them by a factor of 1.15 and 1.00 (standard formulas 18.4 and 0.80).
+Invariant energy is not invariant on real images (factor 6.99). Descriptron always quantises every cell to 16
+grey levels, so energy is comparable among all images analysed with Descriptron, from the same or different
+sources, but not with energy computed at other quantisations. Texture, like any fixed-pixel-distance measure,
+depends on image scale.
+
+![Descriptron texture features vs scikit-image, and grey-level invariance](docs/tutorial/validation_texture_glcm.png)
+
+The scripts (`colour_benchmark_v1.py` with `colour_benchmark_patternize.R` and `colour_benchmark_colormesh.R`,
+`validate_texture_glcm.py`, `validation_colour_texture_figures.py`) are in `descriptron/measure/validation/`.
 
 ### An alternative to geomorph for 2D images
 
