@@ -92,7 +92,7 @@ find "$GUI/measure/tests" -maxdepth 1 -name 'test_*.py' ! -name '*.bak*' \
 # validation against R (RRPP, geomorph): the scripts that make the docs figures
 mkdir -p "$DST/descriptron/measure/validation"
 find "$GUI/measure/validation" -maxdepth 1 \( -name 'validate_*.py' -o -name '*_benchmark_*.py' -o -name 'colour_benchmark_*.R' \
-     -o -name 'validation_colour_texture_figures.py' -o -name 'colour_species_structure_*.py' \) ! -name '*.bak*' \
+     -o -name 'validation_colour_texture_figures.py' -o -name 'colour_species_structure_*.py' -o -name 'validation_summary_figure.py' \) ! -name '*.bak*' \
      -exec cp {} "$DST/descriptron/measure/validation/" \; 2>/dev/null || true   # v2.1.2: + S13 benchmarks
 
 # --- data that is part of the code, not of a dataset -----------------------

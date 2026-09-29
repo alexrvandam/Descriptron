@@ -41,7 +41,7 @@ every claim in the output is checked against the data it came from.
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
 - [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
-  - [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
+  - [Validation at a glance](#validation-at-a-glance) · [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -126,6 +126,24 @@ in `descriptron/measure/validation/` and can be rerun by anyone with R. The chec
 2.1 fixes and which are described below rather than hidden. The colour and texture values themselves are
 standard measures (CIE L\*a\*b\*, GLCM, LBP); what is checked is that they are taken from homologous places
 (panel g of the third figure).
+
+### Validation at a glance
+
+Each component was run against an established alternative on the same *Diaphorina* data, and every number in the
+figure is computed from the benchmark outputs by `descriptron/measure/validation/validation_summary_figure.py`:
+
+- **Segmentation:** SAM2-PAL against SST, the method it builds on (mean IoU 0.68 against 0.59 on forewings, 0.82 against
+  0.58–0.63 on rostra).
+- **Landmarks:** DINOLand against a trained Keypoint R-CNN on wings as photographed: with one to five labelled
+  wings DINOLand lost 1 of 20 test wings and the detector 6 to 8; with many labelled wings the detector is more precise.
+- **Colour pattern:** Descriptron identifies species as well as patternize and better than Colormesh (a paired test
+  finds no difference from patternize), and all three detect the same species differences in pattern beyond overall
+  colour.
+- **Texture:** the co-occurrence matrices are identical to scikit-image's.
+- **Shape statistics:** agreement with geomorph to at most 5.6 × 10⁻⁴, with size, landmark shape and outline
+  semilandmarks plotted value against value.
+
+![Descriptron validated against established tools](docs/tutorial/validation_summary.png)
 
 ### Checked against geomorph
 
