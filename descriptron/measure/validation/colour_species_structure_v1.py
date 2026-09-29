@@ -25,6 +25,27 @@ def permanova(X, y, n_perm=9999, seed=20260929):
     return b / sst, f, (cnt + 1) / (n_perm + 1)
 
 
+def loo_1nn(S, y, per_wing=False):
+    """Leave one wing out, give it the species of its nearest remaining wing; returns (correct, scored)."""
+    ok = [i for i in range(len(y)) if (y == y[i]).sum() >= 2]; hits = []
+    for i in ok:
+        d = np.linalg.norm(S - S[i], axis=1); d[i] = np.inf; hits.append(int(y[d.argmin()] == y[i]))
+    return (np.array(hits) if per_wing else (sum(hits), len(ok)))
+
+
+def wilson(k, n, z=1.96):
+    p = k / n; c = (p + z * z / (2 * n)) / (1 + z * z / n)
+    h = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
+    return c - h, c + h
+
+
+def mcnemar_exact(a, b):
+    """Exact two-sided McNemar test on paired right/wrong calls for the same wings."""
+    from scipy.stats import binomtest
+    n01 = int(((a == 1) & (b == 0)).sum()); n10 = int(((a == 0) & (b == 1)).sum())
+    return (1.0 if n01 + n10 == 0 else binomtest(n01, n01 + n10, 0.5).pvalue), n01, n10
+
+
 def residualise(S, C):
     C1 = np.column_stack([np.ones(len(C)), C]); beta, *_ = np.linalg.lstsq(C1, S, rcond=None)
     return S - C1 @ beta
@@ -50,12 +71,29 @@ def main():
         assert (t.species.values == y).all(); others[m] = t[[c for c in t.columns if c.startswith("PC")]].values
     mean_col = np.column_stack([X[[c for c in feats if c.endswith(f"_{k}_mean_abs")]].mean(1) for k in ("L", "a", "b")])
     mean_col = (mean_col - mean_col.mean(0)) / mean_col.std(0)
-    rows = []
+    # all-PC accuracy for the R packages comes from the benchmark's own summary (only their PC1-10 scores were saved)
+    summ = pd.read_csv(res / "summary_per_method.csv").set_index("method")
+    rows = []; hits_desc = loo_1nn(P_std[:, :5], y, per_wing=True)
     for name, S in (("Descriptron", P_std), ("patternize", others["patternize"]), ("Colormesh", others["Colormesh"]),
                     ("mean wing colour only", mean_col)):
+        c5, nsc = loo_1nn(S[:, :5], y)
+        if name == "Descriptron":
+            call, _ = loo_1nn(S, y); acc_all = call / nsc
+        elif name in summ.index:
+            acc_all = float(summ.loc[name, "loo1nn_acc_allPCs"]); call = round(acc_all * nsc)
+        else:
+            acc_all, call = np.nan, np.nan
         S = S[:, :a.n_pcs]
         r2, f, p = permanova(S, y, a.n_perm)
+        lo5, hi5 = wilson(c5, nsc)
+        pm, only_desc, only_other = mcnemar_exact(hits_desc, loo_1nn(S[:, :5], y, per_wing=True))
+        lo_a, hi_a = (wilson(call, nsc) if not (isinstance(call, float) and np.isnan(call)) else (np.nan, np.nan))
         row = dict(method=name, n_wings=len(y), n_species=len(set(y)), n_dims=S.shape[1],
+                   loo_correct_PC1to5=c5, loo_scored=nsc, loo_acc_PC1to5=c5 / nsc, loo_ci95_PC1to5=f"{lo5:.2f}-{hi5:.2f}",
+                   mcnemar_p_vs_Descriptron_PC1to5=pm, wings_only_Descriptron_right=only_desc,
+                   wings_only_this_right=only_other,
+                   loo_ci95_allPCs=(f"{lo_a:.2f}-{hi_a:.2f}" if not np.isnan(lo_a) else ""),
+                   loo_correct_allPCs=call, loo_acc_allPCs=acc_all,
                    species_R2=r2, pseudo_F=f, p=p)
         if name != "mean wing colour only":
             Sr = residualise(S, mean_col); r2r, fr, pr = permanova(Sr, y, a.n_perm)
