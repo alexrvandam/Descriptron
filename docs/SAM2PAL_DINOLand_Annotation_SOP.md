@@ -152,6 +152,49 @@ vs 4.7%) and slower; the last layer (23) was worse (5.2%) — deep features matc
 - `handedness_used` and `orientation_used` record which reference group each
   target matched.
 
+
+### When to switch from DINOLand to a trained detector
+
+DINOLand needs no training and copes with specimens photographed at any angle or
+as mirror images, so it is the tool for **starting** a landmark set. A trained
+keypoint detector (Keypoint R-CNN, `descriptron-train --task keypoints`) is more
+precise once it has enough corrected specimens that are imaged the same way up.
+On 20 held-out *Diaphorina* forewings (17 landmarks, error as % of wing length;
+"failed" = wing median error above 20%):
+
+| Labelled specimens | DINOLand + orientation search + mirror refs, wings as photographed | Keypoint R-CNN, wings as photographed | Keypoint R-CNN, wings turned the same way up and cropped to the wing |
+|---|---|---|---|
+| 1 | 3.9% median, 1 of 20 wings failed | 12.5%, 8 failed | 2.7%, 3 failed |
+| 5 | 2.5%, 1 failed | 1.3%, 6 failed | 0.8%, 0 failed |
+| 20 | 2.1%, 1 failed | 0.9%, 2 failed | 0.7%, 0 failed |
+| 76 | 1.9%, 1 failed | 0.7%, 1 failed | 0.6%, 0 failed |
+
+**Recommendation:**
+- **1–10 labelled specimens, or specimens imaged in any orientation:** use DINOLand
+  with `--orientation_search rot4 --mirror_refs` and correct its gold points.
+- **About 20 or more corrected specimens, imaged the same way up:** train a keypoint
+  detector on them and let it predict the rest; keep correcting, and retrain as the
+  corrected set grows.
+- If orientation varies and cannot be fixed at imaging, stay with DINOLand longer:
+  the detector lost 6 of 20 wings with five labelled specimens where DINOLand lost 1.
+
+```bash
+descriptron-train --task keypoints --coco-json corrected_landmarks.json --img-dir images/ \
+  --output-dir out_kprcnn/ --dataset-name mytaxon --total-iters 2000
+descriptron-predict --checkpoint out_kprcnn/model_final_mytaxon.pth \
+  --image_folder new_images/ --top_per_category 1 --annotations_out predicted_landmarks.json
+```
+
+In the GUI: **Predict** tab, *LANDMARKS* row, *Train KP R-CNN* and *Predict KP R-CNN*.
+`--image_folder` predicts every image in the folder (from Descriptron 2.1.2; in 2.1.1 the predictor only read
+images that already carried annotations). `--top_per_category 1` keeps one landmark set per image, right for one
+specimen per image.
+
+The detector's output opens in the GUI like DINOLand's; correct it the same way.
+The same hand-over applies to masks: SAM2-PAL starts a mask set, and a trained
+detector (`descriptron-train --task masks`, or Detectron2) takes over once a
+corrected set exists.
+
 ---
 
 ## 5. Docker
@@ -180,5 +223,10 @@ Replace `dinoland` with `sam2-pal` for SAM2-PAL. See [DOCKER_RECIPE.md](DOCKER_R
   landmarks, error as a percentage of wing length; a wing "fails" when its median
   error exceeds 20%. Orientation test: 20 wings × 4 turns, 3 references. Mirror
   test: 89 wings, 17 of them mirrored. Mixed test: 10 mirrored + 10 normal wings × 4 turns.
+- **DINOLand vs a trained detector** (the table in section 4): 96 forewings with
+  reoriented landmarks; 20 held-out test wings from 20 species; nested training sets
+  of 1, 5, 20 and 76 wings; Keypoint R-CNN (torchvision, COCO-pretrained, 2,000
+  iterations). Script `measure/validation/keypoint_benchmark_v1.py`; full results in
+  the paper's Supplementary Text S13.
 - All options were tested against the identical run without them (same
   references, same targets, same model).

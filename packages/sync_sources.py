@@ -54,9 +54,11 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/semi_landmark_and_kpts_procrustesV42_GPA.py",   # V42: same for outlines
               "measure/validation/validate_shape_stats_vs_geomorph.py",
               "measure/validation/validate_semilandmarks_vs_geomorph.py",
-              "measure/validation/validate_pipeline_gm_vs_geomorph.py"]
+              "measure/validation/validate_pipeline_gm_vs_geomorph.py",
+              "measure/validation/validate_centerline_lengths.py",   # v2.1.2
+              "measure/validation/validate_texture_glcm.py"]         # v2.1.2
 EXTRA_GUI = ["marmot.jpg", "icons"]
-EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py"]   # v2.1.0 GUI (binder tabs); cli.py runs the newest descriptron-v2-*.py
+EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py"]   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 
 

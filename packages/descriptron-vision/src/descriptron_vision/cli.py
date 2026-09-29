@@ -58,7 +58,7 @@ def _run(script: str, argv: list[str], subdir: str | None = None) -> None:
 
 
 def train():      _run("tv_train_v1.py", sys.argv[1:], "torchvision_det")
-def predict():    _run("tv_predict_v1.py", sys.argv[1:], "torchvision_det")
+def predict():    _run("tv_predict_v2.py", sys.argv[1:], "torchvision_det")   # v2.1.2: v2 adds --image_folder (unannotated images)
 def sweep():      _run("tv_sweep_v1.py", sys.argv[1:], "torchvision_det")
 def sam2_pal():   _run("sam2_pal_batch_v21.py", sys.argv[1:])
 def dinoland():   _run("dinov3_landmark_transfer_v52.py", sys.argv[1:])   # v52 = v51 + --orientation_search

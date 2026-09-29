@@ -249,7 +249,7 @@ The same region followed through the full rotation of four heads with the fine-t
 reference wings to new psyllid forewings, whichever way up and whichever side they were photographed from
 (`--orientation_search rot4 --mirror_refs`). Each landmark is marked as agreed by the references (filled green)
 or to be checked (open gold), so you look only where it is needed. On 80 test wings, turned copies and mirror
-images included, the median error was 2.3 % of wing size, with 78 % of landmarks within 5 % and 90 % within 10 %.
+images included, the median error was 2.5 % of wing size, with 76 % of landmarks within 5 % and 89 % within 10 %.
 Psyllidae images are from Liliya Serbina (LIB Hamburg).
 
 ![DINOLand landmarks on psyllid forewings](docs/tutorial/showcase_dinoland.jpg)
@@ -259,6 +259,12 @@ orientations) in about four minutes on a laptop without a GPU. By hand that is 1
 DINOLand you look at the gold points and move the ones that are off.
 
 ![DINOLand on 20 psyllid forewings](docs/tutorial/showcase_dinoland_wall.jpg)
+
+Once about 20 or more specimens are corrected and imaged the same way up, a trained keypoint detector is more
+precise: Keypoint R-CNN (GUI *Predict* tab, *Train KP R-CNN* / *Predict KP R-CNN*, or `descriptron-train --task
+keypoints` / `descriptron-predict --image_folder`). With one to five references on specimens photographed as they
+come, DINOLand lost 1 of 20 test wings and the trained detector 6 to 8; see the
+[SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md#when-to-switch-from-dinoland-to-a-trained-detector).
 
 **Measurements** in millimetres, with the scale bar read from the image, and the centre line of a thin,
 curved structure, whose curved length a straight measurement under-reads.

@@ -40,7 +40,7 @@ fi
 
 # live programs the inventory does not (yet) list — without this a rebuild silently drops them
 # (it dropped DINOLand v52 and descriptron_credentials.py, which had been added to the repo by hand)
-EXTRA_LIVE="dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py
+EXTRA_LIVE="dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
 descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descriptron_joints.py
 descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
@@ -91,8 +91,9 @@ find "$GUI/measure/tests" -maxdepth 1 -name 'test_*.py' ! -name '*.bak*' \
      -exec cp {} "$DST/descriptron/measure/tests/" \; 2>/dev/null || true
 # validation against R (RRPP, geomorph): the scripts that make the docs figures
 mkdir -p "$DST/descriptron/measure/validation"
-find "$GUI/measure/validation" -maxdepth 1 -name 'validate_*.py' ! -name '*.bak*' \
-     -exec cp {} "$DST/descriptron/measure/validation/" \; 2>/dev/null || true
+find "$GUI/measure/validation" -maxdepth 1 \( -name 'validate_*.py' -o -name '*_benchmark_*.py' -o -name 'colour_benchmark_*.R' \
+     -o -name 'validation_colour_texture_figures.py' \) ! -name '*.bak*' \
+     -exec cp {} "$DST/descriptron/measure/validation/" \; 2>/dev/null || true   # v2.1.2: + S13 benchmarks
 
 # --- data that is part of the code, not of a dataset -----------------------
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true
