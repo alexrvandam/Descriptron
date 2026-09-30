@@ -1,0 +1,14 @@
+# excluded after visual QC of the contact sheets (label/pin in mask, not spread, damaged, misidentified)
+Grammia_nevadensis__2592570128
+Hypena_crassalis__3003629516
+Hypena_rostralis__3003630518
+Nudaria_mundana__5761338087
+Virbia_ostenta__1882809998
+Schrankia_costaestrigalis__3003683289
+Schrankia_costaestrigalis__5761336570
+Schrankia_costaestrigalis__5761599042
+Herminia_grisealis__3003638530
+Laspeyria_flexula__3003636527
+Spilosoma_lubricipeda__3003637924
+Macrochilo_cribrumalis__3003629149
+Virbia_ostenta__1449742093

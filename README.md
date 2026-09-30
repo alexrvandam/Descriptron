@@ -41,7 +41,7 @@ every claim in the output is checked against the data it came from.
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
 - [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
-  - [Validation at a glance](#validation-at-a-glance) · [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
+  - [Validation at a glance](#validation-at-a-glance) · [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [Traits on a phylogeny](#traits-on-a-phylogeny-checked-against-geomorph-ape-and-phytools-from-220) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -210,6 +210,44 @@ depends on image scale.
 The scripts (`colour_benchmark_v1.py` with `colour_benchmark_patternize.R` and `colour_benchmark_colormesh.R`,
 `colour_species_structure_v1.py`, `validate_texture_glcm.py`, `validation_colour_texture_figures.py`) are in
 `descriptron/measure/validation/`.
+
+### Traits on a phylogeny: checked against geomorph, ape and phytools (from 2.2.0)
+
+`descriptron descriptron_phylo` takes a Newick tree and any continuous trait tables (landmark or
+outline shape, measurements, colour pattern, texture) and computes, on species means: multivariate phylogenetic
+signal Kmult (Adams 2014; Blomberg's K for one variable) with a permutation test; phylogenetic regression (PGLS) on
+a predictor with residual randomisation, as geomorph's `procD.pgls`; ancestral states by generalised least squares;
+and the phylomorphospace. Species missing from the tree, and tips without data, are dropped and the tree is pruned.
+
+    descriptron descriptron_phylo --tree tree.nwk --species_col species \
+        --traits shape=shape.csv --traits colour=colour.csv --scale colour=standardize \
+        --size_col centroid_size --pgls "shape~logCS" --analyses signal pgls morphospace --out_dir phylo/
+
+- **Landmarks on a published tree** (geomorph's `plethspecies`, 9 *Plethodon* species): tree covariance, Kmult,
+  PGLS and ancestral states agree with geomorph and ape to 5 × 10⁻⁸ or better.
+- **A published result from the authors' data** (Waldron et al. 2025, *Evolution* 79: 2369; 57 *Plethodon*
+  species): Blomberg's K reproduced exactly for the three traits without imputed values, and identical to
+  phytools and geomorph for all six.
+- **Colour pattern and texture from photographs** (43 moth species of Noctuidae and Erebidae on the published tree
+  of Nokelainen et al. 2024, *Nature Communications* 15: 1678; 423 museum specimens from GBIF, segmented with
+  Florence-2 + SAM2): colour pattern Kmult 0.66 and texture 0.69 (P = 0.001), unchanged when only two museums'
+  photographs are used; every statistic agrees with geomorph and phytools to 1.4 × 10⁻¹² or better; saturation
+  ranks the species as the published values do (ρ = 0.84).
+
+| Trait set (moths) | Kmult, 43 spp. | P | Kmult, two museums, 32 spp. | P |
+|---|---|---|---|---|
+| Outline shape | 0.72 | 0.001 | 0.71 | 0.016 |
+| Proportions | 0.65 | 0.028 | 0.70 | 0.111 |
+| Colour pattern | 0.66 | 0.001 | 0.73 | 0.011 |
+| Texture | 0.69 | 0.001 | 0.73 | 0.001 |
+
+![Colour pattern, texture and shape on the moth phylogeny](docs/tutorial/validation_phylo_moths.png)
+
+![Phylogenetic analyses vs geomorph, ape, phytools and published values (Plethodon)](docs/tutorial/validation_phylo_plethodon.png)
+
+Moth photographs: GBIF, CC BY 4.0 or CC0 (credits per image in the validation folder). The scripts
+(`validate_phylo_real_tree.py`, `validate_phylo_traits.py`, `validate_phylo_published_waldron2025.py`, and
+`moths_nokelainen2024/` for the whole moth run) are in `descriptron/measure/validation/`.
 
 ### An alternative to geomorph for 2D images
 

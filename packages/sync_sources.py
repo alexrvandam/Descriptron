@@ -44,6 +44,10 @@ EXTRA_VISION = ["torchvision_det",                   # whole directory
 # descriptron_rosetta. Without these the literature RAG dies on import in core.
 EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py",
               "measure/biorag_provenance_v1.py",         # v2.1.3: provenance stamps written by run_full_pipeline_v2
+              "measure/descriptron_phylo.py",            # v2.2.0: phylogenetic signal, PGLS, ancestral states, phylomorphospace
+              "measure/validation/validate_phylo_real_tree.py",          # v2.2.0: vs geomorph/ape/phytools (plethspecies)
+              "measure/validation/validate_phylo_traits.py",             # v2.2.0: vs geomorph/ape/phytools, any trait sets
+              "measure/validation/validate_phylo_published_waldron2025.py",   # v2.2.0: published K, 57 Plethodon
               "measure/descriptron_credentials.py",      # v2.0.4: API keys / tokens (core + DINOLand + GUI)
               # v2.1.0: converters, COCO housekeeping, centre lines, joints, metadata + shape statistics
               "measure/descriptron_convert.py", "measure/descriptron_coco_tools.py",
