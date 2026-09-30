@@ -209,12 +209,37 @@ def _is_number(v: str) -> bool:
         return False
 
 
-def load_traits(path: str, species_col: Optional[str], species_regex: Optional[str], id_col: Optional[str]):
+def _key_forms(s: str) -> List[str]:
+    """an id with and without Descriptron's annotation suffix ("x.png_3") and extension."""
+    s = str(s).strip(); base = re.sub(r"\.(png|jpe?g|tiff?|bmp)_\d+$", r".\1", s, flags=re.I)
+    stem = re.sub(r"\.(png|jpe?g|tiff?|bmp)$", "", base, flags=re.I)
+    return [s, base, stem, Path(stem).name]
+
+
+def load_group_map(path: str, group_col: Optional[str] = None) -> Dict[str, str]:
+    """group labels CSV (filename + group_label/species): id -> species."""
+    rows = list(csv.DictReader(open(path, newline=""), delimiter="\t" if str(path).endswith(".tsv") else ","))
+    lc = {c.strip().lower(): c for c in rows[0]}
+    fcol = lc.get("filename") or lc.get("file") or lc.get("specimen") or list(rows[0])[0]
+    gcol = group_col or lc.get("group_label") or lc.get("species") or list(rows[0])[1]
+    m: Dict[str, str] = {}
+    for r in rows:
+        for k in _key_forms(r[fcol]):
+            m.setdefault(k, r[gcol])
+    return m
+
+
+def load_traits(path: str, species_col: Optional[str], species_regex: Optional[str], id_col: Optional[str],
+                groups: Optional[Dict[str, str]] = None):
     rows = list(csv.DictReader(open(path, newline="")))
     if not rows:
         sys.exit(f"{path}: no rows")
     cols = list(rows[0])
-    if species_col and species_col in cols:
+    if groups is not None and not (species_col and species_col in cols):     # species from a group-labels file
+        idc = id_col or next((c for c in ("filename", "specimen_id", "specimen", "image", "id", "file") if c in cols), cols[0])
+        sp = [next((groups[k] for k in _key_forms(r[idc]) if k in groups), None) for r in rows]
+        species_col = idc                                                # the id column is not a trait
+    elif species_col and species_col in cols:
         sp = [r[species_col] for r in rows]
     else:
         idc = id_col or next((c for c in ("filename", "specimen_id", "specimen", "image", "id", "file") if c in cols), cols[0])
@@ -279,6 +304,8 @@ def main(argv=None):
                     help="a trait table; repeat for several sets (shape, measurements, colour, texture, ...)")
     ap.add_argument("--species_col", default=None, help="column holding the species (default: use --species_regex)")
     ap.add_argument("--species_regex", default=None, help="regex with one group extracting the species from the id column")
+    ap.add_argument("--groups", default=None, help="group labels CSV (filename + group_label/species) giving each "
+                    "specimen's species, as for the rest of the pipeline (instead of --species_col/--species_regex)")
     ap.add_argument("--id_col", default=None, help="id column for --species_regex (default: filename/specimen_id/...)")
     ap.add_argument("--columns", action="append", default=[], metavar="NAME=REGEX",
                     help="keep only the columns of trait set NAME that match REGEX")
@@ -295,12 +322,13 @@ def main(argv=None):
     rng = np.random.default_rng(a.seed)
     root = parse_newick(Path(a.tree).read_text())
     colsel = dict(x.split("=", 1) for x in a.columns)
+    gmap = load_group_map(a.groups) if a.groups else None
     scales = dict(x.split("=", 1) for x in a.scale)
 
     sets = {}
     for spec in a.traits:
         name, path = spec.split("=", 1)
-        sp, cols, M, counts = load_traits(path, a.species_col, a.species_regex, a.id_col)
+        sp, cols, M, counts = load_traits(path, a.species_col, a.species_regex, a.id_col, gmap)
         if name in colsel:
             rx = re.compile(colsel[name]); k = [i for i, c in enumerate(cols) if rx.search(c)]
             cols, M = [cols[i] for i in k], M[:, k]
@@ -323,6 +351,9 @@ def main(argv=None):
         idx = [S["species"].index(t.name) for t in tips]
         how = scales.get(name, "none")
         Y = scale(S["raw"][idx], how)
+        if Y.shape[1] == 0 or not np.isfinite(Y).all() or float(Y.var(axis=0).sum()) == 0:
+            report += [f"## {name}", "no variable differs among the species (for example empty homology cells) - skipped", ""]
+            continue
         C = vcv(tips, tips)
         S.update(tree=tree, tips=tips, Y=Y, C=C, idx=idx)
         dropped = sorted(set(S["species"]) - set(common))
@@ -332,7 +363,9 @@ def main(argv=None):
             r = phylo_signal(Y, C, a.iterations, rng)
             signal_rows.append({"trait_set": name, "n_species": len(tips), "n_variables": Y.shape[1], "scale": how, **r})
             report.append(f"Phylogenetic signal: Kmult = {r['Kmult']:.4f}, P = {r['P']:.4f}, Z = {r['Z']:.2f}")
-        if "morphospace" in a.analyses:
+        if "morphospace" in a.analyses and Y.shape[1] < 2:
+            report.append("Phylomorphospace: fewer than two variables - not drawn")
+        elif "morphospace" in a.analyses:
             nodes = internal_nodes(tree)
             anc = ancestral_states(Y, tips, nodes)
             mu = Y.mean(0)

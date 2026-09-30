@@ -41,7 +41,7 @@ every claim in the output is checked against the data it came from.
   - **[Shared VM hosting recipe](docs/SHARED_VM_RECIPE.md)** — for IT staff: one institutional VM, shared GPU, many users
 - **[Tutorial: the GUI tab by tab](docs/TUTORIAL.md)** — annotation, prediction, measurement, shape statistics, utilities
 - [Automated trait collection: measurements, shape, colour and texture](#automated-trait-collection-measurements-shape-colour-and-texture)
-  - [Validation at a glance](#validation-at-a-glance) · [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [Traits on a phylogeny](#traits-on-a-phylogeny-checked-against-geomorph-ape-and-phytools-from-220) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
+  - [Validation at a glance](#validation-at-a-glance) · [Checked against geomorph](#checked-against-geomorph) · [Colour and texture checked](#colour-and-texture-checked-against-patternize-colormesh-and-scikit-image) · [Traits on a phylogeny](#traits-on-a-phylogeny-checked-against-geomorph-ape-and-phytools-from-220) · [Do the species differ?](#do-the-species-differ-and-in-which-traits-from-230) · [An alternative to geomorph for 2D images](#an-alternative-to-geomorph-for-2d-images) · [Examples](#what-it-produces-examples)
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
@@ -248,6 +248,41 @@ and the phylomorphospace. Species missing from the tree, and tips without data, 
 Moth photographs: GBIF, CC BY 4.0 or CC0 (credits per image in the validation folder). The scripts
 (`validate_phylo_real_tree.py`, `validate_phylo_traits.py`, `validate_phylo_published_waldron2025.py`, and
 `moths_nokelainen2024/` for the whole moth run) are in `descriptron/measure/validation/`.
+
+### Do the species differ, and in which traits? (from 2.3.0)
+
+`descriptron descriptron_trait_stats` runs, for every trait set (colour pattern, texture, outline or landmark shape,
+measurements, descriptive categorical characters) against the species labels:
+- PCA with each species' convex hull;
+- PERMANOVA of species, also after removing each specimen's mean colour ("does the pattern differ beyond overall
+  colour?") and log size;
+- pairwise PERMANOVA for every species pair (Benjamini–Hochberg): which species each trait set separates, and which
+  pairs no trait set separates;
+- leave-one-out identification per trait set and per species, with Wilson 95% intervals, and exact McNemar tests
+  between trait sets;
+- allometry;
+- Cramér's V for each descriptive character.
+
+The pipeline runs it for every structure (step `trait_stats`, and `trait_stats_states` for the descriptive
+characters), and with `--tree` also `descriptron_phylo` (step `phylo`). These are extra results beside the
+descriptions and never change or stop them. In the GUI: Measure tab → STATS → **Morphological statistics**.
+
+It reproduces the colour benchmark above exactly (species R² 0.606, 0.473 beyond mean colour; 40 and 44 of 48 wings
+identified), and every statistic matches R to machine precision (`validate_trait_stats.py`: vegan `adonis2`,
+`class::knn.cv`, `prop.test`, `binom.test`, `chisq.test`).
+
+On the forewings of 13 *Diaphorina* species (69 wings), colour pattern and texture each identified 84% of wings,
+outline shape 59% and measurements 48%; species still explain 45% of colour-pattern variation after each wing's mean
+colour is removed.
+
+    descriptron descriptron_trait_stats --groups group_labels.csv --out_dir stats/ \
+        --traits "colour pattern=color_homology/forewing/color_homology_features_forewing_combined_hw1.csv" \
+        --traits "outline shape=semilandmarks/forewing/aligned_coco.json" --scale "outline shape=none" \
+        --categorical "states=descriptive_states.csv" --size measurements/all_metrics.csv:area_mm2:forewing
+
+![Forewing colour pattern of 13 Diaphorina species, with species hulls and PERMANOVA](docs/tutorial/trait_stats_diaphorina_forewing_colour_pca.png)
+
+![Species identified by each trait set, Diaphorina forewings](docs/tutorial/trait_stats_diaphorina_forewing_identification.png)
 
 ### An alternative to geomorph for 2D images
 

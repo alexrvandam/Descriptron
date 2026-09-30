@@ -45,6 +45,8 @@ EXTRA_VISION = ["torchvision_det",                   # whole directory
 EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta.py",
               "measure/biorag_provenance_v1.py",         # v2.1.3: provenance stamps written by run_full_pipeline_v2
               "measure/descriptron_phylo.py",            # v2.2.0: phylogenetic signal, PGLS, ancestral states, phylomorphospace
+              "measure/descriptron_trait_stats.py",      # v2.3.0: PERMANOVA, pairwise separation, identification, allometry
+              "measure/validation/validate_trait_stats.py",   # v2.3.0: vs vegan/class/prop.test/binom.test/chisq.test
               "measure/validation/validate_phylo_real_tree.py",          # v2.2.0: vs geomorph/ape/phytools (plethspecies)
               "measure/validation/validate_phylo_traits.py",             # v2.2.0: vs geomorph/ape/phytools, any trait sets
               "measure/validation/validate_phylo_published_waldron2025.py",   # v2.2.0: published K, 57 Plethodon
@@ -63,7 +65,7 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/validation/validate_centerline_lengths.py",   # v2.1.2
               "measure/validation/validate_texture_glcm.py"]         # v2.1.2
 EXTRA_GUI = ["marmot.jpg", "icons"]
-EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py"]   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
+EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py"]   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 
 

@@ -63,15 +63,17 @@ Usage:
 """
 
 import argparse
+import csv
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 import yaml
 
@@ -86,6 +88,8 @@ STEP_NAMES = [
     "texture",
     "landmark_gpa",
     "compile",
+    "trait_stats",
+    "phylo",
     "biorag",
     "confab_check",
     "confab_fix",
@@ -105,6 +109,7 @@ STEP_NAMES = [
     "calibrate",
     "describe_v2",
     "descriptive_states",
+    "trait_stats_states",
     "char_reliability",
     "char_figures",
     "subjective_check",
@@ -1782,6 +1787,143 @@ def step_treatments_docx(cfg: Dict, python: str, log_dir: Path) -> bool:
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# 2.3.0: morphological statistics beside the descriptions (added; the description steps are unchanged)
+# ═══════════════════════════════════════════════════════════════════════════════
+MEAS_TRAIT_RX = r"(_mm2?$|aspect_ratio|length_to_height_ratio|extent|solidity|circularity|axis_ratio)"
+
+
+def _trait_inputs(cfg: Dict, cat: str, inp: Path) -> Tuple[List[str], Optional[str]]:
+    """the trait tables of one structure, as --traits NAME=TABLE arguments, and a size column for allometry."""
+    import pandas as pd
+    base = Path(cfg["output_base"]); args: List[str] = []; size = None
+    col = sorted((base / "color_homology" / cat).glob(f"color_homology_features_{cat}*.csv"))
+    if col:
+        args += ["--traits", f"colour pattern={col[0]}"]
+    tex = sorted((base / "texture_homology" / cat).glob(f"texture_homology_features_{cat}*.csv"))
+    if tex:
+        args += ["--traits", f"texture={tex[0]}"]
+    al = base / "semilandmarks" / cat / "aligned_coco.json"
+    if al.exists():                                      # Procrustes coordinates: not standardised
+        args += ["--traits", f"outline shape={al}", "--scale", "outline shape=none"]
+    am = base / "measurements" / "all_metrics.csv"
+    if am.exists():
+        try:
+            d = pd.read_csv(am, low_memory=False)
+            ccol = next((c for c in ("category_name", "category") if c in d.columns), None)
+            if ccol:
+                d = d[d[ccol].astype(str) == cat]
+            keep = [c for c in d.columns if re.search(MEAS_TRAIT_RX, c) and pd.to_numeric(d[c], errors="coerce").notna().mean() > 0.9]
+            if len(d) and keep:
+                inp.mkdir(parents=True, exist_ok=True)
+                t = d[["image_filename"] + keep].rename(columns={"image_filename": "filename"})
+                t.to_csv(inp / "measurements.csv", index=False)
+                args += ["--traits", f"measurements={inp / 'measurements.csv'}"]
+            for sc in ("area_mm2", "area_pixels"):
+                if sc in d.columns and pd.to_numeric(d[sc], errors="coerce").gt(0).mean() > 0.9:
+                    size = f"{am}:{sc}:{cat}"; break
+        except Exception as e:                           # measurements are optional here
+            logger.warning(f"    [{cat}] measurements not used: {e}")
+    return args, size
+
+
+def step_trait_stats(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """Step 7.1: per structure, do the species differ in colour pattern, texture, outline shape and measurements?
+    PCA with species hulls, PERMANOVA (also beyond mean colour and size), pairwise species separation,
+    leave-one-out identification with 95% intervals, McNemar between trait sets, allometry
+    (descriptron_trait_stats.py). Extra results: a failure is logged and never stops the descriptions."""
+    base = Path(cfg["output_base"]); out_base = base / "trait_stats"
+    cats = _find_gpa_categories(base / "semilandmarks")
+    if not cats:
+        logger.warning("  no semilandmark output: nothing to analyse"); return True
+    for cat in cats:
+        out = out_base / cat
+        if (out / "summary.csv").exists() and not cfg["force"]:
+            logger.info(f"    [{cat}] already complete, skipping"); continue
+        args, size = _trait_inputs(cfg, cat, out / "_inputs")
+        if not args:
+            logger.info(f"    [{cat}] no trait tables"); continue
+        cmd = [python, str(SCRIPT_DIR / "descriptron_trait_stats.py"), "--groups", cfg["group_labels"], *args,
+               *(["--size", size] if size else []), "--permutations", str(cfg.get("trait_stats_permutations", 999)),
+               "--out_dir", str(out)]
+        if not _run_step(cmd, f"step7_1_trait_stats_{cat}", log_dir, cfg["dry_run"]):
+            logger.warning(f"    [{cat}] trait statistics failed (see log); continuing")
+    return True
+
+
+def step_phylo(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """Step 7.2: with --tree, phylogenetic signal (Kmult), PGLS on log size and the phylomorphospace of every
+    trait set, per structure (descriptron_phylo.py). Tip names must be the group labels. Extra results."""
+    if not cfg.get("tree"):
+        logger.info("  no --tree given: skipping the phylogenetic analyses"); return True
+    base = Path(cfg["output_base"]); out_base = base / "phylo"
+    for cat in _find_gpa_categories(base / "semilandmarks"):
+        out = out_base / cat
+        if (out / "phylo_report.md").exists() and not cfg["force"]:
+            logger.info(f"    [{cat}] already complete, skipping"); continue
+        args, _ = _trait_inputs(cfg, cat, base / "trait_stats" / cat / "_inputs")
+        # descriptron_phylo reads CSV tables: the aligned outline is written out as one
+        al = base / "semilandmarks" / cat / "aligned_coco.json"
+        if al.exists():
+            shp = base / "trait_stats" / cat / "_inputs" / "outline_shape.csv"
+            _aligned_to_csv(al, shp)
+            i = args.index(f"outline shape={al}"); args[i] = f"outline shape={shp}"
+        # set names without spaces; colour, texture and measurements standardised, Procrustes shape as it is
+        args = [x.replace("colour pattern", "colour_pattern").replace("outline shape", "outline_shape") for x in args]
+        sc = []
+        for x in args:
+            if x.startswith(("colour_pattern=", "texture=", "measurements=")):
+                sc += ["--scale", x.split("=")[0] + "=standardize"]
+        cmd = [python, str(SCRIPT_DIR / "descriptron_phylo.py"), "--tree", cfg["tree"], "--groups", cfg["group_labels"],
+               *args, *sc, "--analyses", "signal", "morphospace", "--iterations", "999", "--out_dir", str(out)]
+        if not _run_step(cmd, f"step7_2_phylo_{cat}", log_dir, cfg["dry_run"]):
+            logger.warning(f"    [{cat}] phylogenetic analyses failed (see log); continuing")
+    return True
+
+
+def _aligned_to_csv(src: Path, dst: Path) -> None:
+    d = json.loads(Path(src).read_text()); names = {im["id"]: im["file_name"] for im in d["images"]}
+    rows = []
+    for a in d["annotations"]:
+        xy = [float(v) for v in (a.get("segmentation") or [[]])[0]]
+        if len(xy) > 4 and xy[:2] == xy[-2:]:
+            xy = xy[:-2]
+        rows.append([names[a["image_id"]]] + xy)
+    k = min(len(r) for r in rows) - 1
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    with open(dst, "w", newline="") as f:
+        w = csv.writer(f); w.writerow(["filename"] + [f"{c}{i // 2 + 1}" for i, c in zip(range(k), "xy" * k)])
+        w.writerows(r[:k + 1] for r in rows)
+
+
+def step_trait_stats_states(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """Step 23.25: the descriptive categorical characters scored per specimen (step 23.2): which characters are
+    associated with species (Cramer's V, permutation P), and how well they separate and identify species
+    (descriptron_trait_stats.py). Extra results."""
+    import pandas as pd
+    base = Path(cfg["output_base"]); tsv = base / "descriptive_states" / "descriptive_states_by_specimen.tsv"
+    if not tsv.exists():
+        logger.info("  no descriptive states scored: skipping"); return True
+    d = pd.read_csv(tsv, sep="\t", dtype=str)
+    d = d[~d["state"].fillna("").str.lower().isin(["", "not assessable", "not visible", "na"])]
+    out_base = base / "trait_stats_states"
+    for cat, g in d.groupby("category"):
+        out = out_base / cat
+        if (out / "summary.csv").exists() and not cfg["force"]:
+            continue
+        wide = g.pivot_table(index=["specimen_id", "species"], columns="character", values="state", aggfunc="first").reset_index()
+        if wide["species"].nunique() < 2:
+            continue
+        out.mkdir(parents=True, exist_ok=True)
+        wide.drop(columns=["species"]).rename(columns={"specimen_id": "filename"}).to_csv(out / "states.csv", index=False)
+        wide[["specimen_id", "species"]].rename(columns={"specimen_id": "filename", "species": "group_label"}).to_csv(out / "groups.csv", index=False)
+        cmd = [python, str(SCRIPT_DIR / "descriptron_trait_stats.py"), "--groups", str(out / "groups.csv"),
+               "--categorical", f"descriptive states={out / 'states.csv'}", "--out_dir", str(out)]
+        if not _run_step(cmd, f"step23_25_trait_stats_states_{cat}", log_dir, cfg["dry_run"]):
+            logger.warning(f"    [{cat}] descriptive-state statistics failed (see log); continuing")
+    return True
+
+
 ALL_STEPS = {
     "coco_clean":      (0, step_coco_clean),
     "measurements":    (1, step_measurements),
@@ -1791,6 +1933,8 @@ ALL_STEPS = {
     "texture":         (5, step_texture_homology),
     "landmark_gpa":    (6, step_landmark_gpa),
     "compile":         (7, step_compile),
+    "trait_stats":     (7.1, step_trait_stats),
+    "phylo":           (7.2, step_phylo),
     "biorag":          (8, step_biorag),
     "confab_check":    (9, step_confab_check),
     "confab_fix":      (10, step_confab_fix),
@@ -1810,6 +1954,7 @@ ALL_STEPS = {
     "calibrate":       (22.5, step_calibrate),
     "describe_v2":     (23, step_describe_v2),
     "descriptive_states": (23.2, step_descriptive_states),
+    "trait_stats_states": (23.25, step_trait_stats_states),
     "char_reliability": (23.3, step_char_reliability),
     "char_figures": (23.4, step_char_figures),
     "subjective_check": (23.5, step_subjective_check),
@@ -1819,12 +1964,12 @@ ALL_STEPS = {
     "ontology_v2":      (23.7, step_ontology_v2),
     "treatments_docx": (24, step_treatments_docx),
 }
-V2_STEPS = ["annotation_screen", "key_matrix", "key_build", "calibrate", "describe_v2", "descriptive_states", "char_reliability",
+V2_STEPS = ["annotation_screen", "key_matrix", "key_build", "calibrate", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
             "char_figures", "subjective_check", "confab_check_v2", "type_material", "char_gate",
             "ontology_v2", "treatments_docx"]
 V2_WORKFLOW = ["coco_clean", "measurements", "semilandmarks", "color", "color_homology", "texture",
-               "landmark_gpa", "compile", "annotation_screen", "key_matrix", "biorag", "key_build", "calibrate", "describe_v2",
-               "descriptive_states", "char_reliability", "char_figures", "subjective_check",
+               "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "biorag", "key_build", "calibrate", "describe_v2",
+               "descriptive_states", "trait_stats_states", "char_reliability", "char_figures", "subjective_check",
                "confab_check_v2", "type_material", "char_gate",
                "ontology_v2", "figure_plates", "treatments_docx"]
 
@@ -1898,6 +2043,11 @@ def parse_args():
     p.add_argument("--conda_env", default="measure_env",
                     help="Conda environment name (default measure_env)")
     # --- BioRAG v2 (evidence-tiered) options ---
+    p.add_argument("--tree", default=None,
+                   help="Newick tree whose tip names are the group labels: adds phylogenetic signal, PGLS and "
+                        "phylomorphospaces of every trait set (step phylo)")
+    p.add_argument("--trait_stats_permutations", type=int, default=999,
+                   help="permutations for the morphological statistics (step trait_stats; default 999)")
     p.add_argument("--workflow", default="v2", choices=["v2", "v1"],
                    help="v2 (default): evidence-tiered, data-driven key; v1: original LLM-key workflow")
     p.add_argument("--keep_flagged", action="store_true",
@@ -1971,7 +2121,7 @@ def parse_args():
 _PATH_ARGS = ("coco_json", "image_dir", "group_labels", "output_base", "api_key_file", "keypoints_json",
               "pdf_dir", "rag_index", "user_prompts", "exclude_list", "grouping_file", "label_dir", "ratio_config",
               "taxon_profile", "system_prompts", "compiled_dir", "prior_cache", "localities", "plates_dir",
-              "descriptive_retest", "novelty_dir", "type_designations")
+              "descriptive_retest", "novelty_dir", "type_designations", "tree")
 
 
 def main():
@@ -2030,6 +2180,12 @@ def main():
     cfg = vars(args)
 
     config_path = base / "pipeline_config.yaml"
+    if config_path.exists():             # never lose the record of an earlier run: keep it, timestamped
+        import shutil
+        prev = base / f"pipeline_config.{datetime.fromtimestamp(config_path.stat().st_mtime):%Y%m%d_%H%M%S}.yaml"
+        if not prev.exists():
+            shutil.copy2(config_path, prev)
+            logger.info(f"  Earlier config kept as: {prev.name}")
     with open(config_path, "w") as f:
         yaml.dump(cfg, f, default_flow_style=False, sort_keys=False)
     logger.info(f"  Config saved: {config_path}")

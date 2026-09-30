@@ -40,7 +40,7 @@ fi
 
 # live programs the inventory does not (yet) list — without this a rebuild silently drops them
 # (it dropped DINOLand v52 and descriptron_credentials.py, which had been added to the repo by hand)
-EXTRA_LIVE="descriptron_phylo.py biorag_provenance_v1.py dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
+EXTRA_LIVE="descriptron_trait_stats.py descriptron-v2-v76.py descriptron_phylo.py biorag_provenance_v1.py dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
 descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descriptron_joints.py
 descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
