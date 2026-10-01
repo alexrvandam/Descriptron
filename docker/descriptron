@@ -38,6 +38,7 @@ descriptron <command> [args...]
   dinoland            DINOv3 landmark transfer                [samm]
   measure             measurements from COCO                  [measure_env]
   pipeline            the full BioRAG v2 pipeline             [measure_env]
+  sam3                find every instance of a structure (SAM 3; -e HF_TOKEN, gated)  [sam3]
   depth               metric depth (only if built in)         [metric3d]
   mcp                 MCP server for Claude and other clients (own venv)
   keys                show / set / remove API keys (docker run -it ... keys --set HF_TOKEN)
@@ -68,7 +69,12 @@ case "$cmd" in
       echo "    -v \"\$PWD:/data\" descriptron:latest gui" >&2
       exit 3
     fi
-    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v78.py" "$@" ;;   # 2.5.0: + drag and drop, SAM 3 prompts (v73-v77 kept)
+    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v79.py" "$@" ;;   # 2.5.1: SAM 3 built in (v73-v78 kept)
+  sam3)
+    # 2.5.1: SAM 3 multi-instance proposals (own env, Python 3.12). Checkpoints are gated: request access at
+    # huggingface.co/facebook/sam3, then pass your token: -e HF_TOKEN=... (cached in -v descriptron-weights:/weights)
+    need_env sam3
+    exec /opt/conda/envs/sam3/bin/python "$GUI/descriptron_sam3_instances.py" "$@" ;;
   train-masks)
     need_env samm
     exec $CONDA_RUN samm python "$GUI/torchvision_det/tv_train_v1.py" --task masks "$@" ;;

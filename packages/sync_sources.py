@@ -67,7 +67,12 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
-                   "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
+                   "descriptron-v2-v79.py",                            # v2.5.1: finds descriptron-sam3 / DESCRIPTRON_SAM3_PYTHON
+                   "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
+# v2.5.1: SAM 3 as its own distribution (Python 3.12, sam3 from PyPI). The text vocabulary goes beside the wrapper
+# in BOTH places it runs from: the sam3 wheel leaves it out.
+SAM3_FILES = ["descriptron_sam3_instances.py"]
+SAM3_DIRS = ["sam3_assets"]   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 
 
@@ -187,6 +192,23 @@ def main():
             else:
                 shutil.copy2(src, dst / src.name)
             print(f"  + {extra} -> descriptron-gui")
+
+    sam3_tools = HERE / "descriptron-sam3" / "src" / "descriptron_sam3" / "tools"
+    if a.clean and sam3_tools.exists():
+        shutil.rmtree(sam3_tools)
+    sam3_tools.mkdir(parents=True, exist_ok=True)
+    counts["descriptron-sam3"] = 0
+    for f in SAM3_FILES:
+        shutil.copy2(gui / f, sam3_tools / f)
+        counts["descriptron-sam3"] += 1
+        print(f"  + {f} -> descriptron-sam3")
+    for d in SAM3_DIRS:
+        for dst_tools in (sam3_tools, gui_tools):
+            dst = dst_tools / d
+            if dst.exists():
+                shutil.rmtree(dst)
+            shutil.copytree(gui / d, dst, ignore=shutil.ignore_patterns("*.bak*"))
+        print(f"  + {d}/ -> descriptron-sam3 and descriptron-gui")
 
     print()
     for dist, n in counts.items():

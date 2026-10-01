@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "descriptron-sam3"
+version = "2.5.1"
+description = "SAM 3 for Descriptron: find every instance of a small structure (e.g. setae) from examples, clicks or a word"
+readme = "README.md"
+# SAM 3 needs PyTorch >= 2.7; tested with Python 3.12. Install it in its own environment (pipx does this for you):
+# the Descriptron GUI runs it as a separate program, so it does not have to share the GUI's Python.
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Alex R. Van Dam" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+]
+dependencies = [
+  "sam3==0.1.4",                 # Meta's SAM 3 (SAM License); the version this release was tested with
+  "torch>=2.7",
+  "torchvision",
+  "numpy>=1.26,<2",
+  "pillow>=9",
+  "opencv-python-headless>=4.8",
+  "einops",
+  "psutil",
+  "pycocotools",
+  "huggingface_hub",
+  "setuptools<81",               # sam3 imports pkg_resources
+]
+
+[project.scripts]
+descriptron-sam3 = "descriptron_sam3.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/alexrvandam/Descriptron"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/descriptron_sam3"]
+
+[tool.hatch.build]
+artifacts = ["src/descriptron_sam3/tools/**"]

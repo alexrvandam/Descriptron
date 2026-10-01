@@ -79,6 +79,25 @@ def outline_points(proc, model, im, pts, labs, size):
     return full, float(np.asarray(ps).ravel()[0])
 
 
+def find_bpe_vocab():
+    """SAM 3's text-encoder vocabulary: sam3's own copy (git install), else the copy shipped with Descriptron
+    (the sam3 0.1.4 wheel on PyPI leaves it out)."""
+    name = "bpe_simple_vocab_16e6.txt.gz"
+    cands = []
+    try:
+        import sam3
+        d = os.path.dirname(sam3.__file__)
+        cands += [os.path.join(d, "assets", name), os.path.join(d, "..", "assets", name)]
+    except Exception:
+        pass
+    here = os.path.dirname(os.path.abspath(__file__))
+    cands += [os.path.join(here, "sam3_assets", name), os.path.join(here, "..", "sam3_assets", name)]
+    for c in cands:
+        if os.path.isfile(c):
+            return os.path.abspath(c)
+    return None
+
+
 def tiles(w, h, size, overlap):
     """top-left corners of overlapping tiles covering a w x h image (one tile if the image is small; size 0 = one)."""
     if size <= 0 or (w <= size and h <= size):
@@ -157,7 +176,7 @@ def main(argv=None):
     from sam3.model_builder import build_sam3_image_model
     from sam3.model.sam3_image_processor import Sam3Processor
     try:
-        model = build_sam3_image_model(enable_inst_interactivity=bool(a.points))
+        model = build_sam3_image_model(bpe_path=find_bpe_vocab(), enable_inst_interactivity=bool(a.points))
     except Exception as e:
         sys.exit(f"Could not load SAM 3 ({e}).\nThe checkpoints are gated: request access at "
                  "https://huggingface.co/facebook/sam3, then run `hf auth login` once in the sam3 environment.")

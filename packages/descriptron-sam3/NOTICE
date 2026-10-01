@@ -1,0 +1,69 @@
+Descriptron
+Copyright 2024-2026 Alex R. Van Dam (ORCID 0000-0002-1966-0338)
+
+This product includes software developed by Alex R. Van Dam
+https://github.com/alexrvandam/Descriptron
+
+Licensed under the Apache License, Version 2.0 (see LICENSE). Under Section
+4(d) of that licence, this NOTICE file must be included with any
+redistribution of this software or of any work derived from it.
+
+REQUIRED CITATION
+-----------------
+Anyone who uses Descriptron, or any software derived from it (including
+descriptron-core, descriptron-vision, descriptron-gui and descriptron-mcp), in
+work that is published, presented or distributed must cite:
+
+  1. The software (Descriptron v2), by the DOI of the version used:
+     Van Dam, A. R. (2026). Descriptron: morphology-driven species descriptions,
+     keys and delimitation for dark taxa (Version 2.1.1). Zenodo.
+     https://doi.org/10.5281/zenodo.22958109
+     (all versions: https://doi.org/10.5281/zenodo.17077224;
+      repository: https://github.com/alexrvandam/Descriptron)
+
+  2. The first Descriptron paper:
+     Van Dam, A. R. & Štarhová Serbina, L. (2026). Descriptron: Artificial
+     intelligence for automating taxonomic species descriptions with a
+     user-friendly software package. Systematic Entomology, 51(1), e70005.
+     https://doi.org/10.1111/syen.70005
+
+  3. Once it is published, the Descriptron v2 paper as well. Its reference
+     will be added here and in CITATION.cff on publication.
+
+BibTeX:
+
+@software{vandam_2026_descriptron_v211,
+  author    = {Van Dam, Alex R.},
+  title     = {Descriptron: morphology-driven species descriptions, keys and
+               delimitation for dark taxa},
+  version   = {v2.1.1},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22958109},
+  url       = {https://doi.org/10.5281/zenodo.22958109}
+}
+
+@article{vandam2026descriptron,
+  author  = {Van Dam, Alex R. and Štarhová Serbina, Liliya},
+  title   = {Descriptron: Artificial intelligence for automating taxonomic species
+             descriptions with a user-friendly software package},
+  journal = {Systematic Entomology},
+  volume  = {51},
+  number  = {1},
+  pages   = {e70005},
+  year    = {2026},
+  doi     = {10.1111/syen.70005}
+}
+
+The same information is in CITATION.cff, which GitHub shows as
+"Cite this repository".
+
+THIRD-PARTY FILES IN descriptron-sam3
+-------------------------------------
+tools/sam3_assets/bpe_simple_vocab_16e6.txt.gz - the byte-pair-encoding vocabulary of OpenAI CLIP
+(https://github.com/openai/CLIP), MIT licence, Copyright (c) 2021 OpenAI. SAM 3's text encoder needs it and the
+sam3 0.1.4 wheel on PyPI does not include it.
+
+SAM 3 itself (the `sam3` package, installed as a dependency) is Meta's, under the SAM License; its model
+checkpoints are gated and are downloaded by each user from https://huggingface.co/facebook/sam3 after requesting
+access. Neither the SAM 3 code nor its checkpoints are redistributed here.

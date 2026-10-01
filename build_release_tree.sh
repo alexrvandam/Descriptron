@@ -40,7 +40,7 @@ fi
 
 # live programs the inventory does not (yet) list — without this a rebuild silently drops them
 # (it dropped DINOLand v52 and descriptron_credentials.py, which had been added to the repo by hand)
-EXTRA_LIVE="descriptron-v2-v77.py descriptron-v2-v78.py descriptron_sam3_instances.py descriptron_trait_stats.py descriptron-v2-v76.py descriptron_phylo.py biorag_provenance_v1.py dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
+EXTRA_LIVE="descriptron-v2-v79.py descriptron-v2-v77.py descriptron-v2-v78.py descriptron_sam3_instances.py descriptron_trait_stats.py descriptron-v2-v76.py descriptron_phylo.py biorag_provenance_v1.py dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
 descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descriptron_joints.py
 descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
@@ -101,6 +101,9 @@ rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/mo
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true
 cp "$GUI/marmot.jpg" "$DST/descriptron/" 2>/dev/null || true
 [ -d "$GUI/icons" ] && cp -r "$GUI/icons" "$DST/descriptron/" || true
+# 2.5.1: SAM 3's text vocabulary (CLIP, MIT) - the sam3 wheel on PyPI leaves it out
+[ -d "$GUI/sam3_assets" ] && mkdir -p "$DST/descriptron/sam3_assets" \
+  && cp "$GUI/sam3_assets/bpe_simple_vocab_16e6.txt.gz" "$GUI/sam3_assets/README.txt" "$DST/descriptron/sam3_assets/" || true
 cp "$SRC/segment-anything-2/gui/torchvision_det/README.md" \
    "$DST/descriptron/torchvision_det/" 2>/dev/null || true
 
@@ -129,6 +132,8 @@ for f in LICENSE NOTICE CITATION.cff; do
 done
 # each distributable package carries them too (hatchling puts LICENSE*/NOTICE* in the wheel)
 for p in "$DST"/packages/*/; do cp "$SRC/LICENSE" "$SRC/NOTICE" "$p"; done
+# 2.5.1: descriptron-sam3 keeps its own NOTICE (adds the CLIP vocabulary and SAM 3's licence)
+cp "$SRC/packages/descriptron-sam3/NOTICE" "$DST/packages/descriptron-sam3/NOTICE" 2>/dev/null || true
 # -r: docs/tutorial/ holds the tutorial's screenshots and figures; skip editor backups
 rsync -a --exclude '*.bak*' "$SRC/docs/" "$DST/docs/"
 cp "$SRC/.dockerignore" "$DST/" 2>/dev/null || true

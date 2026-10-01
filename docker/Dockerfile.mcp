@@ -38,6 +38,14 @@ COPY descriptron /usr/local/bin/descriptron
 # programs fixed since the base image was built, laid over its gui/ copy
 COPY overlay/ /opt/descriptron/gui/
 
+# 2.5.1: SAM 3 in its own env (Python 3.12, PyTorch 2.10 CUDA 12.8): the GUI's SAM 3 buttons find it next to samm,
+# and `descriptron sam3` runs it directly. Checkpoints are gated and NOT in the image: pass -e HF_TOKEN=...
+COPY sam3wheel/ /tmp/sam3-build/
+RUN /opt/conda/bin/conda create -y -p /opt/conda/envs/sam3 -c conda-forge --override-channels python=3.12 pip \
+ && /opt/conda/envs/sam3/bin/pip install --no-cache-dir torch==2.10.0 torchvision --index-url https://download.pytorch.org/whl/cu128 \
+ && /opt/conda/envs/sam3/bin/pip install --no-cache-dir /tmp/sam3-build/*.whl \
+ && rm -rf /tmp/sam3-build && /opt/conda/bin/conda clean -afy
+
 RUN /opt/conda/envs/samm/bin/python -m venv /opt/descriptron-mcp \
  && /opt/descriptron-mcp/bin/pip install --no-cache-dir --upgrade pip \
  && /opt/descriptron-mcp/bin/pip install --no-cache-dir "mcp>=1.2" "pillow>=9" \
