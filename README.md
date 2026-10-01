@@ -306,7 +306,11 @@ regions. You can stay in one Python workflow from photograph to statistics.
 | posture standardisation | `fixed.angle` | `descriptron_joints standardise` | known-answer tests |
 | Mantel, assignment with typicality | — (vegan, MASS) | `mantel`, `assign` | known-answer tests |
 | collection, mm calibration, mirror images, colour and texture in homologous cells | — | built in | see above |
-| **not (yet) in Descriptron:** 3D landmarks and surface semilandmarks, phylogenetic GLS (`procD.pgls`), evolutionary rate comparisons (`compare.evol.rates`), phylomorphospace | yes | no | — |
+| phylogenetic signal of any trait set (shape, measurements, colour pattern, texture) | `physignal` | `descriptron_phylo` (2.2.0) | same numbers (geomorph, phytools) |
+| phylogenetic GLS | `procD.pgls` | `descriptron_phylo --pgls` (2.2.0) | same numbers |
+| ancestral states, phylomorphospace | `gm.prcomp(phy =)` | `descriptron_phylo` (2.2.0) | same numbers (geomorph, phytools `fastAnc`) |
+| PERMANOVA of species, pairwise species separation, leave-one-out identification, any trait set | — (vegan `adonis2`, `class::knn.cv`) | `descriptron_trait_stats` (2.3.0) | same numbers |
+| **not (yet) in Descriptron:** 3D landmarks and surface semilandmarks, evolutionary rate comparisons (`compare.evol.rates`) | yes | no | — |
 
 For these, and for any analysis we have not listed, use geomorph: Descriptron's converters write TPS and
 MorphoJ files, and its aligned coordinates are plain tables.
