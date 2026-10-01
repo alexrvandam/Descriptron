@@ -89,6 +89,7 @@ specimens. The numbers are from the 29-species *Diaphorina* run.
 | checking | — | independent confabulation audit, subjective-word checks, ontology annotation |
 | install | eight conda environments | **`pip install descriptron`**, or one Docker image |
 | shape and form (2.1) | GPA, PCA, MANOVA/CVA | + Procrustes ANOVA with metadata (species x locality...), trajectories, disparity, allometry slopes, 2B-PLS, Mantel, asymmetry, modularity, Kmult, assignment; mirror images reflected automatically; the Procrustes statistics checked against geomorph and RRPP (Mantel and assignment by known-answer tests) |
+| many small structures (2.5) | — | **SAM 3** (optional, own environment): outline one or a few setae with a box or clicks and it proposes every similar instance on that image, shown together and labelled in one step; drag and drop of images and folders onto the GUI |
 | more tools (2.1) | — | centre lines of thin structures, joint angles and posture standardisation, pose skeletons, video tracking with pose (DeepLabCut export), TPS / MorphoJ / StereoMorph / VIA converters, Darwin Core metadata import |
 
 Nothing in the analysis half needs a GPU, and the key, matrix, audits and
@@ -556,6 +557,26 @@ conda env create -f environments/detectron2_env_environment.yml  # Mask R-CNN
 Detectron2 must then be built from source; see `docker/Dockerfile` for the exact
 sequence, including the two flags it needs (`--no-build-isolation`, and a
 non-editable install).
+
+### Optional: SAM 3 for many small structures (from 2.5.0)
+
+SAM 3 finds every instance of a structure (for example all setae on a wing or genitalia) from one or a few
+examples. It needs Python 3.12 and PyTorch >= 2.7, so it lives in its own environment and is not in the pip
+packages or the Docker image:
+
+```bash
+bash environments/build_sam3_env.sh          # creates the conda env `sam3`
+conda run -n sam3 hf auth login               # once; first request access at huggingface.co/facebook/sam3
+```
+
+The checkpoints are gated (SAM License); the first run downloads 3.3 GB. In the GUI (`descriptron-v2-v78.py`),
+on the SAM2 row, draw a box around one example (several boxes = several examples) or click points, then press the
+dark green **Find all instances (SAM 3)**. With clicked points you choose: outline only what you clicked (one mask
+per point, outlined at full image resolution), use each click as an example and find all like them, or use all
+clicks as one example. The instances appear together, one colour each; trash the false ones and Apply Label once
+to label them all. Examples work within the image they are drawn on; a typed word (e.g. "bristle") searches the
+image tile by tile. The grey **Find all instances (SAM 3)** button in the Predict tab runs the same tool on a folder
+(`descriptron_sam3_instances.py`). Results are proposals to review, not finished annotations.
 
 ---
 

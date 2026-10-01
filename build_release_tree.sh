@@ -40,7 +40,7 @@ fi
 
 # live programs the inventory does not (yet) list — without this a rebuild silently drops them
 # (it dropped DINOLand v52 and descriptron_credentials.py, which had been added to the repo by hand)
-EXTRA_LIVE="descriptron_trait_stats.py descriptron-v2-v76.py descriptron_phylo.py biorag_provenance_v1.py dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
+EXTRA_LIVE="descriptron-v2-v77.py descriptron-v2-v78.py descriptron_sam3_instances.py descriptron_trait_stats.py descriptron-v2-v76.py descriptron_phylo.py biorag_provenance_v1.py dinov3_landmark_transfer_v52.py descriptron_credentials.py descriptron-v2-v74.py descriptron-v2-v75.py claude_landmark_grounding_test_v1.py
 descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descriptron_joints.py
 descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
@@ -121,6 +121,7 @@ find "$DST/packages" -name '*.egg-info' -type d -exec rm -rf {} + 2>/dev/null ||
 cp "$SRC/docker/"{Dockerfile,descriptron,README.md,build_descriptron.sh,Dockerfile.mcp,build_mcp_layer.sh} "$DST/docker/"
 cp "$SRC/docker/"requirements-*.txt "$SRC/docker/"constraints-*.txt "$DST/docker/"
 cp "$SRC/environments/"*.yml "$SRC/environments/"*.txt "$DST/environments/" 2>/dev/null || true
+cp "$SRC/environments/build_sam3_env.sh" "$DST/environments/" 2>/dev/null || true   # v2.5.0: optional SAM 3 env
 cp "$SRC/README.md" "$DST/" 2>/dev/null || true
 # licence, attribution and citation: the release must never go out without them
 for f in LICENSE NOTICE CITATION.cff; do

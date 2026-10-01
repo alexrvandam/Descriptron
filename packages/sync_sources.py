@@ -65,7 +65,9 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/validation/validate_centerline_lengths.py",   # v2.1.2
               "measure/validation/validate_texture_glcm.py"]         # v2.1.2
 EXTRA_GUI = ["marmot.jpg", "icons"]
-EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py"]   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
+EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
+                   "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
+                   "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
 DATA_FOR_CORE = ["measure/biorag_prompts"]
 
 
