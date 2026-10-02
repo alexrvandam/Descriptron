@@ -22,7 +22,9 @@ for you; you only place it yourself if you already have it (step 6).
 **Windows**
 - Python: https://www.python.org/downloads/ - download Python **3.12**, run the installer and **tick "Add python.exe
   to PATH"** on the first screen.
-- Git: https://git-scm.com/downloads - install with the default options (needed in step 4).
+- Git (optional - step 4 has a no-Git option): https://git-scm.com/downloads/win - keep the default PATH option
+  "Git from the command line and also from 3rd-party software", and open a NEW Command Prompt afterwards.
+  Details and fixes: [INSTALL_GIT.md](INSTALL_GIT.md).
 
 **macOS**
 - Python: https://www.python.org/downloads/ - the **3.12** macOS installer.
@@ -78,6 +80,13 @@ that the GUI does not use, so no C++ compiler is needed.
 
     SAM2_BUILD_CUDA=0 pip install git+https://github.com/facebookresearch/sam2.git
 
+**No Git (or "git is not recognized")?** Install the same thing from GitHub's zip download instead - replace the
+`pip install git+...` line with:
+
+    pip install https://github.com/facebookresearch/sam2/archive/refs/heads/main.zip
+
+(keep the `SAM2_BUILD_CUDA=0` line before it). To put Git on the PATH instead, see [INSTALL_GIT.md](INSTALL_GIT.md).
+
 ## 5. Install Descriptron
 
     pip install descriptron
@@ -132,7 +141,7 @@ button then finds it.
 | message | fix |
 |---|---|
 | `SAM2 is not installed` / `No module named 'sam2'` | step 4 was not run in the active environment: activate it (step 2) and repeat step 4 |
-| `git` is not recognised | install Git (step 1), open a new terminal, activate the environment, repeat step 4 |
+| `git` is not recognised / `Cannot find command 'git'` | use the zip line in step 4 (no Git needed), or put Git on the PATH: [INSTALL_GIT.md](INSTALL_GIT.md) |
 | `py` / `python3.12` not found | Python 3.12 is not installed, or (Windows) "Add python.exe to PATH" was not ticked: reinstall Python |
 | `tkinter is missing` (Linux) | `sudo apt install python3-tk` |
 | `descriptron-gui` not found | the environment is not active (step 2) |
