@@ -36,7 +36,7 @@ Desktop; Linux: Docker Engine).
 
 Then, in a terminal:
 
-    docker pull ghcr.io/alexrvandam/descriptron:2.1.1
+    docker pull ghcr.io/alexrvandam/descriptron:2.5.1
 
 This downloads 32 GB, so it takes a while.
 
@@ -76,7 +76,7 @@ Open a terminal **in your project folder**.
     docker run --rm --user "$(id -u):$(id -g)" \
       -e ANTHROPIC_API_KEY \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.1.1 pipeline \
+      ghcr.io/alexrvandam/descriptron:2.5.1 pipeline \
         --coco_json /data/annotations.json \
         --image_dir /data/images \
         --group_labels /data/group_labels.csv \
@@ -90,7 +90,7 @@ Open a terminal **in your project folder**.
 
     docker run --rm -e ANTHROPIC_API_KEY `
       -v "${PWD}:/data" -v descriptron-weights:/weights `
-      ghcr.io/alexrvandam/descriptron:2.1.1 pipeline `
+      ghcr.io/alexrvandam/descriptron:2.5.1 pipeline `
         --coco_json /data/annotations.json `
         --image_dir /data/images `
         --group_labels /data/group_labels.csv `
@@ -123,9 +123,9 @@ a key first in the environment, then in a small private file, and otherwise asks
 the first time it needs it. To save them in that file:
 
     docker run -it --rm -v "$HOME/.config/descriptron:/config" \
-      ghcr.io/alexrvandam/descriptron:2.1.1 keys --set ANTHROPIC_API_KEY
+      ghcr.io/alexrvandam/descriptron:2.5.1 keys --set ANTHROPIC_API_KEY
     docker run -it --rm -v "$HOME/.config/descriptron:/config" \
-      ghcr.io/alexrvandam/descriptron:2.1.1 keys --set HF_TOKEN
+      ghcr.io/alexrvandam/descriptron:2.5.1 keys --set HF_TOKEN
 
 Then add `-v "$HOME/.config/descriptron:/config"` to your runs and leave out the
 `export` and `-e` parts. `keys` alone shows which keys are set (never their
@@ -171,7 +171,7 @@ then download once into the `descriptron-weights` volume.
 
     docker run --rm --gpus all --user "$(id -u):$(id -g)" \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.1.1 sam2-pal \
+      ghcr.io/alexrvandam/descriptron:2.5.1 sam2-pal \
         --template_image /data/refs/template.png --template_json /data/refs/annotations.json \
         --training_json /data/refs/annotations.json --training_images_dir /data/refs \
         --image_dir /data/images --output_dir /data/out_sam2pal \
@@ -184,7 +184,7 @@ then download once into the `descriptron-weights` volume.
     export HF_TOKEN=hf_...
     docker run --rm --user "$(id -u):$(id -g)" -e HF_TOKEN \
       -v "$PWD:/data" -v descriptron-weights:/weights \
-      ghcr.io/alexrvandam/descriptron:2.1.1 dinoland \
+      ghcr.io/alexrvandam/descriptron:2.5.1 dinoland \
         --imgA /data/refs/ref1.tif \
         --landmarks /data/refs/ref1.json,/data/refs/ref2.json,/data/refs/ref3.json \
         --ref_dir /data/refs --batch_glob "/data/images/*.tif" --batch_n 999 \
@@ -203,17 +203,43 @@ Masks and landmarks come out as COCO JSON that the Descriptron GUI opens for
 checking and correcting, and that the pipeline above measures.
 
 
-## 7. Other commands
+## 7. SAM 3: every instance of a small structure
 
-    docker run --rm ghcr.io/alexrvandam/descriptron:2.1.1 help
-    docker run --rm ghcr.io/alexrvandam/descriptron:2.1.1 pipeline --help
+From 2.5.1 the image includes SAM 3, which proposes every instance of a structure (for example all setae) from a
+few examples or a word. Its checkpoints are gated: request access at https://huggingface.co/facebook/sam3 (SAM
+License), create a read token in your Hugging Face settings, and pass it with `-e HF_TOKEN`. The checkpoint
+(3.3 GB) downloads once into the `descriptron-weights` volume. A GPU is strongly recommended.
+
+**In the GUI** (Linux; the GUI needs your X display forwarded into the container, see docker/README.md): draw a box around one seta, or click points, and press
+the dark green **Find all instances (SAM 3)** on the SAM2 row.
+
+    xhost +local:docker
+    docker run --rm --gpus all -e HF_TOKEN -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
+      -v "$PWD:/data" -v descriptron-weights:/weights \
+      ghcr.io/alexrvandam/descriptron:2.5.1 gui /data/images
+
+**Without the GUI** (a folder, with a word and/or example boxes from a COCO file):
+
+    export HF_TOKEN=hf_...
+    docker run --rm --gpus all --user "$(id -u):$(id -g)" -e HF_TOKEN \
+      -v "$PWD:/data" -v descriptron-weights:/weights \
+      ghcr.io/alexrvandam/descriptron:2.5.1 sam3 \
+        --images /data/wings --text bristle --category seta --out /data/setae_sam3.json
+
+Open the result with Load Annotations, delete false instances and add misses. `sam3 --help` lists every option
+(`--exemplars`, `--boxes`, `--points`, `--points_mode`, `--tile`, `--confidence`).
+
+## 8. Other commands
+
+    docker run --rm ghcr.io/alexrvandam/descriptron:2.5.1 help
+    docker run --rm ghcr.io/alexrvandam/descriptron:2.5.1 pipeline --help
 
 Training detectors and the annotation GUI are described in the GitHub README.
 **Hosting Descriptron for a group** on one institutional machine with a shared
 GPU: [Shared VM hosting recipe](SHARED_VM_RECIPE.md).
 
 
-## 8. Please cite
+## 9. Please cite
 
 If you use Descriptron in published work, cite the software and the first paper:
 

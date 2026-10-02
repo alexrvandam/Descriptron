@@ -488,6 +488,21 @@ Or take only what you need:
 | `descriptron-core` | the whole analysis half — measurements, matrix, key, treatments, audits | **nothing but pip.** No torch, no CUDA, no compiler |
 | `descriptron-vision` | mask and landmark prediction: torchvision detectors, SAM2-PAL, DINOLand | torch (ordinary wheels; Apple GPU via MPS on macOS) |
 | `descriptron-gui` | the annotation GUI | core + vision + tkinter |
+| `descriptron-sam3` (2.5.1) | SAM 3: find every instance of a small structure (setae...) from a box, clicks or a word; the GUI's SAM 3 buttons use it | **Python 3.12**, its own environment (below) |
+
+**SAM 3 (optional).** It needs Python 3.12 and PyTorch >= 2.7, so it goes in its own environment; pipx makes that
+environment and puts the `descriptron-sam3` command on your PATH, where the GUI finds it:
+
+```bash
+pip install pipx && pipx ensurepath          # once; open a new terminal afterwards
+pipx install --python python3.12 descriptron-sam3
+```
+
+No pipx? `python3.12 -m venv ~/sam3env && ~/sam3env/bin/pip install descriptron-sam3`, then tell the GUI where it
+is: `export DESCRIPTRON_SAM3_PYTHON=~/sam3env/bin/python`. The SAM 3 checkpoints are gated: request access at
+https://huggingface.co/facebook/sam3, then log in once with the token from your Hugging Face settings
+(`pipx run --spec huggingface_hub hf auth login`). The first run downloads 3.3 GB; a CUDA GPU is strongly
+recommended.
 
 **If you only want to reproduce a published analysis from deposited COCO files,
 `pip install descriptron-core` is enough**, and it installs in about a minute on
@@ -511,7 +526,11 @@ your own PDFs: `pip install "descriptron-core[rag]"` (see
 
 ### 2. Docker — everything, including the parts pip cannot carry
 
-docker pull ghcr.io/alexrvandam/descriptron:2.1.1
+    docker pull ghcr.io/alexrvandam/descriptron:2.5.1
+
+SAM 3 is included (from 2.5.1): pass your Hugging Face token (`-e HF_TOKEN=hf_...`, after requesting access at
+https://huggingface.co/facebook/sam3) and the GUI's SAM 3 buttons and the `sam3` command work; see
+[docs/DOCKER_RECIPE.md](docs/DOCKER_RECIPE.md#7-sam-3-every-instance-of-a-small-structure).
 
 Two dependencies are not on PyPI and can never be declared by a published
 package: **SAM2** and **Detectron2**. The image carries both, already built.
