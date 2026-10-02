@@ -69,7 +69,7 @@ case "$cmd" in
       echo "    -v \"\$PWD:/data\" descriptron:latest gui" >&2
       exit 3
     fi
-    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v79.py" "$@" ;;   # 2.5.1: SAM 3 built in (v73-v78 kept)
+    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v80.py" "$@" ;;   # 2.5.2: SAM2 checkpoint found/downloaded (v73-v79 kept)
   sam3)
     # 2.5.1: SAM 3 multi-instance proposals (own env, Python 3.12). Checkpoints are gated: request access at
     # huggingface.co/facebook/sam3, then pass your token: -e HF_TOKEN=... (cached in -v descriptron-weights:/weights)

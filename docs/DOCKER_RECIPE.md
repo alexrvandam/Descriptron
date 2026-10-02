@@ -156,8 +156,9 @@ collection: SAM2-PAL propagates masks, DINOLand transfers numbered landmarks.
 How many references to draw, how to image, and how to check the results:
 [SAM2-PAL & DINOLand annotation SOP](SAM2PAL_DINOLand_Annotation_SOP.md).
 
-**Model weights (once).** SAM2 checkpoints are not in the image; download the
-large one into your project folder:
+**Model weights (once).** SAM2 checkpoints are not in the image. The GUI (from 2.5.2) offers to download
+`sam2_hiera_large.pt` the first time it starts and keeps it in the `descriptron-weights` volume. For SAM2-PAL on
+the command line, download the large one into your project folder:
 
     curl -L -o sam2_hiera_large.pt \
       https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt

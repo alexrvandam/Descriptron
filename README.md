@@ -475,11 +475,22 @@ sp. 'kenya', collected in Kenya (undescribed species carry working codes until t
 
 ### 1. pip — the normal route
 
+**Step by step for Windows, macOS and Linux, from a computer with nothing installed:
+[docs/INSTALL_PIP.md](docs/INSTALL_PIP.md).** In short, in one Python 3.12 environment:
+
 ```bash
-pip install descriptron          # everything
-descriptron-gui                  # the annotation GUI
+pip install torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/cu128   # NVIDIA; Mac/CPU: drop --index-url
+SAM2_BUILD_CUDA=0 pip install git+https://github.com/facebookresearch/sam2.git   # SAM2 library (Windows: set SAM2_BUILD_CUDA=0 first)
+pip install descriptron          # analysis programs, detectors and the GUI
+descriptron-gui                  # first start downloads the SAM2 model file (898 MB) once
 descriptron --list               # the 62 analysis programs
 ```
+
+**SAM2 is not on PyPI**, so `pip install descriptron` cannot bring it: install it from Meta's GitHub as above,
+into the same environment. The **SAM2 model file** `sam2_hiera_large.pt` is downloaded by the GUI the first time
+it starts, into `~/.cache/descriptron/sam2/` (Windows: `C:\Users\<you>\.cache\descriptron\sam2\`); if you
+already have it, copy it there or set `DESCRIPTRON_SAM2_CHECKPOINT` to its path. The analysis half alone
+(`pip install descriptron-core`) needs neither.
 
 Or take only what you need:
 

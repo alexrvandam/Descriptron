@@ -68,6 +68,7 @@ EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
                    "descriptron-v2-v79.py",                            # v2.5.1: finds descriptron-sam3 / DESCRIPTRON_SAM3_PYTHON
+                   "descriptron-v2-v80.py",                            # v2.5.2: finds/downloads the SAM2 checkpoint; any SAM2 install
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
 # v2.5.1: SAM 3 as its own distribution (Python 3.12, sam3 from PyPI). The text vocabulary goes beside the wrapper
 # in BOTH places it runs from: the sam3 wheel leaves it out.

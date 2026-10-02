@@ -40,6 +40,8 @@ COPY overlay/ /opt/descriptron/gui/
 
 # 2.5.1: SAM 3 in its own env (Python 3.12, PyTorch 2.10 CUDA 12.8): the GUI's SAM 3 buttons find it next to samm,
 # and `descriptron sam3` runs it directly. Checkpoints are gated and NOT in the image: pass -e HF_TOKEN=...
+# 2.5.2: the GUI downloads the SAM2 checkpoint once into the weights volume (-v descriptron-weights:/weights)
+ENV DESCRIPTRON_CACHE=/weights/descriptron
 COPY sam3wheel/ /tmp/sam3-build/
 RUN /opt/conda/bin/conda create -y -p /opt/conda/envs/sam3 -c conda-forge --override-channels python=3.12 pip \
  && /opt/conda/envs/sam3/bin/pip install --no-cache-dir torch==2.10.0 torchvision --index-url https://download.pytorch.org/whl/cu128 \
