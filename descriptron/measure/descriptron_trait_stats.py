@@ -89,6 +89,19 @@ def loo_1nn(S, y):
     return out
 
 
+def fit_ratio(S, y):
+    """per specimen: distance to the nearest OTHER specimen of its own species / distance to the nearest specimen of
+    any other species (same space as loo_1nn). Above 1 = closer to another species than to its own; NaN when the
+    species has a single specimen."""
+    out = []
+    for i in range(len(y)):
+        d = np.linalg.norm(S - S[i], axis=1); d[i] = np.inf
+        own, oth = d[(y == y[i])], d[(y != y[i])]
+        own = own[np.isfinite(own)]
+        out.append(float(own.min() / oth.min()) if len(own) and len(oth) and oth.min() > 0 else float("nan"))
+    return out
+
+
 def wilson(k, n, z=1.959963984540054):          # qnorm(0.975), as R
     if n == 0:
         return float("nan"), float("nan")
@@ -285,6 +298,8 @@ def analyse_set(name, S_raw, y, ids, a, out, covs):
         row[f"permanova_R2_beyond_{cname}"] = rr; row[f"permanova_P_beyond_{cname}"] = pp
         beyond_txt.append(f"beyond {cname.replace('_', ' ')} R2 {rr:.2f}, P = {pp:.3g}")
     hits5 = loo_1nn(Pk[:, :min(5, k)], y); hitsA = loo_1nn(P, y)
+    # per-specimen fit to its own species (4th element; everything else reads [0]-[2])
+    hits5 = [h + (r,) for h, r in zip(hits5, fit_ratio(Pk[:, :min(5, k)], y))]
     sc = [h[0] for h in hits5]; c5 = sum(h[1] for h in hits5 if h[0]); cA = sum(h[1] for h in hitsA if h[0]); ns = sum(sc)
     lo5, hi5 = wilson(c5, ns); loA, hiA = wilson(cA, ns)
     scored_species = sorted({yy for yy, s in zip(y, sc) if s})
@@ -446,6 +461,34 @@ def main(argv=None):
     write = lambda fn, rr: pd.DataFrame(rr).to_csv(out / fn, index=False) if rr else None
     write("summary.csv", rows); write("per_species.csv", sp_all); write("pairwise_permanova.csv", pw_all)
     write("mcnemar_between_trait_sets.csv", mc); write("categorical_characters.csv", cat_rows)
+    # every specimen against the species hypothesis it was given (group labels: morphology, DNA, field notes...):
+    # what each trait set calls it under leave-one-out, and whether it should be looked at again
+    sf = {}
+    for nm, (ids_, hits_) in hits_by_set.items():
+        for i_, h_ in zip(ids_, hits_):
+            r_ = sf.setdefault(_key_forms(i_)[2], {"specimen_id": i_, "assigned_species": group_of(i_, gmap)})
+            if h_[0]:
+                r_[f"named_{nm}"] = h_[2]
+                r_[f"fit_ratio_{nm}"] = round(h_[3], 3) if len(h_) > 3 and h_[3] == h_[3] else None
+    spec_rows = []
+    for r_ in sf.values():
+        named = [v for k_, v in r_.items() if k_.startswith("named_")]
+        back = sum(1 for v in named if v == r_["assigned_species"])
+        elsewhere = [v for v in named if v != r_["assigned_species"]]
+        r_.update(sets_scored=len(named), named_back=back, named_elsewhere=len(elsewhere),
+                  named_elsewhere_as="; ".join(sorted(set(elsewhere), key=_natural)),
+                  status=("not scored (single specimen of its species)" if not named else
+                          "fits" if back == len(named) else
+                          "re-examine" if len(elsewhere) > len(named) / 2 else "mixed"))
+        spec_rows.append(r_)
+    if spec_rows:
+        order = {"re-examine": 0, "mixed": 1, "fits": 2}
+        spec_rows.sort(key=lambda r_: (order.get(r_["status"], 3), -r_["named_elsewhere"], _natural(str(r_["specimen_id"]))))
+        lead = ["specimen_id", "assigned_species", "status", "sets_scored", "named_back", "named_elsewhere",
+                "named_elsewhere_as"]
+        sfd = pd.DataFrame(spec_rows)
+        sfd = sfd[lead + [c for c in sfd.columns if c not in lead]]
+        sfd.to_csv(out / "specimen_flags.csv", index=False)
     plot_overview(rows, out / "identification_by_trait_set.png")
     sep = None
     if pw_all:

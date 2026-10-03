@@ -99,3 +99,32 @@ def test_cli_end_to_end(tmp_path):
         assert (out / fn).exists(), fn
     cat = list(csv.DictReader(open(out / "categorical_characters.csv")))
     assert cat[0]["character"] == "tone" and float(cat[0]["cramers_V"]) == pytest.approx(1.0)
+
+
+def test_fit_ratio_marks_a_specimen_closer_to_another_species():
+    X = np.array([[0.0], [0.1], [0.2], [5.0], [5.1], [0.5]]); y = np.array(list("aaabbb"))    # last "b" sits next to the "a"s
+    r = ts.fit_ratio(X, y)
+    assert all(v < 1 for v in r[:5]) and r[5] > 1
+
+
+def test_specimen_flags_find_a_mislabelled_specimen(tmp_path):
+    """a hypothesis (group labels from DNA, field notes...) with one specimen put in the wrong species: that
+    specimen comes out 're-examine', named as the species it really belongs to; the others 'fits'."""
+    rng = np.random.default_rng(4); rows, groups = [], []
+    for s, shift in (("sp1", 0), ("sp2", 6), ("sp3", 12)):
+        for k in range(6):
+            fn = f"{s}_{k}.png"
+            rows.append([fn] + list(rng.normal(shift, 0.5, 4)))
+            groups.append([fn, "sp2" if (s, k) == ("sp1", 0) else s])          # sp1_0 mislabelled as sp2
+    for fn, h, r in (("traits.csv", ["filename", "f1", "f2", "f3", "f4"], rows),
+                     ("groups.csv", ["filename", "group_label"], groups)):
+        with open(tmp_path / fn, "w", newline="") as f:
+            w = csv.writer(f); w.writerow(h); w.writerows(r)
+    out = tmp_path / "out"
+    ts.main(["--groups", str(tmp_path / "groups.csv"), "--traits", f"shape={tmp_path / 'traits.csv'}",
+             "--permutations", "99", "--no_pairwise", "--out_dir", str(out)])
+    flags = {r["specimen_id"]: r for r in csv.DictReader(open(out / "specimen_flags.csv"))}
+    bad = flags["sp1_0.png"]
+    assert bad["status"] == "re-examine" and bad["assigned_species"] == "sp2" and bad["named_elsewhere_as"] == "sp1"
+    assert float(bad["fit_ratio_shape"]) > 1
+    assert all(r["status"] == "fits" for k, r in flags.items() if k != "sp1_0.png")

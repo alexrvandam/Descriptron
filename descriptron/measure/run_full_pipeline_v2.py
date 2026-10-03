@@ -70,6 +70,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from datetime import datetime
 from pathlib import Path
@@ -105,8 +106,10 @@ STEP_NAMES = [
     "figure_captions",
     "annotation_screen",
     "key_matrix",
+    "char_signal",
     "key_build",
     "calibrate",
+    "reexamine",
     "describe_v2",
     "descriptive_states",
     "trait_stats_states",
@@ -1580,6 +1583,70 @@ def step_calibrate(cfg: Dict, python: str, log_dir: Path) -> bool:
     return ok
 
 
+def step_char_signal(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """Step 21.1: how much each matrix character is worth on its own, measured by the hold-outs (naming a withheld
+    specimen, telling a described species from an unseen one; biorag_character_robustness_v1.py), with its species
+    separation (Kruskal-Wallis eta^2, FDR) and, with --tree, its phylogenetic signal (Blomberg's K); the top 25
+    characters per structure as a table and a figure (descriptron_character_signal_v1.py). An extra result."""
+    base = Path(cfg["output_base"]); mdir = base / "compiled_key_tier"
+    if not (mdir / "specimen_matrix_long.csv").exists() and not cfg["dry_run"]:
+        logger.warning("  no character matrix yet (run key_matrix) - skipping the character table")
+        return True
+    # rank by the hold-outs (biorag_character_robustness_v1: naming and novelty per character), not in-sample
+    rob = base / "character_robustness"
+    if not (rob / "character_robustness.tsv").exists() or cfg["force"]:
+        rcmd = [python, str(SCRIPT_DIR / "biorag_character_robustness_v1.py"), "--matrix_dir", str(mdir), "--out_dir", str(rob)]
+        if not _run_step(rcmd, "step21_1_char_robustness", log_dir, cfg["dry_run"]):
+            logger.warning("  character robustness failed (see log); ranking by species separation instead")
+    cmd = [python, str(SCRIPT_DIR / "descriptron_character_signal_v1.py"), "--matrix_dir", str(mdir),
+           *(["--tree", cfg["tree"]] if cfg.get("tree") else []),
+           *(["--robustness", str(rob / "character_robustness.tsv")]
+             if (rob / "character_robustness.tsv").exists() or cfg["dry_run"] else []),
+           "--out_dir", str(base / "character_signal")]
+    if not _run_step(cmd, "step21_1_char_signal", log_dir, cfg["dry_run"]):
+        logger.warning("  character table failed (see log); continuing")
+    return True
+
+
+def step_reexamine(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """Step 22.6: which specimens should the taxonomist look at again, and why (descriptron_reexamine_v1.py).
+
+    Joins the character matrix's leave-one-out verdict with the key's, outlying measurements, flagged outlines and,
+    when given, an outside species hypothesis (trait_stats*/specimen_flags.csv), into specimens_to_reexamine.tsv,
+    a report and a zoomable map (reexamine_map.html). An extra result: it never stops the descriptions."""
+    if not _require_profile(cfg):
+        return True
+    base = Path(cfg["output_base"])
+    cal = base / "calibration"
+    if not (cal / "matrix_identification_distances.tsv").exists() and not cfg["dry_run"]:
+        logger.warning("  no calibration yet (run calibrate) - skipping the re-examination list")
+        return True
+    cmd = [python, str(SCRIPT_DIR / "descriptron_reexamine_v1.py"), "--calibration_dir", str(cal),
+           "--taxon_profile", cfg["taxon_profile"], "--out_dir", str(base / "reexamine")]
+    for k in (base / "key_v2" / "identification_test.tsv", base / "key" / "identification_test.tsv"):
+        if k.exists():
+            cmd += ["--key_loo", str(k)]
+            break
+    for flag, pth in (("--outlier_flags", base / "compiled_key_tier" / "outlier_flags.tsv"),
+                      ("--annotation_screen", base / "annotation_screen" / "annotation_screen.tsv")):
+        if pth.exists():
+            cmd += [flag, str(pth)]
+    if cfg.get("group_labels"):
+        cmd += ["--group_labels", cfg["group_labels"]]
+    hyp = sorted(str(p) for p in base.glob("trait_stats*/**/specimen_flags.csv"))
+    if hyp:
+        cmd += ["--hypothesis_flags", *hyp]
+    ok = _run_step(cmd, "step22_6_reexamine", log_dir, cfg["dry_run"])
+    rep = base / "reexamine" / "reexamine_summary.json"
+    if ok and rep.exists() and not cfg["dry_run"]:
+        r = json.loads(rep.read_text())
+        logger.info(f"  {r['re_examine']} specimens to re-examine, {r['check']} to check "
+                    f"(of {r['specimens']}); open reexamine/reexamine_map.html")
+    elif not ok:
+        logger.warning("  re-examination list failed - the descriptions are not affected")
+    return True
+
+
 def step_confab_check_v2(cfg: Dict, python: str, log_dir: Path) -> bool:
     """Step 23c: independent audit of the treatments against the data matrix."""
     if not _require_profile(cfg):
@@ -1840,7 +1907,7 @@ def step_trait_stats(cfg: Dict, python: str, log_dir: Path) -> bool:
         out = out_base / cat
         if (out / "summary.csv").exists() and not cfg["force"]:
             logger.info(f"    [{cat}] already complete, skipping"); continue
-        args, size = _trait_inputs(cfg, cat, out / "_inputs")
+        args, size = _trait_inputs(cfg, cat, (Path(tempfile.mkdtemp()) / "_inputs") if cfg["dry_run"] else out / "_inputs")
         if not args:
             logger.info(f"    [{cat}] no trait tables"); continue
         cmd = [python, str(SCRIPT_DIR / "descriptron_trait_stats.py"), "--groups", cfg["group_labels"], *args,
@@ -1861,11 +1928,12 @@ def step_phylo(cfg: Dict, python: str, log_dir: Path) -> bool:
         out = out_base / cat
         if (out / "phylo_report.md").exists() and not cfg["force"]:
             logger.info(f"    [{cat}] already complete, skipping"); continue
-        args, _ = _trait_inputs(cfg, cat, base / "trait_stats" / cat / "_inputs")
+        inp = (Path(tempfile.mkdtemp()) if cfg["dry_run"] else base / "trait_stats") / cat / "_inputs"
+        args, _ = _trait_inputs(cfg, cat, inp)
         # descriptron_phylo reads CSV tables: the aligned outline is written out as one
         al = base / "semilandmarks" / cat / "aligned_coco.json"
         if al.exists():
-            shp = base / "trait_stats" / cat / "_inputs" / "outline_shape.csv"
+            shp = inp / "outline_shape.csv"
             _aligned_to_csv(al, shp)
             i = args.index(f"outline shape={al}"); args[i] = f"outline shape={shp}"
         # set names without spaces; colour, texture and measurements standardised, Procrustes shape as it is
@@ -1878,6 +1946,16 @@ def step_phylo(cfg: Dict, python: str, log_dir: Path) -> bool:
                *args, *sc, "--analyses", "signal", "morphospace", "--iterations", "999", "--out_dir", str(out)]
         if not _run_step(cmd, f"step7_2_phylo_{cat}", log_dir, cfg["dry_run"]):
             logger.warning(f"    [{cat}] phylogenetic analyses failed (see log); continuing")
+    # one summary figure: tree, the two most informative colour-pattern phylomorphospaces, Kmult of every set
+    # (and the barcode gap with --dna_dir)
+    if (base / "color_homology").exists() and (any(out_base.glob("*/phylogenetic_signal.csv")) or cfg["dry_run"]):
+        cmd = [python, str(SCRIPT_DIR / "descriptron_phylo_figure_v1.py"), "--tree", cfg["tree"],
+               "--phylo_dir", str(out_base), "--colour_dir", str(base / "color_homology"),
+               "--groups", cfg["group_labels"], "--image_dir", cfg["image_dir"],
+               *(["--dna_dir", cfg["dna_dir"]] if cfg.get("dna_dir") else []),
+               "--out", str(out_base / "phylo_summary_figure")]
+        if not _run_step(cmd, "step7_2_phylo_figure", log_dir, cfg["dry_run"]):
+            logger.warning("    phylogenetic summary figure failed (see log); continuing")
     return True
 
 
@@ -1950,8 +2028,10 @@ ALL_STEPS = {
     "figure_captions": (20, step_figure_captions),
     "annotation_screen": (20.5, step_annotation_screen),
     "key_matrix":      (21, step_key_matrix),
+    "char_signal":     (21.1, step_char_signal),
     "key_build":       (22, step_key_build),
     "calibrate":       (22.5, step_calibrate),
+    "reexamine":       (22.6, step_reexamine),
     "describe_v2":     (23, step_describe_v2),
     "descriptive_states": (23.2, step_descriptive_states),
     "trait_stats_states": (23.25, step_trait_stats_states),
@@ -1964,11 +2044,11 @@ ALL_STEPS = {
     "ontology_v2":      (23.7, step_ontology_v2),
     "treatments_docx": (24, step_treatments_docx),
 }
-V2_STEPS = ["annotation_screen", "key_matrix", "key_build", "calibrate", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
+V2_STEPS = ["annotation_screen", "key_matrix", "char_signal", "key_build", "calibrate", "reexamine", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
             "char_figures", "subjective_check", "confab_check_v2", "type_material", "char_gate",
             "ontology_v2", "treatments_docx"]
 V2_WORKFLOW = ["coco_clean", "measurements", "semilandmarks", "color", "color_homology", "texture",
-               "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "biorag", "key_build", "calibrate", "describe_v2",
+               "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "char_signal", "biorag", "key_build", "calibrate", "reexamine", "describe_v2",
                "descriptive_states", "trait_stats_states", "char_reliability", "char_figures", "subjective_check",
                "confab_check_v2", "type_material", "char_gate",
                "ontology_v2", "figure_plates", "treatments_docx"]
@@ -2046,6 +2126,9 @@ def parse_args():
     p.add_argument("--tree", default=None,
                    help="Newick tree whose tip names are the group labels: adds phylogenetic signal, PGLS and "
                         "phylomorphospaces of every trait set (step phylo)")
+    p.add_argument("--dna_dir", default=None,
+                   help="output of validation/dna_vs_morphology_v1.py (barcode gap; morphospecies_monophyly.tsv from "
+                        "coi_species_tree_v1.py): adds DNA panels to the phylogenetic summary figure")
     p.add_argument("--trait_stats_permutations", type=int, default=999,
                    help="permutations for the morphological statistics (step trait_stats; default 999)")
     p.add_argument("--workflow", default="v2", choices=["v2", "v1"],
@@ -2121,7 +2204,7 @@ def parse_args():
 _PATH_ARGS = ("coco_json", "image_dir", "group_labels", "output_base", "api_key_file", "keypoints_json",
               "pdf_dir", "rag_index", "user_prompts", "exclude_list", "grouping_file", "label_dir", "ratio_config",
               "taxon_profile", "system_prompts", "compiled_dir", "prior_cache", "localities", "plates_dir",
-              "descriptive_retest", "novelty_dir", "type_designations", "tree")
+              "descriptive_retest", "novelty_dir", "type_designations", "tree", "dna_dir")
 
 
 def main():
@@ -2133,18 +2216,16 @@ def main():
             setattr(args, a, str(Path(v).expanduser().resolve()))
 
     base = Path(args.output_base)
-    base.mkdir(parents=True, exist_ok=True)
     log_dir = base / "logs"
-    log_dir.mkdir(exist_ok=True)
+    if not args.dry_run:                 # a dry run writes nothing at all into output_base (no log, config, logs/)
+        base.mkdir(parents=True, exist_ok=True)
+        log_dir.mkdir(exist_ok=True)
 
     log_file = base / "pipeline_log.txt"
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(log_file, mode="a"),
-        ],
+        handlers=[logging.StreamHandler()] + ([] if args.dry_run else [logging.FileHandler(log_file, mode="a")]),
     )
 
     # v2.0.4: the API key comes from the environment, the credentials file, or (first use, interactive
@@ -2180,15 +2261,25 @@ def main():
     cfg = vars(args)
 
     config_path = base / "pipeline_config.yaml"
-    if config_path.exists():             # never lose the record of an earlier run: keep it, timestamped
+    if args.dry_run:
+        logger.info(f"  [DRY RUN] config not saved ({config_path} untouched)")
+    elif config_path.exists():             # never lose the record of an earlier run: keep it, timestamped
         import shutil
         prev = base / f"pipeline_config.{datetime.fromtimestamp(config_path.stat().st_mtime):%Y%m%d_%H%M%S}.yaml"
         if not prev.exists():
             shutil.copy2(config_path, prev)
             logger.info(f"  Earlier config kept as: {prev.name}")
-    with open(config_path, "w") as f:
-        yaml.dump(cfg, f, default_flow_style=False, sort_keys=False)
-    logger.info(f"  Config saved: {config_path}")
+        elif prev.read_bytes() != config_path.read_bytes():
+            # a copy with that timestamp exists but differs: never skip, add a counter
+            k = 2
+            while prev.with_name(f"{prev.stem}_{k}.yaml").exists():
+                k += 1
+            shutil.copy2(config_path, prev.with_name(f"{prev.stem}_{k}.yaml"))
+            logger.info(f"  Earlier config kept as: {prev.stem}_{k}.yaml")
+    if not args.dry_run:
+        with open(config_path, "w") as f:
+            yaml.dump(cfg, f, default_flow_style=False, sort_keys=False)
+        logger.info(f"  Config saved: {config_path}")
 
     python = _python_bin(args.conda_env)
     logger.info(f"  Python:       {python}")
@@ -2212,14 +2303,15 @@ def main():
                     cmd += ["--keypoints_json", args.keypoints_json]
                 if args.user_prompts:
                     cmd += ["--user_prompts", args.user_prompts]
-                _run_step(cmd, "step00_draft_taxon_profile", log_dir, False)
+                _run_step(cmd, "step00_draft_taxon_profile", log_dir, args.dry_run)
             logger.warning(f"  No --taxon_profile given: using the auto-generated DRAFT {draft}. "
                            f"Edit names, status, sex-specific structures and ratios, then re-run with "
                            f"--taxon_profile {draft}")
             cfg["taxon_profile"] = args.taxon_profile = str(draft)
         # record the effective v2 settings (defaults applied above) for reproducibility
-        with open(config_path, "w") as f:
-            yaml.dump(cfg, f, default_flow_style=False, sort_keys=False)
+        if not args.dry_run:
+            with open(config_path, "w") as f:
+                yaml.dump(cfg, f, default_flow_style=False, sort_keys=False)
     if args.v2_only:
         steps_to_run = set(V2_STEPS)
     elif args.only_steps:

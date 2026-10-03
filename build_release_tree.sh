@@ -44,7 +44,8 @@ EXTRA_LIVE="descriptron-v2-v80.py descriptron-v2-v79.py descriptron-v2-v77.py de
 descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descriptron_joints.py
 descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
-remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py landmark_gpa_V2.py semi_landmark_and_kpts_procrustesV42_GPA.py"
+remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py landmark_gpa_V2.py semi_landmark_and_kpts_procrustesV42_GPA.py
+descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo_figure_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
@@ -92,10 +93,13 @@ find "$GUI/measure/tests" -maxdepth 1 -name 'test_*.py' ! -name '*.bak*' \
 # validation against R (RRPP, geomorph): the scripts that make the docs figures
 mkdir -p "$DST/descriptron/measure/validation"
 find "$GUI/measure/validation" -maxdepth 1 \( -name 'validate_*.py' -o -name '*_benchmark_*.py' -o -name 'colour_benchmark_*.R' \
-     -o -name 'validation_colour_texture_figures.py' -o -name 'colour_species_structure_*.py' -o -name 'validation_summary_figure.py' \) ! -name '*.bak*' \
+     -o -name 'validation_colour_texture_figures.py' -o -name 'colour_species_structure_*.py' -o -name 'validation_summary_figure.py' \
+     -o -name 'dna_vs_morphology_v*.py' -o -name 'coi_species_tree_v*.py' \) ! -name '*.bak*' \
      -exec cp {} "$DST/descriptron/measure/validation/" \; 2>/dev/null || true   # v2.1.2: + S13 benchmarks
 # v2.2.0: colour pattern, texture and shape on a published moth phylogeny (Supplementary Text S13.6)
 rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/moths_nokelainen2024" "$DST/descriptron/measure/validation/"
+# v2.6.0: open-set benchmark against BioCLIP / BioCLIP 2 / BIOSCAN-5M (needs open_clip + timm: its own env, see its README)
+rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/open_set_benchmark" "$DST/descriptron/measure/validation/"
 
 # --- data that is part of the code, not of a dataset -----------------------
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true

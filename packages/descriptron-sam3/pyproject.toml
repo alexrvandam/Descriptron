@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-sam3"
-version = "2.5.2"
+version = "2.6.0"
 description = "SAM 3 for Descriptron: find every instance of a small structure (e.g. setae) from examples, clicks or a word"
 readme = "README.md"
 # SAM 3 needs PyTorch >= 2.7; tested with Python 3.12. Install it in its own environment (pipx does this for you):

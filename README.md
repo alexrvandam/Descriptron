@@ -285,6 +285,31 @@ colour is removed.
 
 ![Species identified by each trait set, Diaphorina forewings](docs/tutorial/trait_stats_diaphorina_forewing_identification.png)
 
+### Which characters, which specimens, and does DNA agree? (from 2.6.0)
+
+Three more extra results of the pipeline (they never change or stop the descriptions):
+- **What one character is worth** (step `char_signal`, `descriptron_character_signal_v1`). For every character of
+  the matrix: how often it alone names a withheld specimen, whether it tells a described species from an unseen one,
+  how strongly it separates species (Kruskal–Wallis η², FDR) and, with `--tree`, its phylogenetic signal (Blomberg's
+  K). It writes the 25 best characters of each structure as a table, the character-robustness figure, and a
+  companion figure of phylogenetic signal in the same colours. Characters that identify species well but carry no
+  phylogenetic signal behave like autapomorphies (useful in keys); conserved characters place a species among its
+  relatives.
+- **Specimens to re-examine** (step `reexamine`, `descriptron_reexamine_v1`). After calibration, the specimens the
+  character matrix names as another species (identity), and those with a flagged outline or a value at least twice
+  or at most half the species median (annotation). It also writes a report and a zoomable map with support values.
+- **A phylogenetic summary figure** (end of step `phylo`): the species tree, the two most informative colour-pattern
+  phylomorphospaces (chosen by how well colour pattern identifies species, never by the phylogenetic result) and the
+  Kmult of every structure and trait set.
+
+With DNA barcodes, `descriptron dna_vs_morphology_v1` gives each morphospecies' barcode gap, DNA groups against the
+morphospecies, and a DNA verdict beside the matrix's name for every specimen. `descriptron coi_species_tree_v1` turns
+the gene tree into a species tree for `--tree`; pass the DNA results with `--dna_dir` to add them to the summary
+figure. Practical rule: start from expert morphospecies, use DNA where available as outside evidence; species both
+support are very likely real, and the conflicts show where to look again.
+
+    descriptron run_full_pipeline_v2 ... --tree species_tree.nwk --dna_dir dna/
+
 ### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and

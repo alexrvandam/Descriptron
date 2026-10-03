@@ -213,7 +213,9 @@ def _key_forms(s: str) -> List[str]:
     """an id with and without Descriptron's annotation suffix ("x.png_3") and extension."""
     s = str(s).strip(); base = re.sub(r"\.(png|jpe?g|tiff?|bmp)_\d+$", r".\1", s, flags=re.I)
     stem = re.sub(r"\.(png|jpe?g|tiff?|bmp)$", "", base, flags=re.I)
-    return [s, base, stem, Path(stem).name]
+    forms = [s, base, stem, Path(stem).name]
+    # some steps write file names with spaces replaced by underscores ("Scan 001" -> "Scan_001")
+    return forms + [f.replace(" ", "_") for f in forms if " " in f]
 
 
 def load_group_map(path: str, group_col: Optional[str] = None) -> Dict[str, str]:
@@ -258,6 +260,8 @@ def load_traits(path: str, species_col: Optional[str], species_regex: Optional[s
         if s:
             by.setdefault(s, []).append(i)
     species = sorted(by)
+    if not species:
+        sys.exit(f"{path}: no row could be given a species (check the id column against the group labels / regex)")
     means = np.array([np.nanmean(M[by[s]], axis=0) for s in species])
     keep = ~np.isnan(means).any(axis=0)                  # drop columns missing for any species
     return species, [c for c, k in zip(num, keep) if k], means[:, keep], {s: len(v) for s, v in by.items()}
