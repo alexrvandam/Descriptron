@@ -471,6 +471,14 @@ characters rarely suffice; the matrix works because it combines many.
 
 ![Character robustness](docs/tutorial/showcase_biorag_character_robustness.jpg)
 
+**Which characters reflect shared ancestry** (from 2.6.0, with `--tree`). The same characters, in the same colours,
+against their phylogenetic signal on a species tree (Blomberg's K; filled: P ≤ 0.05; ringed and labelled: signal
+and K > 1; label colour: naming at least 3× chance). In *Diaphorina* the forewing venation proportions are the most
+conserved; the best single identifiers carry no detectable signal, as species-specific, autapomorphy-like
+characters should.
+
+![Phylogenetic signal of every character](docs/tutorial/showcase_biorag_character_phylo_signal.jpg)
+
 **How far apart the species are, and which characters hold up.** Species placed by their distances in the
 matrix (a), the gap between every pair (b), and the support for the characters the knowledge graph and the key
 use, each tested on specimens withheld from it (c, d).
