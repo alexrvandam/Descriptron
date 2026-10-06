@@ -310,6 +310,19 @@ support are very likely real, and the conflicts show where to look again.
 
     descriptron run_full_pipeline_v2 ... --tree species_tree.nwk --dna_dir dna/
 
+### Annotations stay on their own image; labelled plates (from 2.7.0)
+
+- **Check older annotation files.** Before GUI v81, *Load Annotations* drew every annotation in a COCO file on the
+  image on screen and saved it under that image, so a file loaded while another image was showing can hold an
+  outline filed under an image it was never drawn on. `descriptron descriptron_check_cross_image_copies_v1 --coco
+  file.json` finds such copies (same position and the same outline points; independent tracings of similar
+  structures share only a few per cent of their points), reports them and changes nothing; `--drop_image` or
+  `--drop_ids` writes a cleaned copy beside the original. GUI v81 loads only the annotations of the image on screen,
+  and *Load Folder* keeps each image's masks when you move on and come back.
+- **Labelled species plates** (step 18, `descriptron_labelled_plates_v1`): beside the overlay plates, the specimens in
+  their own colours with every structure named by a leader line that ends on its outline (or, with
+  `--plate_anchor centre` / the GUI checkbox, in its middle).
+
 ### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and
@@ -516,8 +529,11 @@ pip install torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytor
 SAM2_BUILD_CUDA=0 pip install git+https://github.com/facebookresearch/sam2.git   # SAM2 library (Windows: set SAM2_BUILD_CUDA=0 first)
 pip install descriptron          # analysis programs, detectors and the GUI
 descriptron-gui                  # first start downloads the SAM2 model file (898 MB) once
-descriptron --list               # the 62 analysis programs
+descriptron --list               # the analysis programs
 ```
+
+To update an existing install: `pip install --upgrade descriptron` (SAM 3, in its own environment:
+`pipx upgrade descriptron-sam3`; Docker: `docker pull ghcr.io/alexrvandam/descriptron:latest`).
 
 **SAM2 is not on PyPI**, so `pip install descriptron` cannot bring it: install it from Meta's GitHub as above,
 into the same environment. The **SAM2 model file** `sam2_hiera_large.pt` is downloaded by the GUI the first time

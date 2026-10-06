@@ -1224,6 +1224,19 @@ def step_figure_plates(cfg: Dict, python: str, log_dir: Path) -> bool:
     if not ok:
         return False
 
+    # second plate set: the specimens in their own colours, each structure named by a leader line (no masks)
+    labelled_cmd = [
+        python, str(SCRIPT_DIR / "descriptron_labelled_plates_v1.py"),
+        "--coco_json", cfg["coco_json"],
+        "--image_dir", cfg["image_dir"],
+        "--group_labels", cfg["group_labels"],
+        "--plates_dir", str(plates_dir),
+        "--max_images_per_species", "8",
+        "--anchor", cfg.get("plate_anchor", "edge"),
+    ]
+    logger.info("  Generating labelled species plates...")
+    _run_step(labelled_cmd, "step18_labelled_plates", log_dir, cfg["dry_run"])
+
     if cfg.get("workflow", "v2") == "v2":
         return True          # v2: figures are referenced by build_species_treatment_docx_v2
 
@@ -2133,6 +2146,9 @@ def parse_args():
                    help="permutations for the morphological statistics (step trait_stats; default 999)")
     p.add_argument("--workflow", default="v2", choices=["v2", "v1"],
                    help="v2 (default): evidence-tiered, data-driven key; v1: original LLM-key workflow")
+    p.add_argument("--plate_anchor", default="edge", choices=["edge", "centre", "center"],
+                   help="labelled species plates: leader lines end on each structure's outline (default) or in "
+                        "its middle")
     p.add_argument("--keep_flagged", action="store_true",
                    help="v2: keep values flagged by the outlier/label-swap screen (default: exclude them)")
     p.add_argument("--v2_only", action="store_true",
@@ -2288,6 +2304,7 @@ def main():
     logger.info(f"  Categories:   {', '.join(categories)}")
 
     order = V2_WORKFLOW if args.workflow == "v2" else [n for n in STEP_NAMES if n not in V2_STEPS]
+    cfg["plate_anchor"] = "centre" if args.plate_anchor in ("centre", "center") else "edge"
     if args.workflow == "v2":
         cfg["exclude_flagged"] = bool(args.exclude_flagged or not args.keep_flagged)
         cfg["annotation_screen"] = not args.no_annotation_screen

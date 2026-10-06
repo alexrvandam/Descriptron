@@ -124,6 +124,15 @@ Open a terminal, activate the environment, start the GUI:
 
 You can drag an image or a folder of images onto the window, or start with one: `descriptron-gui D:\photos\wings`.
 
+## Updating to a new version
+
+Activate the environment as above, then:
+
+    pip install --upgrade descriptron
+
+This updates the GUI and the analysis programs together (their versions always match). If you installed SAM 3,
+update it separately: `pipx upgrade descriptron-sam3`. Your annotations and settings are not touched.
+
 ## Optional: SAM 3 (find every seta at once)
 
 SAM 3 lives in its own environment. With the Descriptron environment **not** active:

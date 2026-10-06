@@ -45,7 +45,8 @@ descriptron_convert.py descriptron_coco_tools.py descriptron_centerline.py descr
 descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
 remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py landmark_gpa_V2.py semi_landmark_and_kpts_procrustesV42_GPA.py
-descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo_figure_v1.py"
+descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo_figure_v1.py
+descriptron-v2-v81.py descriptron_reexamine_v2.py generate_species_plates.py descriptron_labelled_plates_v1.py descriptron_check_cross_image_copies_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0

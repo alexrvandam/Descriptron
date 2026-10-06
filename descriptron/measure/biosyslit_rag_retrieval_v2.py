@@ -64,6 +64,48 @@ from biorag_llm_backend import load_prompt_library, make_llm_client  # noqa: E40
 
 V2_VERSION = "2.0"
 
+# ── retrieval log (opt-in): BIORAG_RETRIEVAL_LOG=<file.jsonl> records every literature search and every passage
+# returned (source, DOI, section, score), so a run can show WHERE in the literature the model was primed from.
+# BIORAG_RETRIEVAL_CONTEXT (e.g. the species code) is copied into each record. v1 is not modified: the two
+# functions are wrapped here.
+_RLOG = os.environ.get("BIORAG_RETRIEVAL_LOG")
+if _RLOG:
+    import datetime as _dt
+    import json as _json
+
+    def _rlog_write(rec):
+        rec = {"time": _dt.datetime.now().isoformat(timespec="seconds"),
+               "context": os.environ.get("BIORAG_RETRIEVAL_CONTEXT", ""), **rec}
+        with open(_RLOG, "a") as _f:
+            _f.write(_json.dumps(rec, ensure_ascii=False) + "\n")
+
+    _orig_retrieve = base.TreatmentIndex.retrieve
+
+    def _logged_retrieve(self, query, _orig=_orig_retrieve):
+        res = _orig(self, query)
+        _rlog_write({"kind": "index_retrieve",
+                     "query": {k: getattr(query, k, "") for k in ("taxon_name", "taxon_family", "body_region",
+                                                                    "description_mode", "free_text", "k")},
+                     "index_chunks": len(getattr(self, "chunks", []) or []),
+                     "results": [{"rank": i + 1, "score": round(float(r.score), 4), "chunk_id": r.chunk.chunk_id,
+                                  "source_type": r.chunk.source_type, "source_id": r.chunk.source_id,
+                                  "source_doi": r.chunk.source_doi, "source_title": r.chunk.source_title,
+                                  "section": r.chunk.description_section, "body_region": r.chunk.body_region,
+                                  "match_reasons": list(r.match_reasons or []),
+                                  "text_preview": (r.chunk.text or "")[:240]} for i, r in enumerate(res)]})
+        return res
+    base.TreatmentIndex.retrieve = _logged_retrieve
+
+    _orig_search = base.BioSysLitIngester.search
+
+    def _logged_search(self, query, *a, _orig=_orig_search, **kw):
+        recs = _orig(self, query, *a, **kw)
+        _rlog_write({"kind": "biosyslit_search", "query": query,
+                     "records": [{"id": r.get("id"), "doi": r.get("doi", ""),
+                                  "title": (r.get("metadata", {}) or {}).get("title", "")} for r in (recs or [])]})
+        return recs
+    base.BioSysLitIngester.search = _logged_search
+
 SUBCOMMAND_MODULES = {
     "build-key": "biorag_key_builder_v1",
     "refine-descriptions": "biorag_description_refiner_v1",

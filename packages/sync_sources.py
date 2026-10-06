@@ -68,12 +68,17 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/descriptron_character_signal_v1.py",          # v2.6.0: per-character table + phylogenetic signal (step 21.1)
               "measure/descriptron_phylo_figure_v1.py",              # v2.6.0: phylogenetic summary figure (step 7.2)
               "measure/validation/dna_vs_morphology_v1.py",          # v2.6.0: barcode gap, DNA groups vs morphospecies
-              "measure/validation/coi_species_tree_v1.py"]           # v2.6.0: species tree from a barcode gene tree
+              "measure/validation/coi_species_tree_v1.py",           # v2.6.0: species tree from a barcode gene tree
+              "measure/descriptron_reexamine_v2.py",                 # v2.7.0: interactive re-examination map v2
+              "measure/generate_species_plates.py",                  # v2.7.0: species plates (step 18; never shipped before)
+              "measure/descriptron_labelled_plates_v1.py",           # v2.7.0: labelled plates in the specimens' own colours
+              "measure/descriptron_check_cross_image_copies_v1.py"]  # v2.7.0: finds annotations copied onto other images
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
                    "descriptron-v2-v79.py",                            # v2.5.1: finds descriptron-sam3 / DESCRIPTRON_SAM3_PYTHON
                    "descriptron-v2-v80.py",                            # v2.5.2: finds/downloads the SAM2 checkpoint; any SAM2 install
+                   "descriptron-v2-v81.py",                            # v2.7.0: annotations load only onto their own image; folder masks kept
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
 # v2.5.1: SAM 3 as its own distribution (Python 3.12, sam3 from PyPI). The text vocabulary goes beside the wrapper
 # in BOTH places it runs from: the sam3 wheel leaves it out.
