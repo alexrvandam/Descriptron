@@ -323,6 +323,18 @@ support are very likely real, and the conflicts show where to look again.
   their own colours with every structure named by a leader line that ends on its outline (or, with
   `--plate_anchor centre` / the GUI checkbox, in its middle).
 
+### Descriptive characters per structure (from 2.7.5)
+
+After a structure is labelled in the GUI (v82), its descriptive characters can be recorded with it: texture,
+sculpture, setae, vestiture, colour, colour pattern, lustre and the other characters of the Descriptron-GBIF
+Annotator, plus counts (number of setae, number of punctures) and characters you add yourself. They are saved
+with the mask (`annotations[].attributes`, the field the GBIF annotator uses) and, with
+`descriptron run_full_pipeline_v2 ... --coded_states_coco annotations.json` (or the checkbox in the BioRAG window),
+become characters of the matrix: the key states them in words ("elytron: setae dense"), the data sheet gives them
+in words for the Diagnosis and Description, and the audit checks every state the text names against what was
+recorded for that species. *Utilities > Rename/delete categories* fixes a misspelt category or merges two, and the
+mouse wheel zooms the image.
+
 ### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and

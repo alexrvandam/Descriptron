@@ -159,6 +159,8 @@ def build_sheet(ev: Evidence, code: str) -> Tuple[str, Dict]:
         meta = fd.loc[fid]
         if meta["tier"] not in pol.TIER1:
             continue
+        if meta.get("family") == "coded_state":      # recorded states: their own section, in words (below)
+            continue
         col = meta["column"]
         if col.startswith("lmkmm_") or (col.startswith("lmkrel_") and row["n"] < 2):
             continue                       # keep sheets readable: landmark ratios with n>=2 only
@@ -219,7 +221,7 @@ def build_sheet(ev: Evidence, code: str) -> Tuple[str, Dict]:
     comp = []
     s_all = ev.summary[(ev.summary["n"] >= 2)]
     for fid, grp in s_all.groupby("feature_id"):
-        if fid not in fd.index or fd.loc[fid]["tier"] != pol.TIER_KEY:
+        if fid not in fd.index or fd.loc[fid]["tier"] != pol.TIER_KEY or fd.loc[fid].get("family") == "coded_state":
             continue
         me = grp[grp["species"] == code]
         if me.empty:
@@ -252,6 +254,13 @@ def build_sheet(ev: Evidence, code: str) -> Tuple[str, Dict]:
     if not comp:
         lines.append("  (none — sample sizes too small or ranges overlap)")
     lines.append("")
+    # descriptive characters the taxonomist recorded (GUI / GBIF annotator), in words
+    cl, cnums, cphr = coded_lines(ev, code)
+    if cl:
+        lines.extend(cl)
+        allowed_t1 += cnums
+        phrases += cphr
+        lines.append("")
     # key characters
     if ev.key:
         lines.append("=== CHARACTERS USED FOR THIS SPECIES IN THE IDENTIFICATION KEY (Tier 1) ===")
@@ -295,6 +304,63 @@ def build_sheet(ev: Evidence, code: str) -> Tuple[str, Dict]:
                    "phrases": phrases,
                    "names": sorted({ev.display(x) for x in ev.species if x != code} |
                                    {short_name(ev, x) for x in ev.species if x != code}, key=len, reverse=True)}
+
+
+def coded_lines(ev: Evidence, code: str):
+    """the descriptive states recorded for this species, as words, with how many specimens show each, what the
+    other species show, and a pre-worded diagnostic statement where a state is recorded in no other species"""
+    try:
+        from biorag_coded_states_from_coco_v1 import recorded_states
+    except Exception:
+        return [], [], []
+    if not hasattr(ev, "_coded"):
+        ev._coded = recorded_states(ev.fdict, ev.long)
+    rec = ev._coded
+    mine = rec.get(code) or {}
+    if not mine:
+        return [], [], []
+    fd = ev.fdict
+    sec_of = {}
+    for fid, m in fd.iterrows():
+        if m.get("family") != "coded_state" and m.get("category") not in sec_of:
+            sec_of[m.get("category")] = m.get("section")
+    secs = ev.profile.get("description_sections") or []
+    order = {x: i for i, x in enumerate(secs)}
+    lines = ["=== DESCRIPTIVE CHARACTERS RECORDED BY THE TAXONOMIST (Tier 1; state them IN WORDS in the Diagnosis "
+             "and the Description, e.g. 'setae dense'; never as numbers or codes) ==="]
+    nums, phrases, diag = [], [], []
+    by_sec = defaultdict(list)
+    for (cat, ch), r in mine.items():
+        info = pol.structure_info(cat, ev.profile)
+        by_sec[sec_of.get(cat) or info.get("section", "Other structures")].append((cat, ch, r, info))
+    for sec in sorted(by_sec, key=lambda x: order.get(x, 99)):
+        lines.append(f"[{sec}]")
+        for cat, ch, r, info in sorted(by_sec[sec], key=lambda x: (x[0], x[1])):
+            states = sorted(r["states"].items(), key=lambda kv: -kv[1])
+            if not states:
+                continue
+            own = ", ".join(f"{st} ({k} of {r['n']} specimens)" for st, k in states)
+            nums += [r["n"]] + [k for _, k in states]
+            others = defaultdict(list)
+            n_other = 0
+            for sp, d in rec.items():
+                if sp == code or (cat, ch) not in d:
+                    continue
+                n_other += 1
+                for st in d[(cat, ch)]["states"]:
+                    others[st].append(ev.display(sp))
+            oth = "; ".join(f"{st} in {join_names(sorted(v))}" for st, v in sorted(others.items()))
+            lines.append(f"  {info['term']}, {r['label']}: {own}" + (f"   | other species: {oth}" if oth else ""))
+            for st, _ in states:
+                if n_other and st not in others:
+                    diag.append(f"{info['term']} with {r['label']} {st}: recorded in no other species "
+                                f"(of {n_other} with this character recorded)")
+                    nums.append(n_other)
+    if diag:
+        lines.append("  Diagnostic (states recorded in this species only; usable in the Diagnosis, quote as given):")
+        for i, t in enumerate(diag, 1):
+            lines.append(f"  [D{i}] {t}")
+    return lines, [float(x) for x in nums], []
 
 
 def short_name(ev: Evidence, code: str) -> str:

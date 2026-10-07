@@ -1251,6 +1251,59 @@ def absence_claims(treat, code, ev: Evidence, issues) -> List[Dict]:
 # Driver
 # ─────────────────────────────────────────────────────────────────────────────
 
+_NEG = re.compile(r"\b(?:not|never|without|non|no)\W+(?:\w+\W+){0,1}$", re.I)
+
+
+def verify_coded_states(field: str, text: str, code: str, ev: Evidence, issues: List[Dict]) -> List[Dict]:
+    """descriptive states recorded by the taxonomist (family coded_state): a state named for a structure must be
+    one recorded for this species; a negated state must not be one recorded for it"""
+    try:
+        from biorag_coded_states_from_coco_v1 import recorded_states
+    except Exception:
+        return []
+    if not hasattr(ev, "_coded"):
+        ev._coded = recorded_states(ev.fdict, ev.long)
+    mine = ev._coded.get(code) or {}
+    recs = []
+    if not mine or not text:
+        return recs
+    vocab = defaultdict(set)                        # (category, character) -> every state recorded in the genus
+    for d in ev._coded.values():
+        for key, r in d.items():
+            vocab[key] |= set(r["states"])
+    for a, b in sentence_spans(text):
+        sent = text[a:b]
+        low = sent.lower()
+        for (cat, ch), r in mine.items():
+            info = pol.structure_info(cat, ev.profile)
+            terms = {info.get("term", ""), info.get("short", ""), cat.replace("_", " ")}
+            if not any(t and re.search(rf"\b{re.escape(t.lower())}\b", low) for t in terms):
+                continue
+            names_char = bool(re.search(rf"\b{re.escape(r['label'].lower())}\b", low)) or \
+                bool(re.search(rf"\b{re.escape(ch.replace('_', ' ').lower())}\b", low))
+            for st in sorted(vocab[(cat, ch)], key=len, reverse=True):
+                for m in re.finditer(rf"\b{re.escape(st.lower())}\b", low):
+                    negated = bool(_NEG.search(low[:m.start()]))
+                    have = st in r["states"]
+                    if negated and have:
+                        status, etype = "error", "coded_state_contradicted"
+                        note = f"{info['term']} {r['label']}: '{st}' is recorded for this species, the text negates it"
+                    elif not negated and not have:
+                        status = "error" if names_char else "review"
+                        etype = "coded_state_mismatch"
+                        note = (f"{info['term']} {r['label']}: '{st}' is not recorded for this species "
+                                f"(recorded: {', '.join(r['states'])})")
+                    else:
+                        status, etype, note = "ok", "", ""
+                    rec = dict(kind="coded_state", section=field, status=status, type=etype,
+                               feature=f"{cat}:{ch}", note=note, context=sent[:200])
+                    recs.append(rec)
+                    if status != "ok":
+                        issues.append({k: rec[k] for k in ("kind", "type", "feature", "note", "context")} |
+                                      {"severity": "error" if status == "error" else "warning"})
+    return recs
+
+
 def audit_species(code: str, treat: Dict, sheet: str, ev: Evidence) -> Dict:
     issues: List[Dict] = []
     records: List[Dict] = []
@@ -1273,6 +1326,7 @@ def audit_species(code: str, treat: Dict, sheet: str, ev: Evidence) -> Dict:
                                                              "feature", "status", "type", "note", "context")}))
         records += verify_comparisons(text, comps, claims, code, ev, issues, name, structs, sheet_comps)
         records += verify_wording(name, text, code, ev, issues)
+        records += verify_coded_states(name, text, code, ev, issues)
     records += verify_wording("Remarks", treat.get("remarks", "") or "", code, ev, issues, tier1=False)
     records += verify_remarks(treat.get("remarks", "") or "", code, ev, blocks, issues, sheet_comps)
     records += absence_claims(treat, code, ev, issues)

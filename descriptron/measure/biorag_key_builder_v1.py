@@ -77,9 +77,12 @@ BUILDER_VERSION = "1.0"
 
 RESOLUTION = {"mm": 0.005, "mm2": 0.0005, "x": 0.02, "L*": 2.0, "a*": 2.0,
               "b*": 2.0, "C*": 2.0, "deg": 5.0}
+RESOLUTION["count"] = 1.0                      # meristic characters recorded in the GUI (whole numbers)
 PRIORITY_WEIGHT = {1: 1.0, 2: 0.85, 3: 0.7}
 DEFAULT_TYPE_WEIGHTS = {"ratio": 1.0, "landmark_ratio": 0.95, "aspect_ratio": 0.9,
                         "length": 0.8, "landmark_mm": 0.75, "colour": 0.6}
+# descriptive states and counts a taxonomist recorded in the GUI (biorag_coded_states_from_coco_v1)
+DEFAULT_TYPE_WEIGHTS.update({"coded_state": 0.9, "meristic": 0.9})
 SEX_SYMBOL = {"male": "♂", "female": "♀"}
 
 
@@ -532,15 +535,21 @@ def template_lead(chars: List[Dict], side: str) -> str:
         op = OP_TXT[c[f"{side}_operator"]]
         lo, hi = c[f"{side}_range"]
         unit = c["unit"]
-        u = "" if unit == "x" else (" mm" if unit == "mm" else f" {unit}" if unit not in ("L*", "a*", "b*", "C*", "deg") else "")
+        u = "" if unit in ("x", "count") else (" mm" if unit == "mm" else f" {unit}" if unit not in ("L*", "a*", "b*", "C*", "deg") else "")
         pre = (SEX_SYMBOL[c["structure_sex"]] + " ") if c["structure_sex"] in SEX_SYMBOL else ""
         lab = c["label"]
         def span(fmt_lo, fmt_hi, suffix=""):
             return f"{fmt_lo}{suffix}" if fmt_lo == fmt_hi else f"{fmt_lo}–{fmt_hi}{suffix}"
         if c.get("binary"):
             # a state, not a measurement: say which, and in how many specimens it was seen
-            state = "present" if c[f"{side}_operator"] == ">" else "absent"
             usually = "" if c["perfect_separation"] else "usually "
+            if c.get("family") == "coded_state" and " = " in lab:
+                # a state the taxonomist recorded ("elytron: setae = dense"): "setae dense" / "setae not dense"
+                base, _, st = lab.rpartition(" = ")
+                word = st if c[f"{side}_operator"] == ">" else f"not {st}"
+                parts.append(f"{pre}{base} {usually}{word} (n = {c[f'{side}_n']})")
+                continue
+            state = "present" if c[f"{side}_operator"] == ">" else "absent"
             parts.append(f"{pre}{lab}: {usually}{state} (n = {c[f'{side}_n']})")
             continue
         if unit in ("L*", "a*", "b*", "C*"):

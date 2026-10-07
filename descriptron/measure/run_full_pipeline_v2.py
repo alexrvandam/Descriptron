@@ -1390,7 +1390,19 @@ def step_key_matrix(cfg: Dict, python: str, log_dir: Path) -> bool:
         cmd += ["--exclude_list", cfg["exclude_list"]]
     if cfg.get("exclude_flagged"):
         cmd += ["--exclude_flagged"]
-    return _run_step(cmd, "step21_key_matrix", log_dir, cfg["dry_run"])
+    if not cfg.get("coded_states_coco"):
+        return _run_step(cmd, "step21_key_matrix", log_dir, cfg["dry_run"])
+    # descriptive characters recorded in the GUI (COCO attributes): the measured matrix goes to
+    # compiled_key_tier_measured/, and compiled_key_tier/ = measured + coded states, so every later step uses both
+    measured = base / "compiled_key_tier_measured"
+    cmd[cmd.index("--output_dir") + 1] = str(measured)
+    if not _run_step(cmd, "step21_key_matrix", log_dir, cfg["dry_run"]):
+        return False
+    coded = [python, str(SCRIPT_DIR / "biorag_coded_states_from_coco_v1.py"),
+             "--coco", *cfg["coded_states_coco"], "--group_labels", cfg["group_labels"],
+             "--taxon_profile", cfg["taxon_profile"], "--matrix_dir", str(measured), "--out_dir", str(out_dir)]
+    logger.info("  Adding descriptive characters recorded in the GUI...")
+    return _run_step(coded, "step21_coded_states", log_dir, cfg["dry_run"])
 
 
 def step_key_build(cfg: Dict, python: str, log_dir: Path) -> bool:
@@ -2139,6 +2151,9 @@ def parse_args():
     p.add_argument("--tree", default=None,
                    help="Newick tree whose tip names are the group labels: adds phylogenetic signal, PGLS and "
                         "phylomorphospaces of every trait set (step phylo)")
+    p.add_argument("--coded_states_coco", nargs="+", default=None,
+                   help="COCO file(s) whose annotations carry descriptive characters (GUI v82+ or the "
+                        "Descriptron-GBIF Annotator: annotations[].attributes); they are added to the key-tier matrix")
     p.add_argument("--dna_dir", default=None,
                    help="output of validation/dna_vs_morphology_v1.py (barcode gap; morphospecies_monophyly.tsv from "
                         "coi_species_tree_v1.py): adds DNA panels to the phylogenetic summary figure")
@@ -2230,6 +2245,8 @@ def main():
         v = getattr(args, a, None)
         if isinstance(v, str) and v:
             setattr(args, a, str(Path(v).expanduser().resolve()))
+    if getattr(args, "coded_states_coco", None):
+        args.coded_states_coco = [str(Path(v).expanduser().resolve()) for v in args.coded_states_coco]
 
     base = Path(args.output_base)
     log_dir = base / "logs"

@@ -46,7 +46,8 @@ descriptron_metadata.py descriptron_shape_stats.py descriptron_video_track.py
 coco_combiner_V13.py coco_converter_v24.py
 remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py landmark_gpa_V2.py semi_landmark_and_kpts_procrustesV42_GPA.py
 descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo_figure_v1.py
-descriptron-v2-v81.py descriptron_reexamine_v2.py generate_species_plates.py descriptron_labelled_plates_v1.py descriptron_check_cross_image_copies_v1.py"
+descriptron-v2-v81.py descriptron_reexamine_v2.py generate_species_plates.py descriptron_labelled_plates_v1.py descriptron_check_cross_image_copies_v1.py
+descriptron-v2-v82.py descriptron_descriptive_characters.py descriptron_category_edit.py biorag_coded_states_from_coco_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
@@ -105,6 +106,8 @@ rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/op
 # --- data that is part of the code, not of a dataset -----------------------
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true
 cp "$GUI/marmot.jpg" "$DST/descriptron/" 2>/dev/null || true
+# v2.7.5: the descriptive-character vocabulary the GUI panel and the converter read (copy_py takes .py/.sh only)
+cp "$GUI/descriptron_descriptive_characters.json" "$DST/descriptron/"
 [ -d "$GUI/icons" ] && cp -r "$GUI/icons" "$DST/descriptron/" || true
 # 2.5.1: SAM 3's text vocabulary (CLIP, MIT) - the sam3 wheel on PyPI leaves it out
 [ -d "$GUI/sam3_assets" ] && mkdir -p "$DST/descriptron/sam3_assets" \

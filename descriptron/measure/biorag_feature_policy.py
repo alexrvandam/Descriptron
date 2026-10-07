@@ -380,6 +380,8 @@ def fmt(value: Optional[float], unit: str, ref: Optional[float] = None) -> str:
     d = decimals_for(unit, ref if ref is not None else value)
     if unit == "deg":
         return f"{value:.0f}"
+    if unit == "count":                         # meristic: whole numbers, a half only for a median/threshold
+        return f"{value:.0f}" if float(value).is_integer() else f"{value:.1f}"
     return f"{value:.{d}f}"
 
 
