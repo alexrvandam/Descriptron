@@ -367,7 +367,9 @@ mean: phylogeny explains 0.26, the side of the Alps nothing. *(c)* The same run 
 | Phylomorphospace ancestral states, PC1 and PC2 | `phytools::fastAnc` | 108 | 4.8e-14 |
 
 The site-level metrics in this museum example are shown only to check the arithmetic: the specimens are
-museum records, not community samples, and the program warns when sites look like that.
+museum records, not community samples, and the program warns when sites look like that. Specimen photographs: ETH Zurich
+Entomological Collection via GBIF, CC BY 4.0, credited per image in
+`docs/tutorial/showcase_community_phylogenetics.thumbnail_credits.csv`.
 
 ### An alternative to geomorph for 2D images
 

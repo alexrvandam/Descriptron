@@ -55,6 +55,7 @@ Writes, in --out_dir: units.tsv, varpart.tsv + varpart.png/.pdf, paired.tsv, pai
 signal.tsv, community_sites.tsv, community_comparison.tsv + community_by_<treatment>.png/.pdf,
 morphospace_<set>.png/.pdf (dots) and, whenever --image_dir is given, morphospace_<set>_thumbnails.png/.pdf
 (the specimen nearest each species x level mean, cut out with COCO masks if available), report.md and summary.json.
+morphospace_<set>_thumbnails.tsv lists the image drawn at each point (for image credits).
 If the site lists do not look like community samples (median < 3 specimens per site, or > 40% single-species sites),
 the run says so: community metrics are then about collecting, not co-occurrence.
 """
@@ -875,6 +876,10 @@ def plot_morphospace(units, S, ev, phy, focal, A, B, name, out, thumbs=None):
             ab = AnnotationBbox(ob, (u["PC1"].iloc[i], u["PC2"].iloc[i]), frameon=True, pad=0.15, zorder=4,
                                 bboxprops=dict(edgecolor=cols.get(u[focal].iloc[i], "#666"), lw=1.6))
             ax.add_artist(ab); n_ok += 1
+        # which specimen is drawn at each point: for image credits (CC BY needs one per image)
+        pd.DataFrame({"species": u["_species"].values, focal: u[focal].values,
+                      "image": [img or "" for img in reps]}).to_csv(out / f"morphospace_{name}_thumbnails.tsv",
+                                                                   sep="\t", index=False)
     if A is not None:
         pa = u[u[focal] == A].groupby("_species")[["PC1", "PC2"]].mean()
         pb = u[u[focal] == B].groupby("_species")[["PC1", "PC2"]].mean()
