@@ -267,6 +267,19 @@ class Phylogeny:
         return names, self.species_distance(names), faith_pd(self.sp_root, set(names))
 
 
+def _u(name) -> str:
+    """names as written to the validation files: spaces -> underscores (Newick-safe)"""
+    return str(name).replace(" ", "_")
+
+
+def to_newick(n) -> str:
+    """Newick of a (pruned) tree, branch lengths kept"""
+    def rec(x):
+        lab = _u(x.name) if not x.kids else "(" + ",".join(f"{rec(k)}:{k.length!r}" for k in x.kids) + ")"
+        return lab
+    return rec(n) + ";"
+
+
 def faith_pd(root, keep) -> float:
     """Faith's PD including the root: total length of the branches joining the kept tips to the root"""
     total = 0.0
@@ -437,6 +450,10 @@ def main(argv=None):
     ap.add_argument("--tip_map", default=None, help="CSV: tip, species, site (one sequence per species per site)")
     ap.add_argument("--site_tree", action="append", default=[], metavar="SITE=tree.nwk")
     ap.add_argument("--analyses", nargs="+", default=["varpart", "paired", "signal", "community", "morphospace"])
+    ap.add_argument("--save_matrices", action="store_true",
+                    help="also write the exact inputs behind the results (varpart matrices, site species lists, trees, "
+                         "phylomorphospace tips and ancestral states) to <out_dir>/validation_inputs/, for checking in R "
+                         "(validation/validate_community_run_vs_r.py)")
     ap.add_argument("--iters", type=int, default=999)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out_dir", required=True)
@@ -445,6 +462,9 @@ def main(argv=None):
     a.thumbnails = (a.thumbnails or bool(a.image_dir)) and not a.no_thumbnails
     rng = np.random.default_rng(a.seed)
     out = Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
+    vdir = out / "validation_inputs"
+    if a.save_matrices:
+        vdir.mkdir(exist_ok=True)
     log = []
 
     def say(s):
@@ -479,6 +499,8 @@ def main(argv=None):
         say(f"traits '{name}': {len(cols)} features, {len(d)} rows linked to {d['_meta'].nunique()} specimens")
 
     phy = Phylogeny(a, sorted(meta[a.species_col].unique())) if (a.tree or a.site_tree) else None
+    if phy is not None:
+        phy._vdir = vdir if a.save_matrices else None
     if phy and phy.species:
         missing = sorted(set(meta[a.species_col]) - set(phy.species))
         say(f"tree: {len(phy.species)} species{' (tip map: one tip per species per site)' if phy.tipmap else ''}"
@@ -535,6 +557,9 @@ def main(argv=None):
             idx = {s: i for i, s in enumerate(spp)}
             P = Vp[[idx[s] for s in units["_species"]]]
             r = varpart(Y, E, P, a.iters, rng)
+            if a.save_matrices:
+                for nm_, M_ in (("Y", Y), ("E", E), ("P", P)):
+                    pd.DataFrame(M_).to_csv(vdir / f"varpart_{name}_{nm_}.csv", index=False)
             r.update(set=name, n_units=len(units), n_species=len(spp), n_treatment_terms=E.shape[1],
                      n_phylo_eigenvectors=P.shape[1])
             rows_var.append(r)
@@ -637,7 +662,7 @@ def main(argv=None):
             if len(mm) >= 3:
                 Z, _, _, _, _, _ = pca(mm.to_numpy(), max_k=min(10, len(mm) - 1))
                 trait_sp[name] = pd.DataFrame(Z, index=mm.index)
-        rows = []
+        rows, site_rows = [], []
         for site, spp in site_sp.items():
             r = {"site": site, focal: site_level.get(site), "richness": len(spp)}
             for c in a.covariate:
@@ -645,6 +670,8 @@ def main(argv=None):
             com = phy.site_community(str(site), spp)
             if com is not None:
                 names, Dd, pd_ = com
+                if a.save_matrices:
+                    site_rows.append({"site": site, "tips": ",".join(_u(n_) for n_ in names), "PD": pd_})
                 mpd, mntd = mpd_mntd(Dd)
                 r.update(n_in_tree=len(names), PD=pd_, MPD=mpd, MNTD=mntd)
                 if site not in phy.site_trees and len(names) >= 2 and len(pool) > len(names):
@@ -674,6 +701,12 @@ def main(argv=None):
             rows.append(r)
         cs = pd.DataFrame(rows)
         cs.to_csv(out / "community_sites.tsv", sep="\t", index=False)
+        if a.save_matrices and site_rows:
+            pd.DataFrame(site_rows).merge(cs[["site", "MPD", "MNTD"]], on="site", how="left").to_csv(
+                vdir / "site_species.tsv", sep="\t", index=False)
+            tree_for_sites = phy.root if phy.tipmap else phy.sp_root
+            if tree_for_sites is not None:
+                (vdir / "tree_sites.nwk").write_text(to_newick(tree_for_sites))
         # are these site lists community samples at all? museum or opportunistic records usually are not
         per_site = meta.groupby(a.site_col)[a.specimen_col].nunique()
         single = float((cs["richness"] <= 1).mean())
@@ -847,6 +880,11 @@ def plot_morphospace(units, S, ev, phy, focal, A, B, name, out, thumbs=None):
         pb = u[u[focal] == B].groupby("_species")[["PC1", "PC2"]].mean()
         for s in sorted(set(pa.index) & set(pb.index)):
             ax.annotate("", xy=pb.loc[s], xytext=pa.loc[s], arrowprops=dict(arrowstyle="->", color="#444", lw=0.8), zorder=2)
+    if thumbs is None and getattr(phy, "_vdir", None) is not None:
+        (phy._vdir / f"morpho_{name}_tree.nwk").write_text(to_newick(r))
+        pd.DataFrame(Yt, index=[_u(t.name) for t in tips], columns=["PC1", "PC2"]).to_csv(phy._vdir / f"morpho_{name}_tips.csv")
+        pd.DataFrame({"descendants": [",".join(sorted(_u(t.name) for t in ph.tips_of(n_))) for n_ in nodes],
+                      "PC1": anc[:, 0], "PC2": anc[:, 1]}).to_csv(phy._vdir / f"morpho_{name}_nodes.csv", index=False)
     ax.set_xlabel(f"PC1 ({100*ev[0]:.0f}%)"); ax.set_ylabel(f"PC2 ({100*ev[1]:.0f}%)")
     ax.set_title(f"{name}: species x {focal} means; tree through the species means;\narrows {A} -> {B} for species under both",
                  fontsize=9)

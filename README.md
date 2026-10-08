@@ -349,6 +349,26 @@ ape). A worked example with Darwin Core metadata is in `descriptron/measure/exam
 every site the same way: a camera or lighting difference shows up as a shift of absolute colour and texture in
 every species, which the paired test detects (colour pattern is much less affected).
 
+![Community phylogenetics on GBIF moth photographs: variance partitioning, a phylomorphospace with specimen thumbnails, and every number against R](docs/tutorial/showcase_community_phylogenetics.jpg)
+
+*(a)* Swiss (ETH Zurich) against Estonian (Tartu) moths, 31 species: the collection shifts absolute colour and
+texture in every species (photography) but hardly colour pattern, which follows phylogeny. *(b)* Colour-pattern
+phylomorphospace of 19 Swiss species north and south of the Alps, each point drawn as the specimen nearest its
+mean: phylogeny explains 0.26, the side of the Alps nothing. *(c)* The same run given to R. To check your own run
+(from 2.7.7; needs R with vegan, ape and phytools), add `--save_matrices` and then run
+`descriptron validate_community_run_vs_r --run_dir <out_dir>` (pip) or `python descriptron/measure/validation/validate_community_run_vs_r.py --run_dir <out_dir>` (GitHub), which writes
+`community_vs_R.tsv` and panel (c). On the moth run:
+
+| Quantity | R reference | Comparisons | Largest difference |
+|---|---|---|---|
+| Variance-partition fractions [a] [b] [c] [d] | `vegan::varpart` | 12 | 4.2e-16 |
+| Partial F (treatment given phylogeny and vice versa) | `vegan::rda` + `anova` | 6 | 1.2e-14 |
+| Faith's PD (with root), MPD, MNTD per site | `ape` (`keep.tip`, `cophenetic`) | 47 | 3.4e-13 |
+| Phylomorphospace ancestral states, PC1 and PC2 | `phytools::fastAnc` | 108 | 4.8e-14 |
+
+The site-level metrics in this museum example are shown only to check the arithmetic: the specimens are
+museum records, not community samples, and the program warns when sites look like that.
+
 ### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and

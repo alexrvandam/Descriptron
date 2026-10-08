@@ -76,7 +76,8 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/biorag_coded_states_from_coco_v1.py",         # v2.7.5: descriptive characters recorded in the GUI -> matrix
               "descriptron_descriptive_characters.json",             # v2.7.5: its vocabulary (types and labels)
               "measure/descriptron_community_v1.py",                 # v2.7.6: phylogeny vs treatment; community phylogenetics
-              "measure/validation/validate_community_vs_r.py"]       # v2.7.6: its check against vegan / ape
+              "measure/validation/validate_community_vs_r.py",       # v2.7.6: its check against vegan / ape
+              "measure/validation/validate_community_run_vs_r.py"]   # v2.7.7: one run checked against vegan / ape / phytools, number by number
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)

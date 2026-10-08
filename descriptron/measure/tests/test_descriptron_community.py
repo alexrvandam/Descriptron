@@ -143,3 +143,15 @@ def test_survey_warning(tmp_path):
     assert r.returncode == 0, r.stderr[-1500:]
     assert "do not look like community samples" in r.stdout
     assert json.loads((tmp_path / "b/summary.json").read_text())["community_warning"] is True
+
+
+@pytest.mark.skipif(__import__("shutil").which("Rscript") is None, reason="needs R (vegan, ape, phytools)")
+def test_run_matches_r_number_by_number(tmp_path):
+    run(tmp_path, "--tree", str(EX / "tree_species.nwk"), "--save_matrices", iters="19")
+    assert (tmp_path / "validation_inputs/site_species.tsv").exists()
+    r = subprocess.run([sys.executable, str(HERE / "validation" / "validate_community_run_vs_r.py"),
+                        "--run_dir", str(tmp_path)], capture_output=True, text=True)
+    assert r.returncode == 0, (r.stdout + r.stderr)[-2000:]
+    df = pd.read_csv(tmp_path / "validation_vs_R/community_vs_R.tsv", sep="\t")
+    assert set(df.panel) >= {"variance partitioning", "community phylogenetics", "phylomorphospace ancestral states"}
+    assert df.abs_difference.max() < 1e-8
