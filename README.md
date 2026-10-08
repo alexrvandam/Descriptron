@@ -335,6 +335,20 @@ in words for the Diagnosis and Description, and the audit checks every state the
 recorded for that species. *Utilities > Rename/delete categories* fixes a misspelt category or merges two, and the
 mouse wheel zooms the image.
 
+### Phylogeny, habitat or both? Community phylogenetics (from 2.7.6)
+
+`descriptron descriptron_community_v1` (GUI: *Measure & analyse > Community & phylogeny*) takes a Darwin Core
+specimen table (site, treatment such as forest type, image names), the colour and texture tables, and a species
+tree (one exemplar per species, pruned per site from the metadata, or one sequence per species per site with a tip
+map). For colour, colour pattern (split automatically from the colour table) and texture it reports how much
+variation the treatment explains alone, phylogeny alone, both together, or neither (variance partitioning with
+phylogenetic eigenvectors); whether species found under both treatments shift; phylogenetic signal per treatment;
+and, with sites as replicates, each site's phylogenetic diversity, MPD and MNTD with null-model effect sizes and
+its trait dispersion. Phylomorphospaces are drawn with dots and with specimen thumbnails. Checked against R (vegan,
+ape). A worked example with Darwin Core metadata is in `descriptron/measure/examples/community_example/`. Image
+every site the same way: a camera or lighting difference shows up as a shift of absolute colour and texture in
+every species, which the paired test detects (colour pattern is much less affected).
+
 ### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and

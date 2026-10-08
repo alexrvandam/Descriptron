@@ -47,7 +47,8 @@ coco_combiner_V13.py coco_converter_v24.py
 remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py landmark_gpa_V2.py semi_landmark_and_kpts_procrustesV42_GPA.py
 descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo_figure_v1.py
 descriptron-v2-v81.py descriptron_reexamine_v2.py generate_species_plates.py descriptron_labelled_plates_v1.py descriptron_check_cross_image_copies_v1.py
-descriptron-v2-v82.py descriptron_descriptive_characters.py descriptron_category_edit.py biorag_coded_states_from_coco_v1.py"
+descriptron-v2-v82.py descriptron_descriptive_characters.py descriptron_category_edit.py biorag_coded_states_from_coco_v1.py
+descriptron-v2-v83.py descriptron_community_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
@@ -102,6 +103,8 @@ find "$GUI/measure/validation" -maxdepth 1 \( -name 'validate_*.py' -o -name '*_
 rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/moths_nokelainen2024" "$DST/descriptron/measure/validation/"
 # v2.6.0: open-set benchmark against BioCLIP / BioCLIP 2 / BIOSCAN-5M (needs open_clip + timm: its own env, see its README)
 rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/open_set_benchmark" "$DST/descriptron/measure/validation/"
+# v2.7.6: worked examples (community_example: Darwin Core metadata, trees, tip map, traits, README)
+rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/examples" "$DST/descriptron/measure/"
 
 # --- data that is part of the code, not of a dataset -----------------------
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true

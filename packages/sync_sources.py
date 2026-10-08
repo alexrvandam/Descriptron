@@ -74,7 +74,9 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/descriptron_labelled_plates_v1.py",           # v2.7.0: labelled plates in the specimens' own colours
               "measure/descriptron_check_cross_image_copies_v1.py",  # v2.7.0: finds annotations copied onto other images
               "measure/biorag_coded_states_from_coco_v1.py",         # v2.7.5: descriptive characters recorded in the GUI -> matrix
-              "descriptron_descriptive_characters.json"]             # v2.7.5: its vocabulary (types and labels)
+              "descriptron_descriptive_characters.json",             # v2.7.5: its vocabulary (types and labels)
+              "measure/descriptron_community_v1.py",                 # v2.7.6: phylogeny vs treatment; community phylogenetics
+              "measure/validation/validate_community_vs_r.py"]       # v2.7.6: its check against vegan / ape
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
@@ -84,6 +86,7 @@ EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptro
                    "descriptron-v2-v82.py",                            # v2.7.5: descriptive characters per structure; rename/delete categories
                    "descriptron_descriptive_characters.py", "descriptron_descriptive_characters.json",
                    "descriptron_category_edit.py",
+                   "descriptron-v2-v83.py",                            # v2.7.6: Community & phylogeny button
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
 # v2.5.1: SAM 3 as its own distribution (Python 3.12, sam3 from PyPI). The text vocabulary goes beside the wrapper
 # in BOTH places it runs from: the sam3 wheel leaves it out.
