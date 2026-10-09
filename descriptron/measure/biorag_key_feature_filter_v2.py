@@ -412,6 +412,11 @@ def main():
                     help="CSV of annotations to drop (image_filename, category_name, reason)")
     ap.add_argument("--exclude_flagged", action="store_true",
                     help="Drop rows flagged by the outlier/label-swap screen (see outlier_flags.tsv)")
+    ap.add_argument("--completeness_table", default=None,
+                    help="completeness_by_character.tsv from descriptron_check_completeness_v1 (with --min_completeness)")
+    ap.add_argument("--min_completeness", type=float, default=0.0,
+                    help="drop every feature of a structure scored (present or recorded absent) in fewer than this "
+                         "share of specimens, e.g. 0.8; needs --completeness_table (default 0 = keep all)")
     ap.add_argument("--cache_dir", default=None,
                     help="Optional BioRAG cache to copy with computational sentences removed (v1 filter)")
     args = ap.parse_args()
@@ -468,6 +473,18 @@ def main():
     long = long.rename(columns={"group_label": "species"})
     long = long[["species", "specimen_id", "sex", "category", "base_category", "column",
                  "feature_id", "tier", "family", "value", "n_images"]]
+    if args.min_completeness > 0:                       # 2.7.8: drop structures scored in too few specimens
+        if not args.completeness_table:
+            sys.exit("--min_completeness needs --completeness_table (descriptron_check_completeness_v1)")
+        ct = pd.read_csv(args.completeness_table, sep="\t")
+        ct = ct[~ct["character"].str.contains(" ")]     # structures (masks); keypoint slots are 'name keypoint N'
+        low = set(ct.loc[ct["share_scored"] < args.min_completeness, "character"])
+        dropped = sorted(set(long["base_category"]) & low)
+        long = long[~long["base_category"].isin(low)]
+        report["completeness"] = {"table": str(args.completeness_table), "min_completeness": args.min_completeness,
+                                  "structures_dropped": dropped}
+        print(f"Completeness: {len(dropped)} structure(s) scored in < {args.min_completeness:.0%} of specimens "
+              f"dropped: {dropped[:8]}")
     long.to_csv(dst / "specimen_matrix_long.csv", index=False)
 
     # ---- feature dictionary

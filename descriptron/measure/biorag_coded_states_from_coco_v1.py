@@ -18,6 +18,12 @@ script turns them into what the pipeline reads:
      count. A character scored in fewer than --min_species species, or with one state everywhere, is dropped
      and reported, as in biorag_add_discrete_characters_v1.
 
+Structures recorded as ABSENT in the GUI (v84: Record absent -> Absent, or a Lost keypoint; images[].structure_status
+and annotations[].keypoint_status) become a character 'presence' of that structure: present where a mask or a
+visible keypoint exists, absent where recorded. Only structures with at least one recorded absence get it, and a
+structure that is merely missing (not visible, or never annotated) is missing data, never 'absent'
+(descriptron_check_completeness_v1 lists those gaps).
+
 States a taxonomist records are bench observations, so they enter at --tier key by default (model-scored
 states stay at the tier their reliability check allows). The source matrix folder is never written to.
 
@@ -38,7 +44,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-VERSION = "1.0"
+VERSION = "1.1"   # 1.1: presence / absence of structures recorded as absent
 
 
 def slug(s):
@@ -87,12 +93,27 @@ def read_states(coco_paths, group_labels, profile, vocab):
             cat = cats.get(a.get("category_id"), str(a.get("category_id")))
             cat = aliases.get(cat, cat)
             for ch, st in attrs.items():
-                if str(ch).startswith("_") or st in (None, ""):
-                    continue
+                if str(ch).startswith("_") or str(ch).startswith("via_") or st in (None, ""):
+                    continue                             # 1.1: via_* = VIA annotator bookkeeping (e.g. the body-part
+                                                         # group of a region), not a character
                 typ = chars.get(ch, {}).get("type", "categorical")
                 rows.append({"specimen_id": pol.specimen_id(stem, sp, profile), "species": sp, "category": cat,
                              "structure": cat, "character": ch, "type": "count" if typ == "count" else "nominal",
                              "state": str(st).strip(), "image": stem, "source": "human"})
+    # v1.1: presence / absence, for every structure recorded absent somewhere (a recorded character loss)
+    from descriptron_check_completeness_v1 import structure_states
+    states, _, _ = structure_states([json.load(open(p)) for p in coco_paths], aliases)
+    lost = {ch for rec in states.values() for ch, v in rec.items() if v == "absent"}
+    for stem_, rec in states.items():
+        sp = species_of.get(stem_) or species_of.get(stem_.replace(" ", "_"))
+        if sp is None:
+            continue
+        for ch in lost:
+            if rec.get(ch) in ("present", "absent"):
+                cat = ch.replace(" ", "_")
+                rows.append({"specimen_id": pol.specimen_id(stem_, sp, profile), "species": sp, "category": cat,
+                             "structure": cat, "character": "presence", "type": "nominal", "state": rec[ch],
+                             "image": stem_, "source": "human"})
     df = pd.DataFrame(rows, columns=["specimen_id", "species", "category", "structure", "character", "type",
                                      "state", "image", "source"])
     # a character the vocabulary does not know (added by the user, or no vocabulary found) is a count when every
@@ -162,11 +183,13 @@ def to_features(per, tier, min_species, known, labels=None):
         if g["state"].nunique() < 2:
             dropped["same state in every specimen"].append(name); continue
         lab = labels.get(ch, ch.replace("_", " "))
+        presence = ch == "presence"                      # v1.1: "eye = absent", worded "eye absent"
         if typ == "count":
             feats = [(f"{cat}.coded_{slug(ch)}", f"{cat}: {lab}", "meristic", "count", "",
                       g.set_index("specimen_id")["state"].astype(float))]
         else:
-            feats = [(f"{cat}.coded_{slug(ch)}__{slug(s)}", f"{cat}: {lab} = {s}", "coded_state", "", s,
+            feats = [(f"{cat}.coded_{slug(ch)}__{slug(s)}", f"{cat} = {s}" if presence else f"{cat}: {lab} = {s}",
+                      "coded_state", "", s,
                       (g.set_index("specimen_id")["state"] == s).astype(float)) for s in sorted(g["state"].unique())]
         meta = g.drop_duplicates("specimen_id").set_index("specimen_id")
         for fid, label, fam, unit, state, vals in feats:
@@ -226,11 +249,24 @@ def main():
             clash = set(add_fd["feature_id"]) & set(fd["feature_id"])
             if clash:
                 sys.exit(f"feature ids already in the matrix: {sorted(clash)[:5]}")
-        pd.concat([fd, add_fd], ignore_index=True).to_csv(out / "feature_dictionary.tsv", sep="\t", index=False)
-        pd.concat([long, add_long], ignore_index=True).to_csv(out / "specimen_matrix_long.csv", index=False)
-        for extra in ("outlier_flags.tsv", "filter_report_v2.json"):
-            if (src / extra).exists():
-                shutil.copy2(src / extra, out / extra)
+        fd_all = pd.concat([fd, add_fd], ignore_index=True)
+        long_all = pd.concat([long, add_long], ignore_index=True)
+        fd_all.to_csv(out / "feature_dictionary.tsv", sep="\t", index=False)
+        long_all.to_csv(out / "specimen_matrix_long.csv", index=False)
+        # 1.1: every other file of the matrix folder comes along (the description and audit steps read the species
+        # summary, the full-features table and the diagnostic report); the summaries are rebuilt to include the
+        # added characters, exactly as biorag_key_feature_filter_v2 writes them
+        rebuilt = {"feature_dictionary.tsv", "specimen_matrix_long.csv", "species_feature_summary.csv",
+                   "coverage_species_by_structure.tsv"}
+        for f in src.iterdir():
+            if f.is_file() and f.name not in rebuilt and not (out / f.name).exists():
+                shutil.copy2(f, out / f.name)
+        ss = (long_all.groupby(["species", "feature_id"])["value"]
+              .agg(n="count", min="min", max="max", mean="mean", sd="std", median="median").reset_index())
+        ss = ss.merge(fd_all[["feature_id", "tier", "unit", "category", "column"]], on="feature_id", how="left")
+        ss.to_csv(out / "species_feature_summary.csv", index=False)
+        (long_all.groupby(["species", "category"])["specimen_id"].nunique().unstack(fill_value=0)
+         .to_csv(out / "coverage_species_by_structure.tsv", sep="\t"))
         n_key = lambda f: int((f["tier"] == "key").sum()) if len(f) else 0      # noqa: E731
         print(f"  matrix: {len(add_fd)} features added ({n_key(add_fd)} at tier key); key features "
               f"{n_key(fd)} -> {n_key(fd) + n_key(add_fd)} -> {out}")

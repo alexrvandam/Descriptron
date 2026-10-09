@@ -371,6 +371,27 @@ museum records, not community samples, and the program warns when sites look lik
 Entomological Collection via GBIF, CC BY 4.0, credited per image in
 `docs/tutorial/showcase_community_phylogenetics.thumbnail_credits.csv`.
 
+### Absent structures are characters; missing ones are missing data (from 2.7.8)
+
+A subterranean weevil without eyes, or a species that has lost a spine, carries a character: *absent*. A
+structure that was hidden, broken or simply not annotated is missing data. GUI v84 records the difference and the
+pipeline keeps it: **Record absent** marks a structure the specimen does not have, and a **Lost** point takes a
+keypoint's number without a position (place 1-9, two Lost points, and the next point is 12). Absences become
+present/absent characters in the matrix, key and descriptions ("eyes absent"); anything not recorded stays missing
+data and is listed by the completeness check (first pipeline step; Utilities > Completeness check) so you can find
+what you forgot.
+
+| What you do in the GUI | Character state | Treated as |
+|---|---|---|
+| Mask, or Positive point | present | measured / landmark |
+| Record absent > Absent (lost), or a Lost point | absent | a character state: "eyes absent" |
+| Record absent > Not visible, or a Negative point | unknown | missing data |
+| Nothing recorded | unknown (gap) | missing data, listed in `completeness_worklist.csv` |
+
+Options: `--min_completeness` drops structures scored in too few specimens, `--completeness_strict` stops while
+gaps remain, `--landmarks_present_in_all` runs landmark GPA on the landmarks every specimen has. How to record
+absences, and what changed for older files: [docs/CHARACTER_LOSS.md](docs/CHARACTER_LOSS.md).
+
 ### An alternative to geomorph for 2D images
 
 For two-dimensional landmark and outline data, Descriptron now covers most of what taxonomists and

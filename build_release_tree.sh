@@ -48,7 +48,8 @@ remove_images_from_coco.py build_species_treatment_docx.py zenodo_upload.py land
 descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo_figure_v1.py
 descriptron-v2-v81.py descriptron_reexamine_v2.py generate_species_plates.py descriptron_labelled_plates_v1.py descriptron_check_cross_image_copies_v1.py
 descriptron-v2-v82.py descriptron_descriptive_characters.py descriptron_category_edit.py biorag_coded_states_from_coco_v1.py
-descriptron-v2-v83.py descriptron_community_v1.py"
+descriptron-v2-v83.py descriptron_community_v1.py
+descriptron-v2-v84.py descriptron_check_completeness_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0

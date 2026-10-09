@@ -74,16 +74,20 @@ def process_keypoints(annotation, img_id, ann_idx, category_name, mm_scale=None)
     keypoints = annotation.get('keypoints', [])
     num_keypoints = annotation.get('num_keypoints', 0)
 
-    if len(keypoints) != num_keypoints * 3:
+    # 2.7.8: COCO num_keypoints counts VISIBLE keypoints only, so a set with an absent or not-visible keypoint was
+    # rejected here as 'inconsistent'. Only a length that is not a multiple of 3 is malformed.
+    if len(keypoints) % 3 != 0 or (num_keypoints and num_keypoints * 3 > len(keypoints)):
         logging.warning(f"Annotation {ann_idx + 1} for Image ID {img_id} ({category_name}) has inconsistent keypoints data.")
         return None
 
-    # Extract (x, y) coords of visible keypoints
+    # Extract (x, y) coords of visible keypoints, remembering each one's number (its slot)
     keypoint_coords = []
+    keypoint_ids = []
     for i in range(0, len(keypoints), 3):
         x, y, v = keypoints[i:i+3]
         if v > 0:
             keypoint_coords.append((x, y))
+            keypoint_ids.append(i // 3 + 1)
 
     if len(keypoint_coords) < 2:
         logging.warning(f"Annotation {ann_idx + 1} for Image ID {img_id} ({category_name}) has <2 visible keypoints.")
@@ -95,6 +99,12 @@ def process_keypoints(annotation, img_id, ann_idx, category_name, mm_scale=None)
         axis=2
     )
     distances = distance_matrix.flatten()
+    # 2.7.8: the stored matrices are full size (every keypoint slot), NaN where a keypoint is absent or not
+    # visible, so row/column k is always keypoint k+1 (they were the visible points renumbered 1..n)
+    n_slots = len(keypoints) // 3
+    full = np.full((n_slots, n_slots), np.nan)
+    ix = np.array(keypoint_ids) - 1
+    full[np.ix_(ix, ix)] = distance_matrix
 
     # Summary (pixel-based)
     summary = {
@@ -115,7 +125,9 @@ def process_keypoints(annotation, img_id, ann_idx, category_name, mm_scale=None)
         "category_id": annotation['category_id'],
         "category_name": category_name,
         "method": "Keypoints Distance Matrix",
-        "keypoints_distance_matrix": distance_matrix.tolist(),  # in pixels
+        "keypoints_distance_matrix": full.tolist(),  # in pixels, every slot (NaN = absent / not visible)
+        "keypoints_distance_matrix_visible": distance_matrix.tolist(),
+        "keypoint_ids": keypoint_ids,
         "image_filename": "Unknown",  # Will be fixed in main
         "summary": summary
     }
@@ -132,7 +144,7 @@ def process_keypoints(annotation, img_id, ann_idx, category_name, mm_scale=None)
         summary['median_distance_mm'] = float(np.median(distances_mm))
 
         # Store entire matrix in mm
-        keypoints_metrics["keypoints_distance_matrix_mm"] = distance_matrix_mm.tolist()
+        keypoints_metrics["keypoints_distance_matrix_mm"] = (full / mm_scale).tolist()
     else:
         keypoints_metrics["keypoints_distance_matrix_mm"] = None
 
@@ -175,7 +187,7 @@ def create_mask_from_annotation(annotation, height, width, img_id, ann_idx, cate
         return None
 
 
-def visualize_keypoints_distances(image, keypoint_coords, distance_matrix, output_dir, img_id, ann_idx, category_name, image_basename, mm_scale=None):
+def visualize_keypoints_distances(image, keypoint_coords, distance_matrix, output_dir, img_id, ann_idx, category_name, image_basename, mm_scale=None, keypoint_ids=None):
     """
     Visualizes keypoints and draws lines between them representing distances.
     Automatically shows distances in mm if mm_scale is provided (and > 0).
@@ -185,6 +197,9 @@ def visualize_keypoints_distances(image, keypoint_coords, distance_matrix, outpu
 
     x_coords, y_coords = zip(*keypoint_coords)
     plt.scatter(x_coords, y_coords, c='red', s=100, label='Keypoints')
+    for _k, (_x, _y) in enumerate(keypoint_coords):           # 2.7.8: each point's real number
+        plt.text(_x, _y, str(keypoint_ids[_k] if keypoint_ids else _k + 1), color='white', fontsize=9,
+                 ha='left', va='bottom', fontweight='bold')
 
     num_keypoints = len(keypoint_coords)
     for i in range(num_keypoints):
@@ -1347,7 +1362,7 @@ def save_tps_file(all_keypoints_metrics, combined_scales, output_dir, filename='
     tps_path = os.path.join(output_dir, filename)
     with open(tps_path, 'w') as f:
         for kp in all_keypoints_metrics:
-            coords = kp.get('keypoint_coords', [])
+            coords = kp.get('keypoint_coords_all') or kp.get('keypoint_coords', [])   # 2.7.8: all slots
             num = len(coords)
             f.write(f"LM={num}\n")
             f.write(f"IMAGE={kp['image_filename']}\n")
@@ -1355,8 +1370,11 @@ def save_tps_file(all_keypoints_metrics, combined_scales, output_dir, filename='
             scale = combined_scales.get(kp['image_filename'], '')
             if scale:
                 f.write(f"SCALE={scale}\n")
-            for x, y in coords:
-                f.write(f"{x:.2f} {y:.2f}\n")
+            for xy in coords:
+                if xy is None:                          # missing landmark: tpsDig / geomorph convention
+                    f.write("-1.00 -1.00\n")
+                else:
+                    f.write(f"{xy[0]:.2f} {xy[1]:.2f}\n")
             f.write("\n")
     logging.info(f"TPS landmarks saved to {tps_path}")
 
@@ -1707,12 +1725,16 @@ def main():
                         ]
                         # NEW: store coords for TPS output
                         keypoints_metrics["keypoint_coords"] = coords
+                        # 2.7.8: every slot, None where absent / not visible (TPS writes -1 -1 there)
+                        keypoints_metrics["keypoint_coords_all"] = [
+                            (raw[i], raw[i+1]) if raw[i+2] > 0 else None for i in range(0, len(raw), 3)]
                         
                         distance_matrix_px = np.array(keypoints_metrics["keypoints_distance_matrix"])
                         visualize_keypoints_distances(
                             image=image,
                             keypoint_coords=coords,
-                            distance_matrix=distance_matrix_px,
+                            distance_matrix=np.array(keypoints_metrics["keypoints_distance_matrix_visible"]),
+                            keypoint_ids=keypoints_metrics["keypoint_ids"],
                             output_dir=args.output_dir,
                             img_id=img_id,
                             ann_idx=ann_idx,
@@ -1992,13 +2014,24 @@ def main():
                 'max_distance', 'min_distance', 'median_distance'
             ]
             kp_vectors = []
-            for km in all_keypoints_metrics:
+            # 2.7.8: summaries of all pairwise distances are only comparable between specimens with the same
+            # landmarks; a set with an absent / not-visible landmark would separate just for having fewer points
+            _n_full = max(km['summary'].get('num_visible_keypoints', 0) for km in all_keypoints_metrics)
+            _kp_imgs = []
+            for km, _img in zip(all_keypoints_metrics, keypoint_images_list):
                 try:
+                    if km['summary']['num_visible_keypoints'] < _n_full:
+                        continue
                     kp_vectors.append([km['summary'][k] for k in kp_keys])
+                    _kp_imgs.append(_img)
                 except KeyError:
                     continue
+            if len(_kp_imgs) < len(all_keypoints_metrics):
+                logging.info(f"Keypoint PCA/UMAP: {len(all_keypoints_metrics) - len(_kp_imgs)} set(s) with missing "
+                             f"landmarks left out (summaries over fewer points are not comparable)")
+            keypoint_images_list = _kp_imgs
             kp_vectors = np.array(kp_vectors)
-            if kp_vectors.size > 0:
+            if kp_vectors.size > 0 and len(kp_vectors) >= 3:
                 # PCA on keypoints
                 kp_pca = PCA(n_components=2).fit_transform(kp_vectors)
                 # NEW: default category_name if None

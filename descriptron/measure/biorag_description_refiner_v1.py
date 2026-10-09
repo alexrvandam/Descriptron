@@ -353,7 +353,8 @@ def coded_lines(ev: Evidence, code: str):
             lines.append(f"  {info['term']}, {r['label']}: {own}" + (f"   | other species: {oth}" if oth else ""))
             for st, _ in states:
                 if n_other and st not in others:
-                    diag.append(f"{info['term']} with {r['label']} {st}: recorded in no other species "
+                    diag.append((f"{info['term']} {st}" if ch == "presence" else f"{info['term']} with {r['label']} {st}")
+                                + f": recorded in no other species "
                                 f"(of {n_other} with this character recorded)")
                     nums.append(n_other)
     if diag:

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-vision"
-version = "2.7.7"
+version = "2.7.8"
 description = "Mask and landmark prediction for Descriptron: torchvision detectors, SAM2-PAL propagation, DINOv3 landmark transfer"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,7 +26,7 @@ classifiers = [
 # For CUDA, install torch from PyTorch's own index FIRST, then this package:
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 dependencies = [
-  "descriptron-core==2.7.7",
+  "descriptron-core==2.7.8",
   # Capped deliberately (2.5.2: the cap had been lost, leaving only the comment). Unbounded, pip installs
   # torch 2.14 with ~3 GB of CUDA 13 wheels, untested here. Validated on torch 2.4 (analysis) and 2.10 (GUI with
   # Meta's current SAM2, and SAM 3). Raise the cap only after testing, not before.

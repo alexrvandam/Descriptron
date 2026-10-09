@@ -1279,7 +1279,8 @@ def verify_coded_states(field: str, text: str, code: str, ev: Evidence, issues: 
             terms = {info.get("term", ""), info.get("short", ""), cat.replace("_", " ")}
             if not any(t and re.search(rf"\b{re.escape(t.lower())}\b", low) for t in terms):
                 continue
-            names_char = bool(re.search(rf"\b{re.escape(r['label'].lower())}\b", low)) or \
+            names_char = ch == "presence" or \
+                bool(re.search(rf"\b{re.escape(r['label'].lower())}\b", low)) or \
                 bool(re.search(rf"\b{re.escape(ch.replace('_', ' ').lower())}\b", low))
             for st in sorted(vocab[(cat, ch)], key=len, reverse=True):
                 for m in re.finditer(rf"\b{re.escape(st.lower())}\b", low):

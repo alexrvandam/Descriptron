@@ -515,6 +515,9 @@ def load_landmark_gpa(gpa_dirs: List[str]) -> Dict[Tuple[str, str], Dict]:
                                    key=lambda c: int(c.replace("lm", "").replace("_x", "")))
                 lm_y_cols = [c.replace("_x", "_y") for c in lm_x_cols]
                 n_lm = len(lm_x_cols)
+                # 2.7.8: landmark numbers from the column names (a subset analysed by --landmarks_present_in_all
+                # is lm1, lm2, lm5, ...; position would renumber them)
+                lm_ids = [int(c.replace("lm", "").replace("_x", "")) for c in lm_x_cols]
 
                 for _, row in df_proc.iterrows():
                     raw_fn = str(row[fn_col]).strip()
@@ -536,7 +539,7 @@ def load_landmark_gpa(gpa_dirs: List[str]) -> Dict[Tuple[str, str], Dict]:
                                 dx = coords[i][0] - coords[j][0]
                                 dy = coords[i][1] - coords[j][1]
                                 dist = (dx * dx + dy * dy) ** 0.5
-                                data[key][f"lmk_dist_{i+1}_{j+1}"] = dist
+                                data[key][f"lmk_dist_{lm_ids[i]}_{lm_ids[j]}"] = dist   # real numbers
 
     logger.info(f"Landmark GPA: {len(data)} entries")
     return data

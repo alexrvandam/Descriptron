@@ -547,6 +547,7 @@ def template_lead(chars: List[Dict], side: str) -> str:
                 # a state the taxonomist recorded ("elytron: setae = dense"): "setae dense" / "setae not dense"
                 base, _, st = lab.rpartition(" = ")
                 word = st if c[f"{side}_operator"] == ">" else f"not {st}"
+                word = {"not absent": "present", "not present": "absent"}.get(word, word)   # presence of a structure
                 parts.append(f"{pre}{base} {usually}{word} (n = {c[f'{side}_n']})")
                 continue
             state = "present" if c[f"{side}_operator"] == ">" else "absent"

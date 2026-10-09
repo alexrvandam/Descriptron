@@ -82,6 +82,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 
 STEP_NAMES = [
     "coco_clean",
+    "completeness",
     "measurements",
     "semilandmarks",
     "color",
@@ -380,6 +381,37 @@ def step_coco_clean(cfg: Dict, python: str, log_dir: Path) -> bool:
     return ok
 
 
+def step_completeness(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """2.7.8: which structures and keypoints each specimen has, lacks (recorded absent = a character loss) or was
+    never scored for (gaps, listed for checking). Recorded absences are added to the key-tier matrix as presence /
+    absence characters (step key_matrix); --min_completeness drops structures scored in too few specimens."""
+    out_dir = Path(cfg["output_base"]) / "completeness"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    cocos = [cfg["coco_json"]] + [p for p in ([cfg.get("keypoints_json")] + list(cfg.get("extra_keypoints_json") or [])
+                                              + list(cfg.get("coded_states_coco") or [])) if p and p != cfg["coco_json"]]
+    cmd = [python, str(SCRIPT_DIR / "descriptron_check_completeness_v1.py"), "--coco", *dict.fromkeys(cocos),
+           "--out_dir", str(out_dir)]
+    if cfg.get("group_labels"):
+        cmd += ["--group_labels", cfg["group_labels"]]
+    if cfg.get("taxon_profile"):                       # its specimen pattern merges the images of one specimen
+        cmd += ["--taxon_profile", cfg["taxon_profile"]]
+    if cfg.get("completeness_strict"):
+        cmd += ["--strict"]
+    ok = _run_step(cmd, "step0_5_completeness", log_dir, cfg["dry_run"])
+    cfg["completeness_table"] = str(out_dir / "completeness_by_character.tsv")
+    summ = out_dir / "completeness_summary.json"
+    if summ.exists():
+        import json as _json
+        sm = _json.loads(summ.read_text())
+        n_abs = int(sm.get("states", {}).get("absent", 0))
+        logger.info(f"  {sm.get('specimens')} specimens: {n_abs} recorded absence(s), {sm.get('gaps')} gap(s) to "
+                    f"check ({sm.get('gaps_priority_1')} probably not annotated) -> completeness_worklist.csv")
+        if n_abs and not cfg.get("coded_states_coco"):
+            # recorded absences reach the matrix through the coded-states converter
+            cfg["coded_states_coco"] = list(dict.fromkeys(cocos))
+    return ok
+
+
 def step_measurements(cfg: Dict, python: str, log_dir: Path) -> bool:
     out_dir = Path(cfg["output_base"]) / "measurements"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -606,6 +638,8 @@ def step_landmark_gpa(cfg: Dict, python: str, log_dir: Path) -> bool:
     ]
     if cfg.get("group_labels"):
         cmd += ["--group_labels", cfg["group_labels"]]
+    if cfg.get("landmarks_present_in_all") and script.name == "landmark_gpa_V2.py":
+        cmd += ["--landmarks_present_in_all"]
 
     ok = True
     if cfg["force"] or not any(out_dir.glob("*/*_pc_scores.csv")):
@@ -1390,6 +1424,8 @@ def step_key_matrix(cfg: Dict, python: str, log_dir: Path) -> bool:
         cmd += ["--exclude_list", cfg["exclude_list"]]
     if cfg.get("exclude_flagged"):
         cmd += ["--exclude_flagged"]
+    if float(cfg.get("min_completeness") or 0) > 0 and cfg.get("completeness_table"):
+        cmd += ["--completeness_table", cfg["completeness_table"], "--min_completeness", str(cfg["min_completeness"])]
     if not cfg.get("coded_states_coco"):
         return _run_step(cmd, "step21_key_matrix", log_dir, cfg["dry_run"])
     # descriptive characters recorded in the GUI (COCO attributes): the measured matrix goes to
@@ -2029,6 +2065,7 @@ def step_trait_stats_states(cfg: Dict, python: str, log_dir: Path) -> bool:
 
 ALL_STEPS = {
     "coco_clean":      (0, step_coco_clean),
+    "completeness":    (0.5, step_completeness),
     "measurements":    (1, step_measurements),
     "semilandmarks":   (2, step_semilandmarks),
     "color":           (3, step_color_extraction),
@@ -2072,7 +2109,7 @@ ALL_STEPS = {
 V2_STEPS = ["annotation_screen", "key_matrix", "char_signal", "key_build", "calibrate", "reexamine", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
             "char_figures", "subjective_check", "confab_check_v2", "type_material", "char_gate",
             "ontology_v2", "treatments_docx"]
-V2_WORKFLOW = ["coco_clean", "measurements", "semilandmarks", "color", "color_homology", "texture",
+V2_WORKFLOW = ["coco_clean", "completeness", "measurements", "semilandmarks", "color", "color_homology", "texture",
                "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "char_signal", "biorag", "key_build", "calibrate", "reexamine", "describe_v2",
                "descriptive_states", "trait_stats_states", "char_reliability", "char_figures", "subjective_check",
                "confab_check_v2", "type_material", "char_gate",
@@ -2164,6 +2201,14 @@ def parse_args():
     p.add_argument("--plate_anchor", default="edge", choices=["edge", "centre", "center"],
                    help="labelled species plates: leader lines end on each structure's outline (default) or in "
                         "its middle")
+    p.add_argument("--min_completeness", type=float, default=0.0,
+                   help="drop structures scored (present or recorded absent) in fewer than this share of specimens, "
+                        "e.g. 0.8 (step completeness; default 0 = keep all)")
+    p.add_argument("--completeness_strict", action="store_true",
+                   help="stop at step completeness while any structure is neither annotated nor recorded")
+    p.add_argument("--landmarks_present_in_all", action="store_true",
+                   help="landmark GPA: keep specimens with missing landmarks and analyse the landmarks every "
+                        "specimen has (default: leave those specimens out)")
     p.add_argument("--keep_flagged", action="store_true",
                    help="v2: keep values flagged by the outlier/label-swap screen (default: exclude them)")
     p.add_argument("--v2_only", action="store_true",

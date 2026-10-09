@@ -151,7 +151,10 @@ def mirrored_specimens(configs, iters=20):
 
 # ─── Data loading ────────────────────────────────────────────────────
 
-def load_keypoints(json_path, category_name=None):
+LANDMARK_IDS = {}   # 2.7.8: category prefix -> the landmark numbers analysed (when a subset is used)
+
+
+def load_keypoints(json_path, category_name=None, present_in_all=False):
     with open(json_path) as f:
         data = json.load(f)
 
@@ -171,6 +174,7 @@ def load_keypoints(json_path, category_name=None):
     for cid, cname in target_cats.items():
         configs = []
         filenames = []
+        skipped = []
         for ann in data["annotations"]:
             if ann["category_id"] != cid:
                 continue
@@ -187,10 +191,27 @@ def load_keypoints(json_path, category_name=None):
             else:
                 fn = imgs.get(ann["image_id"], f"image_{ann['image_id']}")
                 missing = np.sum(vis == 0)
+                if present_in_all:
+                    skipped.append((arr, os.path.basename(fn)))
+                    continue
                 log.warning(f"Skipping {fn} — {missing}/{n_kp} landmarks not visible")
 
+        if present_in_all and skipped:                  # 2.7.8: keep the specimens, use the shared landmarks
+            arrs = [a for a, _ in skipped] + [np.column_stack([c, np.full(len(c), 2)]) for c in configs]
+            fns = [f for _, f in skipped] + filenames
+            common = [i for i in range(arrs[0].shape[0]) if all(a.shape[0] > i and a[i, 2] > 0 for a in arrs)]
+            if len(common) >= 3:
+                configs = [a[common, :2].astype(np.float64) for a in arrs]
+                filenames = fns
+                LANDMARK_IDS[cname.replace(" ", "_")] = [i + 1 for i in common]
+                log.info(f"Category '{cname}': --landmarks_present_in_all keeps all {len(configs)} specimens with "
+                         f"the {len(common)} landmarks every specimen has: {[i + 1 for i in common]}")
+            else:
+                log.warning(f"Category '{cname}': only {len(common)} landmarks are present in every specimen; "
+                            "specimens with missing landmarks are left out instead")
         results[cname] = (configs, filenames)
-        log.info(f"Category '{cname}': {len(configs)} complete specimens, {arr.shape[0]} landmarks each")
+        log.info(f"Category '{cname}': {len(configs)} complete specimens, "
+                 f"{configs[0].shape[0] if configs else arr.shape[0]} landmarks each")
 
     return results
 
@@ -657,8 +678,9 @@ def save_tps(aligned, sizes, filenames, output_dir, prefix):
 def save_procrustes_coords(aligned, filenames, groups, output_dir, prefix):
     k = aligned.shape[1]
     cols = []
+    ids = LANDMARK_IDS.get(prefix) or list(range(1, k + 1))   # 2.7.8: real numbers when a subset is used
     for i in range(k):
-        cols.extend([f"lm{i+1}_x", f"lm{i+1}_y"])
+        cols.extend([f"lm{ids[i]}_x", f"lm{ids[i]}_y"])
     X = aligned.reshape(len(aligned), -1)
     df = pd.DataFrame(X, columns=cols)
     df.insert(0, "filename", filenames)
@@ -679,13 +701,16 @@ def main():
     parser.add_argument("--category", default=None, help="Process only this category name (default: all)")
     parser.add_argument("--perform_manova", action="store_true", default=True)
     parser.add_argument("--skip_umap", action="store_true")
+    parser.add_argument("--landmarks_present_in_all", action="store_true",
+                        help="keep specimens with missing landmarks (absent or not visible) and analyse the landmarks "
+                             "that every specimen has (default: leave those specimens out)")
     parser.add_argument("--no_reflect_mirrored", action="store_true",
                         help="V1 behaviour: do not reflect mirror-image specimens before GPA")
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    all_results = load_keypoints(args.json, args.category)
+    all_results = load_keypoints(args.json, args.category, args.landmarks_present_in_all)
 
     for cat_name, (configs, filenames) in all_results.items():
         if len(configs) < 3:
