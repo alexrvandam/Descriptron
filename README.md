@@ -25,9 +25,9 @@ every claim in the output is checked against the data it came from.
 > (BioSysLit and your own PDFs) is a secondary, optional source.
 
 <p align="center">
-  <img src="docs/weevil_instance_segmentation.jpg" alt="A weevil in lateral view with every structure automatically segmented as a labelled, coloured mask" width="640">
+  <img src="docs/weevil_trigonopterus_segmentation.jpg" alt="A Trigonopterus weevil in lateral view with every structure outlined as a labelled, coloured mask" width="640">
   <br>
-  <sub>Automated instance segmentation of a weevil in lateral view: each structure is a labelled mask with the model's confidence.</sub>
+  <sub>A <i>Trigonopterus</i> weevil in lateral view: every structure is a labelled mask, propagated by SAM2-PAL and checked by hand in the Descriptron GUI (setae and elytral striae are masked but not labelled). Photo: Matthew Van Dam, California Academy of Sciences.</sub>
 </p>
 
 ---
@@ -451,8 +451,7 @@ marks the same structure.</sub>
 
 **Detectron2** (Meta's Mask R-CNN) is the third route. Once enough images have been annotated and corrected, it
 is trained on them and then segments every structure of new images in one pass, each mask with a confidence
-score; Descriptron's training keeps a held-out validation set, split by specimen. The weevil at the top of this
-page was segmented this way.
+score; Descriptron's training keeps a held-out validation set, split by specimen.
 
 ### What it produces: examples
 
