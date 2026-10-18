@@ -109,6 +109,7 @@ STEP_NAMES = [
     "key_matrix",
     "char_signal",
     "key_build",
+    "diagnoses",
     "calibrate",
     "reexamine",
     "describe_v2",
@@ -386,7 +387,8 @@ def step_completeness(cfg: Dict, python: str, log_dir: Path) -> bool:
     never scored for (gaps, listed for checking). Recorded absences are added to the key-tier matrix as presence /
     absence characters (step key_matrix); --min_completeness drops structures scored in too few specimens."""
     out_dir = Path(cfg["output_base"]) / "completeness"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if not cfg["dry_run"]:
+        out_dir.mkdir(parents=True, exist_ok=True)
     cocos = [cfg["coco_json"]] + [p for p in ([cfg.get("keypoints_json")] + list(cfg.get("extra_keypoints_json") or [])
                                               + list(cfg.get("coded_states_coco") or [])) if p and p != cfg["coco_json"]]
     cmd = [python, str(SCRIPT_DIR / "descriptron_check_completeness_v1.py"), "--coco", *dict.fromkeys(cocos),
@@ -449,9 +451,9 @@ def step_semilandmarks(cfg: Dict, python: str, log_dir: Path) -> bool:
 
     # V42 (2026-09-25) = V34 + mirror-image outlines reflected before GPA (checked against geomorph); V34 fallback
     script = SCRIPT_DIR / "semi_landmark_and_kpts_procrustesV42_GPA.py"
-    align = "reflect_mirrored"
+    align = cfg.get("semilandmark_alignment") or "reflect_mirrored"   # v86: without_reflection for symmetric views
     if not script.is_file():
-        script, align = SCRIPT_DIR / "semi_landmark_and_kpts_procrustesV34_GPA.py", "without_reflection"
+        script, align = SCRIPT_DIR / "semi_landmark_and_kpts_procrustesV34_GPA.py", ("with_reflection" if align == "with_reflection" else "without_reflection")
     cmd = [
         python, str(script),
         "--json", cfg["coco_json"],
@@ -465,8 +467,29 @@ def step_semilandmarks(cfg: Dict, python: str, log_dir: Path) -> bool:
     ]
     if cfg.get("group_labels"):
         cmd += ["--group_labels", cfg["group_labels"]]
+    if cfg.get("repair_outline_with"):  # 2026-10-12 opt-in
+        cmd += ["--repair_outline_with", cfg["repair_outline_with"]]
 
-    return _run_step(cmd, "step2_semilandmarks", log_dir, cfg["dry_run"])
+    ok = _run_step(cmd, "step2_semilandmarks", log_dir, cfg["dry_run"])
+    # v86: hidden stretches of repaired outlines re-estimated by TPS from the reference (Gunz et al. 2009); the colour and
+    # texture homology steps then read semilandmarks_hidden_tps/<cat>. Tested: TPS closer to the truth than the chord in
+    # 66-80% of hidden stretches (validation/validate_hidden_semilandmarks_v1.py). The chord version stays in semilandmarks/.
+    if ok and cfg.get("repair_outline_with") and cfg.get("estimate_hidden", True) and not cfg["dry_run"]:
+        tps_base = Path(cfg["output_base"]) / "semilandmarks_hidden_tps"
+        for cat in _find_gpa_categories(out_dir):
+            c2 = [python, str(SCRIPT_DIR / "estimate_hidden_semilandmarks_v1.py"), "--gpa_dir", str(out_dir / cat),
+                  "--json", cfg["coco_json"], "--category_name", cat, "--image_dir", cfg["image_dir"],
+                  "--output_dir", str(tps_base / cat)]
+            if cfg.get("outline_also_visible"):
+                c2 += ["--also_visible", cfg["outline_also_visible"]]
+            _run_step(c2, f"step2b_hidden_tps_{cat}", log_dir, cfg["dry_run"])
+    return ok
+
+
+def _gpa_dir_for(cfg: Dict, cat: str) -> Path:
+    """v86: the TPS-estimated GPA folder when it exists (repaired outlines), else the semilandmark folder."""
+    t = Path(cfg["output_base"]) / "semilandmarks_hidden_tps" / cat
+    return t if (t / "back_transformed_coco.json").exists() else Path(cfg["output_base"]) / "semilandmarks" / cat
 
 
 def step_color_extraction(cfg: Dict, python: str, log_dir: Path) -> bool:
@@ -528,6 +551,49 @@ def step_color_extraction(cfg: Dict, python: str, log_dir: Path) -> bool:
     return all_ok
 
 
+def _homology_grid_opts(cfg: Dict) -> list:
+    """2026-10-12 opt-in options for the TPS homology grids (see homology_grid_ext.py). Empty = previous behaviour."""
+    o = []
+    if int(cfg.get("grid_ext") or 0) > 0:
+        o += ["--grid_ext", str(cfg["grid_ext"])]
+    if cfg.get("occluder_categories"):
+        o += ["--occluder_categories", cfg["occluder_categories"]]
+    if cfg.get("grid_figures_all"):
+        o += ["--viz_specimens", "-1"]
+    return o
+
+
+def _batch_correct(cfg: Dict, python: str, out_dir: Path, stem: str, cat: str, log_dir: Path) -> bool:
+    """2026-10-12 opt-in: species-matched mean shift between imaging batches (homology_batch_meanshift_v1.py).
+    The corrected table replaces the features CSV that later steps read; the uncorrected one is kept as *_uncorrected.csv."""
+    import pandas as pd
+    feats = sorted(out_dir.glob(f"{stem}_{cat}*.csv"))
+    feats = [f for f in feats if not f.stem.endswith(("_uncorrected", "_batchcorrected"))]
+    if not feats:
+        logger.warning(f"    [{cat}] batch correction: no {stem} table found")
+        return False
+    bm = pd.read_csv(cfg["batch_metadata"], sep="\t" if str(cfg["batch_metadata"]).endswith(".tsv") else ",")
+    gl = pd.read_csv(cfg["group_labels"]); gl.columns = [c.strip().lower() for c in gl.columns]
+    bm["_bn"] = bm["filename"].astype(str).map(lambda x: Path(x).name); gl["_bn"] = gl["filename"].astype(str).map(lambda x: Path(x).name)
+    meta = bm[["_bn", cfg["batch_column"]]].merge(gl[["_bn", "group_label"]], on="_bn").rename(columns={"_bn": "filename"})
+    meta_path = out_dir / "batch_metadata_merged.csv"; meta.to_csv(meta_path, index=False)
+    ok_all = True
+    for f in feats:
+        bdir = out_dir / "batch_correction"
+        cmd = [python, str(SCRIPT_DIR / "homology_batch_meanshift_v1.py"), "--features", str(f), "--metadata", str(meta_path),
+               "--batch_column", cfg["batch_column"], "--species_column", "group_label", "--evaluate", "--output_dir", str(bdir)]
+        ok = _run_step(cmd, f"batchshift_{f.stem}", log_dir, cfg["dry_run"])
+        corr = bdir / f"{f.stem}_batchcorrected.csv"
+        if ok and corr.exists() and not cfg["dry_run"]:
+            unc = f.with_name(f.stem + "_uncorrected.csv")
+            if not unc.exists():
+                f.rename(unc)
+            corr.replace(f)
+            logger.info(f"    [{cat}] batch-corrected {f.name} (uncorrected kept as {unc.name})")
+        ok_all &= bool(ok)
+    return ok_all
+
+
 def step_color_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
     semi_dir = Path(cfg["output_base"]) / "semilandmarks"
     out_base = Path(cfg["output_base"]) / "color_homology"
@@ -549,7 +615,7 @@ def step_color_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
             continue
 
         out_dir.mkdir(parents=True, exist_ok=True)
-        gpa_dir = semi_dir / cat
+        gpa_dir = _gpa_dir_for(cfg, cat)   # v86
 
         cmd = [
             python, str(script),
@@ -561,11 +627,14 @@ def step_color_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
             "--color_mode", "combined",
         ]
 
+        cmd += _homology_grid_opts(cfg)  # 2026-10-12 opt-in: --grid_ext / --occluder_categories / overlays
         logger.info(f"    [{cat}] Running color homology...")
         ok = _run_step(cmd, f"step4_colhom_{cat}", log_dir, cfg["dry_run"])
         if not ok:
             all_ok = False
             logger.error(f"    [{cat}] FAILED")
+        elif cfg.get("batch_column"):
+            _batch_correct(cfg, python, out_dir, "color_homology_features", cat, log_dir)
 
     return all_ok
 
@@ -591,7 +660,7 @@ def step_texture_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
             continue
 
         out_dir.mkdir(parents=True, exist_ok=True)
-        gpa_dir = semi_dir / cat
+        gpa_dir = _gpa_dir_for(cfg, cat)   # v86
 
         cmd = [
             python, str(script),
@@ -602,11 +671,14 @@ def step_texture_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
             "--category_name", cat,
         ]
 
+        cmd += _homology_grid_opts(cfg)  # 2026-10-12 opt-in: --grid_ext / --occluder_categories / overlays
         logger.info(f"    [{cat}] Running texture homology...")
         ok = _run_step(cmd, f"step5_texhom_{cat}", log_dir, cfg["dry_run"])
         if not ok:
             all_ok = False
             logger.error(f"    [{cat}] FAILED")
+        elif cfg.get("batch_column"):
+            _batch_correct(cfg, python, out_dir, "texture_homology_features", cat, log_dir)
 
     return all_ok
 
@@ -621,7 +693,8 @@ def step_landmark_gpa(cfg: Dict, python: str, log_dir: Path) -> bool:
             return True
 
     out_dir = Path(cfg["output_base"]) / "landmark_gpa"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if not cfg["dry_run"]:                               # a dry run writes nothing
+        out_dir.mkdir(parents=True, exist_ok=True)
     # landmark_gpa_V1.py writes <out>/<category>/<category>_pc_scores.csv (there is no <out>/pc_scores.csv)
     if any(out_dir.glob("*/*_pc_scores.csv")) and not cfg["force"] and not cfg.get("extra_keypoints_json"):
         logger.info("  Already complete (*_pc_scores.csv exists), skipping")
@@ -1458,6 +1531,26 @@ def step_key_build(cfg: Dict, python: str, log_dir: Path) -> bool:
     return _run_step(cmd, "step22_key_build", log_dir, cfg["dry_run"])
 
 
+def step_diagnoses(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """2.7.9: a diagnosis per species written by fixed rules from the key path and the lineage-specific characters
+    (recorded categorical states and absences, counts, unique measurements); no model. With
+    --deterministic_diagnosis the treatments use it verbatim."""
+    if not _require_profile(cfg):
+        return False
+    base = Path(cfg["output_base"])
+    key = base / "key_v2" / "key_tree.json"
+    if not key.exists() and not cfg["dry_run"]:
+        logger.info("  No key_v2/key_tree.json (step key_build), skipping")
+        return True
+    out_dir = base / "diagnoses"
+    cmd = [python, str(SCRIPT_DIR / "biorag_diagnosis_builder_v1.py"),
+           "--matrix_dir", str(base / "compiled_key_tier"), "--key_tree", str(key),
+           "--taxon_profile", cfg["taxon_profile"], "--out_dir", str(out_dir)]
+    if cfg.get("species"):
+        cmd += ["--species"] + cfg["species"]
+    return _run_step(cmd, "step22_4_diagnoses", log_dir, cfg["dry_run"])
+
+
 def step_describe_v2(cfg: Dict, python: str, log_dir: Path) -> bool:
     if not _require_profile(cfg):
         return False
@@ -1477,6 +1570,8 @@ def step_describe_v2(cfg: Dict, python: str, log_dir: Path) -> bool:
         cmd += ["--species"] + cfg["species"]
     if cfg.get("repair_existing"):
         cmd += ["--repair_existing"]
+    if cfg.get("deterministic_diagnosis"):              # 2.7.9: diagnoses written by fixed rules (step diagnoses)
+        cmd += ["--deterministic_diagnosis", str(base / "diagnoses" / "diagnoses.json")]
     if cfg["force"]:
         cmd += ["--force"]
     return _run_step(cmd, "step23_describe_v2", log_dir, cfg["dry_run"])
@@ -2092,6 +2187,7 @@ ALL_STEPS = {
     "key_matrix":      (21, step_key_matrix),
     "char_signal":     (21.1, step_char_signal),
     "key_build":       (22, step_key_build),
+    "diagnoses":       (22.4, step_diagnoses),
     "calibrate":       (22.5, step_calibrate),
     "reexamine":       (22.6, step_reexamine),
     "describe_v2":     (23, step_describe_v2),
@@ -2106,11 +2202,11 @@ ALL_STEPS = {
     "ontology_v2":      (23.7, step_ontology_v2),
     "treatments_docx": (24, step_treatments_docx),
 }
-V2_STEPS = ["annotation_screen", "key_matrix", "char_signal", "key_build", "calibrate", "reexamine", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
+V2_STEPS = ["annotation_screen", "key_matrix", "char_signal", "key_build", "diagnoses", "calibrate", "reexamine", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
             "char_figures", "subjective_check", "confab_check_v2", "type_material", "char_gate",
             "ontology_v2", "treatments_docx"]
 V2_WORKFLOW = ["coco_clean", "completeness", "measurements", "semilandmarks", "color", "color_homology", "texture",
-               "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "char_signal", "biorag", "key_build", "calibrate", "reexamine", "describe_v2",
+               "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "char_signal", "biorag", "key_build", "diagnoses", "calibrate", "reexamine", "describe_v2",
                "descriptive_states", "trait_stats_states", "char_reliability", "char_figures", "subjective_check",
                "confab_check_v2", "type_material", "char_gate",
                "ontology_v2", "figure_plates", "treatments_docx"]
@@ -2160,6 +2256,35 @@ def parse_args():
     p.add_argument("--slide_method", choices=["none", "procd", "bending"], default="none",
                     help="Semilandmark sliding as in geomorph (V42): none = fixed (default), procd = minimum "
                          "Procrustes distance, bending = minimum bending energy")
+    # 2026-10-12 opt-in additions for the TPS homology grids (homology_grid_ext.py); defaults = previous behaviour
+    p.add_argument("--repair_outline_with", default="",
+                    help="Comma-separated categories hiding part of a structure (e.g. scape,antenna,leg); added back "
+                         "before semilandmarks so the outline is not dented")
+    p.add_argument("--semilandmark_alignment", default="reflect_mirrored",
+                    choices=["reflect_mirrored", "without_reflection", "with_reflection"],
+                    help="reflect_mirrored (default): one-sided structures seen from either side (left/right wings, lateral "
+                         "habitus facing either way) are flipped to match. without_reflection: structures symmetric in the "
+                         "view (full-face head, dorsal pronotum) - flipping some of them would swap their left and right sides")
+    p.add_argument("--no_estimate_hidden", dest="estimate_hidden", action="store_false",
+                    help="With --repair_outline_with: keep the convex-hull chord across hidden margins instead of the TPS "
+                         "estimate (the TPS estimate is the default; both are written)")
+    p.add_argument("--outline_also_visible", default="",
+                    help="Categories that belong to an outline but not to its mask (e.g. compound_eye on a head outline)")
+    p.add_argument("--grid_ext", type=int, default=2,
+                    help="Extend the colour/texture homology grid by N cells on every side and keep cells that overlap "
+                         "the outline (default 2 since GUI v86 / next release; 0 = previous grid)")
+    p.add_argument("--occluder_categories", default="",
+                    help="Comma-separated categories removed from colour/texture sampling (visible pixels only); "
+                         "writes a per-cell visible fraction")
+    p.add_argument("--grid_figures_all", dest="grid_figures_all", action="store_true", default=True,
+                    help="Save the warped-grid figure for every specimen (default since GUI v86)")
+    p.add_argument("--no_grid_figures_all", dest="grid_figures_all", action="store_false",
+                    help="Only the first 5 grid figures (previous behaviour)")
+    p.add_argument("--batch_column", default="",
+                    help="Column in --batch_metadata naming the imaging batch/session; colour and texture homology "
+                         "tables are then mean-shifted onto the largest batch using species imaged in both")
+    p.add_argument("--batch_metadata", default="",
+                    help="CSV/TSV with 'filename' and the --batch_column (species come from --group_labels)")
     p.add_argument("--alpha", type=float, default=0.05,
                     help="Significance threshold for diagnostic features (default 0.05)")
     p.add_argument("--model", default="claude-sonnet-4-6",
@@ -2201,6 +2326,9 @@ def parse_args():
     p.add_argument("--plate_anchor", default="edge", choices=["edge", "centre", "center"],
                    help="labelled species plates: leader lines end on each structure's outline (default) or in "
                         "its middle")
+    p.add_argument("--deterministic_diagnosis", action="store_true",
+                   help="treatments use the diagnosis written by fixed rules (step diagnoses: key path + "
+                        "lineage-specific characters) verbatim, instead of the model's")
     p.add_argument("--min_completeness", type=float, default=0.0,
                    help="drop structures scored (present or recorded absent) in fewer than this share of specimens, "
                         "e.g. 0.8 (step completeness; default 0 = keep all)")

@@ -689,6 +689,16 @@ def codes_to_check(profile: Dict) -> List[str]:
     return out
 
 
+def deterministic_diagnosis(args, code):
+    """2.7.9: the diagnosis from biorag_diagnosis_builder_v1 (--deterministic_diagnosis diagnoses.json), or None"""
+    path = getattr(args, "deterministic_diagnosis", None)
+    if not path:
+        return None
+    if getattr(args, "_det_cache", None) is None:
+        args._det_cache = json.loads(Path(path).read_text())
+    return args._det_cache.get(code)
+
+
 def refine_one(code, ev, client, prompts, args, out_dir, log, cev=None):
     sp_dir = out_dir / code
     sp_dir.mkdir(parents=True, exist_ok=True)
@@ -786,6 +796,13 @@ def refine_one(code, ev, client, prompts, args, out_dir, log, cev=None):
         history.append({"attempt": "merged into the existing treatment", "problems": probs})
     cleaned = clean_treatment(treat, cev) if treat else {}
     removed = strip_bad_sentences(treat, allowed, codes_to_check(ev.profile)) if probs and treat else []
+    det = deterministic_diagnosis(args, code) if treat else None
+    if det:                                              # 2.7.9: the diagnosis written by fixed rules, verbatim
+        treat["diagnosis"] = det["text"]
+        treat["diagnosis_source"] = "deterministic (biorag_diagnosis_builder_v1): key path + lineage-specific characters"
+        treat["citations"] = (treat.get("citations") or []) + \
+            [c for c in det.get("citations", []) if c not in (treat.get("citations") or [])]
+        allowed["t1"] = list(allowed.get("t1", [])) + [float(x) for x in re.findall(r"\d+(?:\.\d+)?", det["text"])]
     final = (validate(treat, allowed, codes_to_check(ev.profile), sections) +
              independent_problems(code, treat, sheet, cev)) if treat else probs
     treat["_validation"] = {"attempts": history, "final_problems": final, "removed_sentences": removed,
@@ -839,6 +856,9 @@ def main():
     ap.add_argument("--added_by", default=None,
                     help="Who is adding those sections, e.g. 'Smith, 2031'. Recorded per section so "
                          "a reader can tell the original description from what was added later")
+    ap.add_argument("--deterministic_diagnosis", default=None,
+                    help="diagnoses.json from biorag_diagnosis_builder_v1: its text replaces the model's diagnosis "
+                         "verbatim (key path + lineage-specific characters, written by fixed rules)")
     ap.add_argument("--repair_existing", action="store_true",
                     help="Audit existing treatments and send only the flagged problems back to the model "
                          "(the previous JSON is kept as <code>_treatment_before_repair_<date>.json)")

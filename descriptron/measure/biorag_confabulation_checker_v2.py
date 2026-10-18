@@ -769,7 +769,17 @@ def verify_measurement(c: Claim, code: str, ev: Evidence, cits, issues: List[Dic
         elif matching and not ctx_fid:
             cand = [f for f in matching if f.split(".", 1)[0] in mentioned] or matching
             target = cand[0]
-            if len(cand) > 1 and len({f.split('.', 1)[1] for f in cand}) > 1:
+            # 2.7.9: a single value in a key-couplet context that is a key threshold is that threshold, even when
+            # it happens to equal some other measurement of the species (e.g. 'L* > 58 ... key couplet 20b')
+            key_thr = None
+            if hi is None and c.get("key_context") and ev.key:
+                for r_ in ev.key["couplets"]:
+                    for ch_ in r_["characters"]:
+                        if matches(lo, ch_.get("threshold")):
+                            key_thr = (ev.canon_fid(ch_["feature_id"]), r_["number"])
+            if key_thr is not None:
+                target, note = key_thr[0], f"key couplet {key_thr[1]} threshold"
+            elif len(cand) > 1 and len({f.split('.', 1)[1] for f in cand}) > 1:
                 status, etype, note = "review", "unresolved_attribution", f"value fits {', '.join(cand[:3])}"
             else:
                 note = "uncited; matched by value"

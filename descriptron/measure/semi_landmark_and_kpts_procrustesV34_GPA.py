@@ -61,6 +61,13 @@ def parse_args():
                         help='Category to process (blank = all non-keypoint categories)')
 
     # Semi-landmarking
+    # 2026-10-12 opt-in (homology_grid_ext.py): outline repaired with occluding categories before semilandmarks
+    parser.add_argument('--repair_outline_with', type=str, default='',
+                        help='Comma-separated categories that hide part of the structure (e.g. scape,antenna,leg). '
+                             'Their overlap with the structure is added back before the contour is taken, so the '
+                             'semilandmarks follow the true outline. "auto" = categories flagged as occluders in the '
+                             'COCO file (GUI v86). Occluders also repair each other; nested parts are never used. '
+                             'Empty = previous behaviour')
     parser.add_argument('--num_landmarks', type=int, default=100)
     parser.add_argument('--auto_landmarks', action='store_true')
     parser.add_argument('--min_auto_landmarks', type=int, default=50)
@@ -1760,6 +1767,12 @@ def main():
                 resampled = resample_open(pts, args.num_line_landmarks)
             else:
                 mask = mk_mask(best, h, w)
+                if args.repair_outline_with.strip():
+                    # every OTHER occluder may hide this structure (legs over legs); nested parts never count
+                    from homology_grid_ext import repair_outline, occluder_setup, occluders_for
+                    _rn = occluders_for(cat_name, *occluder_setup(args.repair_outline_with, args.json))
+                    if _rn:
+                        mask = repair_outline(mask, [a for a in anns if cats_d.get(a['category_id'], '').lower() in _rn], h, w, mk_mask)
                 cts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
                 if not cts: continue
                 cp = max(cts, key=cv2.contourArea).reshape(-1, 2).astype(np.float64)

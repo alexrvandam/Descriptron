@@ -376,7 +376,7 @@ def quantize_foreground(gray, mask_bool, n_levels=16):
     return quantized
 
 def extract_cell_features(gray, img_lab, cell_mask, specimen_lab_means=None,
-                          glcm_levels=16, gray_quantized=None):
+                          glcm_levels=16, gray_quantized=None, lbp_full=None):
     """Extract texture vector from one warped grid cell.
     Only pixels where cell_mask > 0 are used.
 
@@ -415,7 +415,9 @@ def extract_cell_features(gray, img_lab, cell_mask, specimen_lab_means=None,
 
     # LBP
     if HAS_SKIMAGE:
-        lbp = local_binary_pattern(gray, 16, 2, method='uniform')
+        # 2026-10-12: the same whole-image LBP was recomputed for every cell (2.6 s each on a 20 MP montage);
+        # it is now computed once per specimen and passed in - identical values
+        lbp = lbp_full if lbp_full is not None else local_binary_pattern(gray, 16, 2, method='uniform')
         fg_lbp = lbp[fg]
         hist, _ = np.histogram(fg_lbp, bins=18, range=(0, 18), density=True)
         hist_nz = hist[hist > 0]
@@ -454,7 +456,8 @@ def get_cell_feature_names(normalize_color=True):
 
 def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
                      image_dir, mask_lookup, ctrl_step=5, normalize_color=True,
-                     normalize_intensity=True, glcm_levels=16):
+                     normalize_intensity=True, glcm_levels=16,
+                     occluder_lookup=None, coverage_out=None):
     """Process one specimen with warped quad grid cells."""
 
     # resolve image path
@@ -480,6 +483,16 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
         logging.warning(f"  No mask for {orig_fn}")
         return None
 
+    # 2026-10-12 (opt-in): occluders removed -> features from visible pixels only; see homology_grid_ext.py
+    _expected = None
+    if occluder_lookup is not None:
+        from homology_grid_ext import visible_and_expected
+        fg_mask, _expected = visible_and_expected(fg_mask, occluder_lookup.get(orig_fn), decode_mask)
+        if fg_mask.sum() < 100:
+            logging.warning(f"  Too little visible foreground for {orig_fn}")
+            return None
+    _cov = []
+
     fg_bool = fg_mask > 0
 
     # --- Per-specimen histogram equalization of grayscale within mask ---
@@ -502,6 +515,7 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
     # Maps each specimen's actual intensity range to [0, N-1] so cameras
     # with different dynamic ranges produce equivalent GLCM matrices.
     gray_quantized = quantize_foreground(gray, fg_bool, glcm_levels)
+    lbp_full = local_binary_pattern(gray, 16, 2, method='uniform') if HAS_SKIMAGE else None   # once per specimen
 
     # compute specimen-wide foreground L*a*b* means for relative color
     specimen_lab_means = None
@@ -557,18 +571,24 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
         for c in range(n_cols):
             if not cell_inside[r, c]:
                 cell_features.append([np.nan] * n_feats)
+                _cov.append(np.nan)
                 continue
             cm = build_cell_mask(warped_ints, r, c, h, w, fg_mask)
+            if _expected is not None:
+                _e = build_cell_mask(warped_ints, r, c, h, w, _expected).sum()
+                _cov.append(cm.sum() / _e if _e else np.nan)
             feats = extract_cell_features(gray, img_lab, cm,
                                           specimen_lab_means=specimen_lab_means,
                                           glcm_levels=glcm_levels,
-                                          gray_quantized=gray_quantized)
+                                          gray_quantized=gray_quantized, lbp_full=lbp_full)
             if feats is None:
                 cell_features.append([np.nan] * n_feats)
             else:
                 cell_features.append(feats)
 
     fv = np.array(cell_features).flatten()
+    if coverage_out is not None and _expected is not None:
+        coverage_out[fn_gpa] = np.array(_cov, dtype=float)
     return (fn_gpa, fv, img, fg_mask, warped_ints)
 
 
@@ -686,7 +706,18 @@ def parse_args():
     p.add_argument('--n_clusters', type=int, default=0,
                    help='Number of clusters (0 = auto via silhouette score, '
                         'positive integer = force that k)')
-    p.add_argument('--viz_specimens', type=int, default=5)
+    p.add_argument('--viz_specimens', type=int, default=5,
+                   help='Number of per-specimen grid overlays to save; -1 = every specimen')
+    # 2026-10-12 opt-in additions (homology_grid_ext.py); defaults keep the previous behaviour
+    p.add_argument('--grid_ext', type=int, default=0,
+                   help='Extend the grid by N cells on every side and keep cells that overlap the outline '
+                        '(>= --min_cell_overlap) instead of requiring the cell centre inside. 0 = previous grid')
+    p.add_argument('--min_cell_overlap', type=float, default=0.02,
+                   help='With --grid_ext: minimum fraction of a cell inside the consensus outline (default 0.02)')
+    p.add_argument('--occluder_categories', type=str, default='',
+                   help='Comma-separated COCO categories that hide the structure (e.g. scape,antenna,leg), or "auto" '
+                        '(categories flagged as occluders in the COCO file, GUI v86). They are removed from the mask '
+                        '(visible pixels only) and a per-cell visible fraction is written. Nested parts are never used')
     p.add_argument('--umap_n_neighbors', type=int, default=15)
     p.add_argument('--normalize_color', action='store_true', default=True,
                    help='Use specimen-relative L*a*b* (deviation from specimen '
@@ -739,8 +770,19 @@ def main():
                  f"{len(mask_lookup)} masks available")
 
     # --- Build grid ---
-    grid_info = create_grid_inside_contour(
-        mean_shape, n_rows=args.grid_rows, n_cols=args.grid_cols)
+    if args.grid_ext > 0:
+        from homology_grid_ext import create_grid_extended
+        grid_info = create_grid_extended(mean_shape, n_rows=args.grid_rows, n_cols=args.grid_cols,
+                                         ext=args.grid_ext, min_overlap=args.min_cell_overlap)
+    else:
+        grid_info = create_grid_inside_contour(
+            mean_shape, n_rows=args.grid_rows, n_cols=args.grid_cols)
+    occluder_lookup, coverage = None, None
+    if args.occluder_categories.strip():
+        from homology_grid_ext import build_occluder_lookup
+        occluder_lookup = build_occluder_lookup(args.json, args.occluder_categories.split(','),
+                                                target=cat_name)  # never the structure itself or its nested parts
+        coverage = {}
 
     ctrl_step = args.landmark_step
     n_ctrl = len(range(0, mean_shape.shape[0], ctrl_step))
@@ -764,7 +806,8 @@ def main():
                                 ctrl_step=ctrl_step,
                                 normalize_color=normalize_color,
                                 normalize_intensity=normalize_intensity,
-                                glcm_levels=glcm_levels)
+                                glcm_levels=glcm_levels,
+                                occluder_lookup=occluder_lookup, coverage_out=coverage)
 
     items = list(specimens.items())
     results = []
@@ -793,9 +836,14 @@ def main():
     # save grid overlays
     viz_dir = os.path.join(args.output_dir, 'grid_overlays')
     os.makedirs(viz_dir, exist_ok=True)
-    for fn, fv, img, mask, wi in results[:args.viz_specimens]:
+    n_viz = len(results) if args.viz_specimens < 0 else args.viz_specimens
+    for fn, fv, img, mask, wi in results[:n_viz]:
         viz_warped_grid_on_specimen(fn, img, mask, wi, grid_info, viz_dir, cat_name)
-    logging.info(f"Saved {min(len(results), args.viz_specimens)} grid overlays")
+    logging.info(f"Saved {min(len(results), n_viz)} grid overlays")
+    if coverage is not None:
+        from homology_grid_ext import write_coverage_csv
+        write_coverage_csv(os.path.join(args.output_dir, f"texture_homology_visible_fraction_{cat_name}.csv"), coverage, grid_info)
+        logging.info(f"Saved per-cell visible fraction for {len(coverage)} specimens")
 
     # --- Assemble feature matrix ---
     fns = [r[0] for r in results]

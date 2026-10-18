@@ -90,6 +90,7 @@ specimens. The numbers are from the 29-species *Diaphorina* run.
 | install | eight conda environments | **`pip install descriptron`**, or one Docker image |
 | shape and form (2.1) | GPA, PCA, MANOVA/CVA | + Procrustes ANOVA with metadata (species x locality...), trajectories, disparity, allometry slopes, 2B-PLS, Mantel, asymmetry, modularity, Kmult, assignment; mirror images reflected automatically; the Procrustes statistics checked against geomorph and RRPP (Mantel and assignment by known-answer tests) |
 | many small structures (2.5) | — | **SAM 3** (optional; in the Docker image, `pip install descriptron-sam3`): outline one or a few setae with a box or clicks and it proposes every similar instance on that image, shown together and labelled in one step; drag and drop of images and folders onto the GUI |
+| parts and characters from DINOv3 tokens (2.8) | — | **DINOMask** part segmentation from a few hand-drawn images; **BioRAG-Probe** (literature labels x DINOv3 tokens, taxon held out); **BioRAG Annotate** in the GUI (tokens in PCA space linked to the images, lasso a cluster -> mask) |
 | more tools (2.1) | — | centre lines of thin structures, joint angles and posture standardisation, pose skeletons, video tracking with pose (DeepLabCut export), TPS / MorphoJ / StereoMorph / VIA converters, Darwin Core metadata import |
 
 Nothing in the analysis half needs a GPU, and the key, matrix, audits and
@@ -453,6 +454,30 @@ marks the same structure.</sub>
 is trained on them and then segments every structure of new images in one pass, each mask with a confidence
 score; Descriptron's training keeps a held-out validation set, split by specimen.
 
+### DINOMask, BioRAG-Probe and BioRAG Annotate (from 2.8.0)
+
+**DINOMask** is a fourth route for part masks: the DINOv3 ViT-L backbone stays frozen and a small per-patch
+classifier is trained on a few hand-annotated images; prediction uses four shifted passes and a guided filter, and
+"background" doubles as "part absent". There is no template to propagate, so a template that looks unlike the target
+cannot break it. Held out against hand masks it scored 0.60 mean IoU on 11 weevil parts (leave-one-specimen-out over
+12 images; SAM2-PAL with one template 0.54). Recipe, options and all held-out numbers:
+[descriptron/dinomask/README.md](descriptron/dinomask/README.md). Run it with `descriptron-dinomask` /
+`descriptron-dinomask-rot4` (pip) or `descriptron dinomask` / `dinomask-rot4` (Docker).
+
+**BioRAG-Probe** tests whether a character described in the literature (sculpture, setosity, vein setulae...) can be
+read from DINOv3 patch tokens inside a mask, with the taxon held out, a simple baseline and a shuffled-label null
+beside every result: `descriptron-probe` (pip) or `descriptron probe` (Docker); the design and the routes per
+character type are in [descriptron/measure/BIORAG_PROBE_DESIGN.md](descriptron/measure/BIORAG_PROBE_DESIGN.md).
+The related tools (`biorag_probe_parts_v1`, `biorag_probe_panels_v2`, `wing_vein_unsupervised_eval_v1`,
+`wing_spot_tokens_v1`) run with `descriptron-vision <name>`; the torch-free ones (`wing_vein_naming_rule_v1`,
+`wing_fringe_character_v1`, `wing_spot_pattern_v1`, `annotation_scale_transfer_v1`) with `descriptron <name>`.
+
+**BioRAG Annotate** (GUI v89+, tab *6 BioRAG Annotate*) shows the DINOv3 tokens of the loaded images as a PCA scatter
+linked to the images: lasso a cluster and the matching pixels light up, select similar patches, apply the rule to all
+images, and assign the selection to a mask in the editor. The tokens are computed in a separate process; it uses
+`BIORAG_ANNOTATE_PY` if set, else a conda env named `biorag` beside the GUI's env, else the GUI's own Python (which
+then needs `transformers` >= 4.56 for DINOv3).
+
 ### What it produces: examples
 
 Assembled from the programs' output (panel titles added; the animation is drawn from SAM2-PAL's
@@ -582,6 +607,15 @@ sp. 'kenya', collected in Kenya (undescribed species carry working codes until t
 >
 > *(Excerpt, verbatim. The full treatment covers antenna, rostrum, forewing cells, male and female terminalia,
 > proportions, sexual dimorphism, remarks and what could not be assessed from the material.)*
+
+**Who writes what.** The key is built by the program from the matrix: characters, thresholds, ranges and wording
+(a model, if switched on, only rewords couplets). The description is written by a model, but only from a data sheet
+the program computes, and an independent audit recomputes every number and comparison. The diagnosis can be
+either: by default the model chooses which of the supplied diagnostic statements to lead with; from 2.8.0,
+`--deterministic_diagnosis` (GUI: *Diagnosis written by fixed rules*) uses a diagnosis written entirely by rules -
+the characters of the species' path through the key with its own ranges, then lineage-specific characters
+(recorded states and absences found in no or few other species, non-overlapping counts, unique measurements) -
+so the same data always give the same diagnosis. Every run writes these to `diagnoses/diagnoses.md` either way.
 
 ---
 

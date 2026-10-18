@@ -21,7 +21,7 @@ DST="${1:-$HOME/Desktop/Descriptron-v2}"
 # have destroyed the repository, its remote and its tags on the second run.
 mkdir -p "$DST"
 find "$DST" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-mkdir -p "$DST"/{docs,docker,environments,descriptron/measure,descriptron/torchvision_det,descriptron/detectron2}
+mkdir -p "$DST"/{docs,docker,environments,descriptron/measure,descriptron/torchvision_det,descriptron/detectron2,descriptron/dinomask,descriptron/test_brush}
 
 # The working tree holds every version ever written — 968 .py in measure/ alone,
 # of which 67 are the live pipeline. Publishing all of them makes the repository
@@ -49,7 +49,14 @@ descriptron_reexamine_v1.py descriptron_character_signal_v1.py descriptron_phylo
 descriptron-v2-v81.py descriptron_reexamine_v2.py generate_species_plates.py descriptron_labelled_plates_v1.py descriptron_check_cross_image_copies_v1.py
 descriptron-v2-v82.py descriptron_descriptive_characters.py descriptron_category_edit.py biorag_coded_states_from_coco_v1.py
 descriptron-v2-v83.py descriptron_community_v1.py
-descriptron-v2-v84.py descriptron_check_completeness_v1.py"
+descriptron-v2-v84.py descriptron_check_completeness_v1.py
+descriptron-v2-v85.py biorag_diagnosis_builder_v1.py
+descriptron-v2-v86.py homology_grid_ext.py homology_batch_meanshift_v1.py estimate_hidden_semilandmarks_v1.py validate_hidden_semilandmarks_v1.py descriptron_category_edit.py
+descriptron-v2-v87.py descriptron-v2-v88.py descriptron-v2-v89.py descriptron-v2-v90.py
+biorag_annotate_v1.py biorag_annotate_tokens_v1.py descriptron_folder_save_v1.py
+biorag_probe_v1.py biorag_probe_parts_v1.py biorag_probe_panels_v2.py
+wing_vein_unsupervised_eval_v1.py wing_spot_tokens_v1.py wing_vein_naming_rule_v1.py wing_fringe_character_v1.py wing_spot_pattern_v1.py
+annotation_scale_transfer_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
@@ -84,6 +91,13 @@ done
 # file in it is live; from detectron2/ only the two scripts the GUI calls, plus the
 # fixed-budget copy used for the backend comparison
 LIVE_LIST="" copy_py "$GUI/torchvision_det" "$DST/descriptron/torchvision_det"
+# 2.8.0: DINOMask (whole folder is live) + its README; BioRAG-Probe design notes; the GUI's headless tests
+LIVE_LIST="" copy_py "$GUI/dinomask" "$DST/descriptron/dinomask"
+cp "$GUI/dinomask/README.md" "$DST/descriptron/dinomask/"
+cp "$GUI/measure/BIORAG_PROBE_DESIGN.md" "$DST/descriptron/measure/"
+for t in test_folder_save test_biorag_annotate test_logic test_keypoints test_v87_fixes test_v88_context_tools; do
+  cp "$GUI/test_brush/$t.py" "$DST/descriptron/test_brush/"
+done
 for f in detectron2_training_and_filterV10_and_kpts-17.py \
          detectron2_training_and_filterV10_and_kpts-18.py \
          detectron2_predict_and_filterV10_and_kptsV2.py \

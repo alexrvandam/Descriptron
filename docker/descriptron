@@ -36,6 +36,9 @@ descriptron <command> [args...]
   predict-d2          predict with a Detectron2 checkpoint    [detectron2_env]
   sam2-pal            SAM2-PAL mask propagation               [samm]
   dinoland            DINOv3 landmark transfer                [samm]
+  dinomask            DINOMask part segmentation: train + predict (DINOv3 tokens)  [samm]
+  dinomask-rot4       DINOMask prediction with test-time rotation                  [samm]
+  probe               BioRAG-Probe: literature labels x DINOv3 tokens               [samm]
   measure             measurements from COCO                  [measure_env]
   pipeline            the full BioRAG v2 pipeline             [measure_env]
   sam3                find every instance of a structure (SAM 3; -e HF_TOKEN, gated)  [sam3]
@@ -69,7 +72,7 @@ case "$cmd" in
       echo "    -v \"\$PWD:/data\" descriptron:latest gui" >&2
       exit 3
     fi
-    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v84.py" "$@" ;;   # 2.7.8: Lost keypoints + Record absent (v73-v83 kept)
+    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v90.py" "$@" ;;   # 2.8.0: v90 (v89 BioRAG Annotate tab + folder-session save fix; v73-v89 kept)
   sam3)
     # 2.5.1: SAM 3 multi-instance proposals (own env, Python 3.12). Checkpoints are gated: request access at
     # huggingface.co/facebook/sam3, then pass your token: -e HF_TOKEN=... (cached in -v descriptron-weights:/weights)
@@ -98,6 +101,15 @@ case "$cmd" in
   dinoland)
     need_env samm
     exec $CONDA_RUN samm python "$GUI/dinov3_landmark_transfer_v52.py" "$@" ;;
+  dinomask)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v4.py" "$@" ;;   # 2.8.0
+  dinomask-rot4)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_predict_rot4_v1.py" "$@" ;;    # 2.8.0
+  probe)
+    need_env samm
+    exec $CONDA_RUN samm python "$GUI/measure/biorag_probe_v1.py" "$@" ;;              # 2.8.0
   measure)
     need_env measure_env
     exec $CONDA_RUN measure_env python \

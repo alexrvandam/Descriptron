@@ -607,7 +607,8 @@ def combine_pattern_and_hue(X_pattern, X_hue, hue_weight=1.0):
 ###############################################################################
 
 def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
-                     image_dir, mask_lookup, ctrl_step=5, color_bins=8):
+                     image_dir, mask_lookup, ctrl_step=5, color_bins=8,
+                     occluder_lookup=None, coverage_out=None):
     """Process one specimen: TPS warp grid, extract per-cell color."""
 
     # resolve image path
@@ -631,6 +632,16 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
     if fg_mask.sum() < 100:
         logging.warning(f"  No mask for {orig_fn}")
         return None
+
+    # 2026-10-12 (opt-in): occluders removed -> features from visible pixels only; see homology_grid_ext.py
+    _expected = None
+    if occluder_lookup is not None:
+        from homology_grid_ext import visible_and_expected
+        fg_mask, _expected = visible_and_expected(fg_mask, occluder_lookup.get(orig_fn), decode_mask)
+        if fg_mask.sum() < 100:
+            logging.warning(f"  Too little visible foreground for {orig_fn}")
+            return None
+    _cov = []
 
     fg_bool = fg_mask > 0
 
@@ -693,8 +704,12 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
         for c in range(n_cols):
             if not cell_inside[r, c]:
                 cell_features.append([np.nan] * n_feats)
+                _cov.append(np.nan)
                 continue
             cm = build_cell_mask(warped_ints, r, c, h, w, fg_mask)
+            if _expected is not None:
+                _e = build_cell_mask(warped_ints, r, c, h, w, _expected).sum()
+                _cov.append(cm.sum() / _e if _e else np.nan)
             feats = extract_cell_color_features(img_lab, cm,
                                                  specimen_lab_means,
                                                  n_color_bins=color_bins)
@@ -704,6 +719,8 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
                 cell_features.append(feats)
 
     fv = np.array(cell_features).flatten()
+    if coverage_out is not None and _expected is not None:
+        coverage_out[fn_gpa] = np.array(_cov, dtype=float)
     # v2: 6-tuple now — trailing hue_feats is the specimen-level block.
     return (fn_gpa, fv, img, fg_mask, warped_ints, hue_feats)
 
@@ -824,7 +841,18 @@ def parse_args():
     p.add_argument('--workers', type=int, default=0)
     p.add_argument('--n_clusters', type=int, default=0,
                    help='Number of clusters (0 = auto via silhouette score)')
-    p.add_argument('--viz_specimens', type=int, default=5)
+    p.add_argument('--viz_specimens', type=int, default=5,
+                   help='Number of per-specimen grid overlays to save; -1 = every specimen')
+    # 2026-10-12 opt-in additions (homology_grid_ext.py); defaults keep the previous behaviour
+    p.add_argument('--grid_ext', type=int, default=0,
+                   help='Extend the grid by N cells on every side and keep cells that overlap the outline '
+                        '(>= --min_cell_overlap) instead of requiring the cell centre inside. 0 = previous grid')
+    p.add_argument('--min_cell_overlap', type=float, default=0.02,
+                   help='With --grid_ext: minimum fraction of a cell inside the consensus outline (default 0.02)')
+    p.add_argument('--occluder_categories', type=str, default='',
+                   help='Comma-separated COCO categories that hide the structure (e.g. scape,antenna,leg), or "auto" '
+                        '(categories flagged as occluders in the COCO file, GUI v86). They are removed from the mask '
+                        '(visible pixels only) and a per-cell visible fraction is written. Nested parts are never used')
     p.add_argument('--umap_n_neighbors', type=int, default=15)
     p.add_argument('--color_bins', type=int, default=8,
                    help='Number of bins for within-cell color entropy '
@@ -877,8 +905,19 @@ def main():
                  f"{len(mask_lookup)} masks available")
 
     # --- Build grid ---
-    grid_info = create_grid_inside_contour(
-        mean_shape, n_rows=args.grid_rows, n_cols=args.grid_cols)
+    if args.grid_ext > 0:
+        from homology_grid_ext import create_grid_extended
+        grid_info = create_grid_extended(mean_shape, n_rows=args.grid_rows, n_cols=args.grid_cols,
+                                         ext=args.grid_ext, min_overlap=args.min_cell_overlap)
+    else:
+        grid_info = create_grid_inside_contour(
+            mean_shape, n_rows=args.grid_rows, n_cols=args.grid_cols)
+    occluder_lookup, coverage = None, None
+    if args.occluder_categories.strip():
+        from homology_grid_ext import build_occluder_lookup
+        occluder_lookup = build_occluder_lookup(args.json, args.occluder_categories.split(','),
+                                                target=cat_name)  # never the structure itself or its nested parts
+        coverage = {}
 
     ctrl_step = args.landmark_step
     n_ctrl = len(range(0, mean_shape.shape[0], ctrl_step))
@@ -898,7 +937,8 @@ def main():
         return process_specimen(fn, contour, mean_shape, grid_info,
                                 args.image_dir, mask_lookup,
                                 ctrl_step=ctrl_step,
-                                color_bins=color_bins)
+                                color_bins=color_bins,
+                                occluder_lookup=occluder_lookup, coverage_out=coverage)
 
     items = list(specimens.items())
     results = []
@@ -928,9 +968,14 @@ def main():
     viz_dir = os.path.join(args.output_dir, 'grid_overlays')
     os.makedirs(viz_dir, exist_ok=True)
     # v2: 6-tuple — use *_rest to stay robust if tuple ever grows.
-    for fn, fv, img, mask, wi, *_rest in results[:args.viz_specimens]:
+    n_viz = len(results) if args.viz_specimens < 0 else args.viz_specimens
+    for fn, fv, img, mask, wi, *_rest in results[:n_viz]:
         viz_warped_grid_on_specimen(fn, img, mask, wi, grid_info, viz_dir, cat_name)
-    logging.info(f"Saved {min(len(results), args.viz_specimens)} grid overlays")
+    logging.info(f"Saved {min(len(results), n_viz)} grid overlays")
+    if coverage is not None:
+        from homology_grid_ext import write_coverage_csv
+        write_coverage_csv(os.path.join(args.output_dir, f"color_homology_visible_fraction_{cat_name}.csv"), coverage, grid_info)
+        logging.info(f"Saved per-cell visible fraction for {len(coverage)} specimens")
 
     # --- Assemble feature matrix ---
     fns = [r[0] for r in results]

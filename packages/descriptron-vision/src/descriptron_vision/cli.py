@@ -64,3 +64,41 @@ def sam2_pal():   _run("sam2_pal_batch_v21.py", sys.argv[1:])
 def dinoland():   _run("dinov3_landmark_transfer_v52.py", sys.argv[1:])   # v52 = v51 + --orientation_search
 def measure():
     _run("measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py", sys.argv[1:])
+
+
+# 2.8.0: DINOMask (frozen DINOv3 + per-patch classifier) and BioRAG-Probe (literature labels x DINOv3 tokens)
+def dinomask():       _run("dinomask_train_predict_v4.py", sys.argv[1:], "dinomask")
+def dinomask_rot4():  _run("dinomask_predict_rot4_v1.py", sys.argv[1:], "dinomask")
+def probe():          _run("biorag_probe_v1.py", sys.argv[1:])
+
+
+def _available() -> list[str]:
+    d = tools_dir()
+    if not d.exists():
+        return []
+    names = [p.stem for p in d.iterdir() if p.suffix == ".py" and not p.name.startswith("_")]
+    for sub in ("dinomask", "torchvision_det"):
+        if (d / sub).is_dir():
+            names += [f"{sub}/{p.stem}" for p in (d / sub).iterdir()
+                      if p.suffix == ".py" and not p.name.startswith("_")]
+    return sorted(names)
+
+
+def main() -> None:
+    """2.8.0: `descriptron-vision <program> [args]` runs any program of this package (as `descriptron` does for core);
+    `descriptron-vision --list` shows them. Programs in a sub-folder are named `dinomask/<file>`."""
+    args = sys.argv[1:]
+    if not args or args[0] in ("-h", "--help", "help"):
+        print(main.__doc__.strip())
+        print(f"\n{len(_available())} programs available; --list shows them.")
+        return
+    if args[0] in ("--list", "list"):
+        print("\n".join(_available()))
+        return
+    name = args[0][:-3] if args[0].endswith(".py") else args[0]
+    matches = [n for n in _available() if n == name] or [n for n in _available() if n.startswith(name)]
+    if len(matches) != 1:
+        raise SystemExit(f"'{args[0]}' is " + ("ambiguous: " + ", ".join(matches) if matches else
+                                                "not a program of descriptron-vision; --list shows them"))
+    sub, _, stem = matches[0].rpartition("/")
+    _run(stem + ".py", args[1:], sub or None)

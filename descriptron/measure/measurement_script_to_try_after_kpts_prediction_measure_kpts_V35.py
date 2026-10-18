@@ -466,6 +466,28 @@ def clean_filename(filename):
 
 # 1. Add this helper function near the other definitions (e.g., after `calculate_pixels_per_mm`):
 
+# Search windows tried in turn: the bar must not touch the left/right edge of the window, otherwise the window clipped it
+# (on large montages the bar is longer than text +- 100 px and the window width was returned as the bar length).
+_SCALE_WINDOWS = (100, 300, 800, 2000)
+
+def _bar_in_window(image, text_xs, text_ys, args, expand_px):
+    """Find the scale bar near a text box, widening the window until the bar is not clipped by it.
+    Returns (bar_w, bar_bbox, bar_contour, x_min, y_min) in ROI coords + ROI offset, or (None,)*5."""
+    for ex in sorted(set((expand_px,) + tuple(w for w in _SCALE_WINDOWS if w > expand_px))):
+        x_min, y_min = max(int(min(text_xs)) - ex, 0), max(int(min(text_ys)) - ex, 0)
+        x_max, y_max = min(int(max(text_xs)) + ex, image.shape[1]), min(int(max(text_ys)) + ex, image.shape[0])
+        roi = image[y_min:y_max, x_min:x_max]
+        bar_w, bar_bbox, bar_contour = find_scale_bar_length_in_pixels(roi, args)
+        if not bar_w:
+            return None, None, None, None, None
+        bx = bar_bbox[0] if bar_bbox is not None else (cv2.boundingRect(bar_contour)[0] if bar_contour is not None else 1)
+        clipped = (bx <= 2 and x_min > 0) or (bx + bar_w >= roi.shape[1] - 2 and x_max < image.shape[1])
+        if not clipped:
+            return bar_w, bar_bbox, bar_contour, x_min, y_min
+        logging.info(f"scale bar clipped by a +-{ex}px window ({bar_w}px); widening")
+    logging.warning("scale bar still clipped by the widest search window; scale not used")
+    return None, None, None, None, None
+
 def detect_image_scale(image, reader, args, expand_px=100):
     """
     Detect scale length in pixels per unit by: 1) OCR entire image for text like '50 µm' or '2 mm';
@@ -484,11 +506,8 @@ def detect_image_scale(image, reader, args, expand_px=100):
             # Compute text bounding box coords
             xs = [int(pt[0]) for pt in bbox]
             ys = [int(pt[1]) for pt in bbox]
-            x_min, y_min = max(min(xs) - expand_px, 0), max(min(ys) - expand_px, 0)
-            x_max, y_max = min(max(xs) + expand_px, image.shape[1]), min(max(ys) + expand_px, image.shape[0])
-            roi = image[y_min:y_max, x_min:x_max]
-            # Detect scale bar in the ROI
-            bar_w, bar_bbox, bar_contour = find_scale_bar_length_in_pixels(roi, args)
+            # Detect scale bar near the text, widening the window if the bar is clipped by it
+            bar_w, bar_bbox, bar_contour, x_min, y_min = _bar_in_window(image, xs, ys, args, expand_px)
             if bar_w and length_val:
                 pixels_per_unit = calculate_pixels_per_mm(bar_w, length_val, unit)
                 logging.info(f"Detected scale: {length_val}{unit} => {pixels_per_unit:.2f} px/unit")
@@ -534,12 +553,7 @@ def detect_image_scale_florence2(image, args, expand_px=100):
             continue
         xs = [qbox[i] for i in range(0, len(qbox), 2)]
         ys = [qbox[i] for i in range(1, len(qbox), 2)]
-        x_min = max(int(min(xs)) - expand_px, 0)
-        y_min = max(int(min(ys)) - expand_px, 0)
-        x_max = min(int(max(xs)) + expand_px, image.shape[1])
-        y_max = min(int(max(ys)) + expand_px, image.shape[0])
-        roi = image[y_min:y_max, x_min:x_max]
-        bar_w, bar_bbox, bar_contour = find_scale_bar_length_in_pixels(roi, args)
+        bar_w, bar_bbox, bar_contour, x_min, y_min = _bar_in_window(image, xs, ys, args, expand_px)
         if bar_w and length_val:
             pixels_per_unit = calculate_pixels_per_mm(bar_w, length_val, unit)
             logging.info(f"Florence-2 scale: '{text}' => {length_val}{unit} => {pixels_per_unit:.2f} px/unit")

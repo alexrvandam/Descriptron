@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "descriptron-vision"
-version = "2.7.8"
+version = "2.8.0"
 description = "Mask and landmark prediction for Descriptron: torchvision detectors, SAM2-PAL propagation, DINOv3 landmark transfer"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,13 +26,13 @@ classifiers = [
 # For CUDA, install torch from PyTorch's own index FIRST, then this package:
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 dependencies = [
-  "descriptron-core==2.7.8",
+  "descriptron-core==2.8.0",
   # Capped deliberately (2.5.2: the cap had been lost, leaving only the comment). Unbounded, pip installs
   # torch 2.14 with ~3 GB of CUDA 13 wheels, untested here. Validated on torch 2.4 (analysis) and 2.10 (GUI with
   # Meta's current SAM2, and SAM 3). Raise the cap only after testing, not before.
   "torch>=2.3,<2.11",     # torch.amp.GradScaler("cuda") in tv_train_v1 needs 2.3
   "torchvision>=0.18,<0.26",
-  "transformers>=4.38",   # Florence-2 scale-bar reading
+  "transformers>=4.56",   # Florence-2 scale-bar reading; DINOv3 (DINOMask, probe, BioRAG Annotate, DINOLand) needs >= 4.56
   "timm>=0.9",
   "einops>=0.7",
   "tqdm>=4.65",
@@ -55,6 +55,10 @@ descriptron-sweep      = "descriptron_vision.cli:sweep"
 descriptron-sam2pal    = "descriptron_vision.cli:sam2_pal"
 descriptron-dinoland   = "descriptron_vision.cli:dinoland"
 descriptron-measure    = "descriptron_vision.cli:measure"
+descriptron-vision     = "descriptron_vision.cli:main"            # 2.8.0: any program of this package
+descriptron-dinomask   = "descriptron_vision.cli:dinomask"        # 2.8.0: DINOMask train + predict
+descriptron-dinomask-rot4 = "descriptron_vision.cli:dinomask_rot4" # 2.8.0: DINOMask prediction, test-time rotation
+descriptron-probe      = "descriptron_vision.cli:probe"           # 2.8.0: BioRAG-Probe
 
 [project.urls]
 Homepage = "https://github.com/alexrvandam/Descriptron"

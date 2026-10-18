@@ -37,7 +37,11 @@ TARGETS = {
 # things the inventory does not list but the packages need
 EXTRA_VISION = ["torchvision_det",                   # whole directory
                 "dinov3_landmark_transfer_v52.py",    # v52 (orientation search) is not in the inventory yet
-                "descriptron_video_track.py"]         # v2.1.0: video - individuals + pose (SAM2 video)
+                "descriptron_video_track.py",         # v2.1.0: video - individuals + pose (SAM2 video)
+                "dinomask",                           # v2.8.0: DINOMask (whole directory: train/predict v4, rot4, fg mask, README)
+                # v2.8.0: BioRAG-Probe and the DINOv3-token wing tools (need torch + transformers)
+                "measure/biorag_probe_v1.py", "measure/biorag_probe_parts_v1.py", "measure/biorag_probe_panels_v2.py",
+                "measure/wing_vein_unsupervised_eval_v1.py", "measure/wing_spot_tokens_v1.py"]
 # modules a core program imports that the inventory files elsewhere or does not list:
 # biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
 # because it CAN use Florence-2, which it loads lazily), and that imports
@@ -78,7 +82,15 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/descriptron_community_v1.py",                 # v2.7.6: phylogeny vs treatment; community phylogenetics
               "measure/validation/validate_community_vs_r.py",       # v2.7.6: its check against vegan / ape
               "measure/validation/validate_community_run_vs_r.py",   # v2.7.7: one run checked against vegan / ape / phytools, number by number
-              "measure/descriptron_check_completeness_v1.py"]         # v2.7.8: present / absent (character loss) / not recorded, per specimen
+              "measure/descriptron_check_completeness_v1.py",         # v2.7.8: present / absent (character loss) / not recorded, per specimen
+              "measure/biorag_diagnosis_builder_v1.py",               # v2.8.0 (v85): diagnosis by fixed rules
+              "measure/homology_grid_ext.py",                         # v2.8.0 (v86): extended grid, hidden parts, outline repair
+              "measure/homology_batch_meanshift_v1.py",               # v2.8.0 (v86): imaging-batch mean shift
+              "measure/estimate_hidden_semilandmarks_v1.py",          # v2.8.0 (v86): hidden margins by TPS (Gunz 2009)
+              "measure/validation/validate_hidden_semilandmarks_v1.py",   # v2.8.0 (v86): chord vs TPS on hidden stretches
+              # v2.8.0: torch-free helpers of BioRAG-Probe / DINOMask work
+              "measure/wing_vein_naming_rule_v1.py", "measure/wing_fringe_character_v1.py",
+              "measure/wing_spot_pattern_v1.py", "measure/annotation_scale_transfer_v1.py"]
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
@@ -90,6 +102,13 @@ EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptro
                    "descriptron_category_edit.py",
                    "descriptron-v2-v83.py",                            # v2.7.6: Community & phylogeny button
                    "descriptron-v2-v84.py",                            # v2.7.8: Lost keypoints, Record absent, completeness check
+                   "descriptron-v2-v85.py",                            # v2.8.0: deterministic diagnosis checkbox
+                   "descriptron-v2-v86.py",                            # v2.8.0: homology grid extension, hidden parts, batches
+                   "descriptron-v2-v87.py", "descriptron-v2-v88.py",   # v2.8.0: fixes (v87); lasso, push/pull, undo (v88)
+                   "descriptron-v2-v89.py",                            # v2.8.0: closable menus, multi-mask focus, tab 6 BioRAG Annotate
+                   "descriptron-v2-v90.py",                            # v2.8.0: = v89 + folder-session save fix (default GUI)
+                   "biorag_annotate_v1.py", "biorag_annotate_tokens_v1.py",   # v2.8.0: BioRAG Annotate window + its token subprocess
+                   "descriptron_folder_save_v1.py",                    # v2.8.0: folder-session save (v90)
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
 # v2.5.1: SAM 3 as its own distribution (Python 3.12, sam3 from PyPI). The text vocabulary goes beside the wrapper
 # in BOTH places it runs from: the sam3 wheel leaves it out.
@@ -155,7 +174,7 @@ def main():
             counts["descriptron-vision"] += n
             print(f"  + {extra}/ ({n} modules) -> descriptron-vision")
         elif src.is_file():
-            shutil.copy2(src, vis_tools / extra)
+            shutil.copy2(src, vis_tools / src.name)   # 2.8.0: src.name, so measure/<file> entries land flat in tools/
             counts["descriptron-vision"] += 1
             print(f"  + {extra} -> descriptron-vision")
 
@@ -166,6 +185,10 @@ def main():
             shutil.copy2(src, core_tools / src.name)
             print(f"  + {src.name} -> descriptron-core (imported by core programs)")
         else:
+            print(f"  ! missing: {extra}")
+
+    for extra in EXTRA_VISION:   # 2.8.0: a listed vision file that is missing must be reported, not skipped
+        if not (gui / extra).exists():
             print(f"  ! missing: {extra}")
 
     # Prompts, taxon profiles, ontology releases and schemas.

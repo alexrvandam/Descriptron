@@ -60,3 +60,45 @@ def corrected_path(path: str) -> str:
     import os
     base, ext = os.path.splitext(path)
     return f"{base}_categories_fixed{ext or '.json'}"
+
+
+# --- occlusion (GUI v86): which category can hide which -------------------------------------------------------------
+# Stored on the COCO category: "occluder": true = can hide any structure (legs, antennae lying over the body);
+# "occludes": ["head", "compound_eye"] = can hide only those (a pronotum hides the head and eye but only abuts the
+# elytron). Read by the measurement scripts with --repair_outline_with auto / --occluder_categories auto
+# (measure/homology_grid_ext.py). A part nested inside another (cephalic_dorsum in head_capsule) is NOT an occlusion.
+
+def occlusion_of(coco: dict) -> dict:
+    """category name -> None (not an occluder), '*' (hides anything) or a sorted list of names it can hide"""
+    out = {}
+    for c in coco.get("categories", []):
+        if c.get("occludes"):
+            out[c["name"]] = sorted(c["occludes"])
+        elif c.get("occluder"):
+            out[c["name"]] = "*"
+        else:
+            out[c["name"]] = None
+    return out
+
+
+def set_occlusion(coco: dict, name: str, hides) -> dict:
+    """hides: None (not an occluder), '*' (anything) or an iterable of category names. Returns a new dict."""
+    cats = coco.get("categories", [])
+    names = {c["name"] for c in cats}
+    if name not in names:
+        raise KeyError(f"no category named {name!r}")
+    if hides not in (None, "*"):
+        hides = sorted(set(hides) - {name})
+        unknown = set(hides) - names
+        if unknown:
+            raise KeyError(f"unknown categories: {sorted(unknown)}")
+    new = []
+    for c in cats:
+        if c["name"] == name:
+            c = {k: v for k, v in c.items() if k not in ("occluder", "occludes")}
+            if hides == "*":
+                c["occluder"] = True
+            elif hides:
+                c["occludes"] = list(hides)
+        new.append(c)
+    return {**coco, "categories": new}
