@@ -682,7 +682,8 @@ Writing treatments is the only step that calls a language model:
 descriptions with `--llm_backend api`; a Hugging Face token the first time DINOLand
 downloads DINOv3) are read from the environment or from
 `~/.config/descriptron/credentials`; if neither has one, you are asked the first
-time it is needed, and it is saved there (`descriptron-keys --set NAME` to change). Literature retrieval from BioSysLit and
+time it is needed, and it is saved there (`descriptron-keys --set NAME` to change). Getting the Hugging Face token
+and access to the gated DINOv3 / SAM 3 models, step by step: [docs/HUGGINGFACE_TOKEN.md](docs/HUGGINGFACE_TOKEN.md). Literature retrieval from BioSysLit and
 your own PDFs: `pip install "descriptron-core[rag]"` (see
 [What BioRAG retrieves](#what-biorag-retrieves-the-data-matrix-and-the-literature)).
 

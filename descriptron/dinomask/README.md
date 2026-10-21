@@ -19,6 +19,13 @@ Installed with pip (`descriptron-vision`): `descriptron-dinomask` and `descriptr
 also be run with `descriptron-vision dinomask/<file> ...`. A GPU is strongly advised; both scripts fall back to the
 CPU. The DINOv3 weights are gated on Hugging Face: accept the licence once and set `HF_TOKEN`.
 
+**Model:** always pass `--model facebook/dinov3-vitl16-pretrain-lvd1689m` - the ViT-L/16 at
+https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m (LVD-1689M web images, not the `sat493m` satellite
+model). Without `--model` the script falls back to the small ViT-S/16; every result below used the ViT-L.
+Request access on that page and set up a token once: step by step in [docs/HUGGINGFACE_TOKEN.md](../../docs/HUGGINGFACE_TOKEN.md)
+(the token must be in the environment or saved with `hf auth login`; Descriptron's own key store is not read by DINOMask
+in 2.8.0).
+
 ## Recipe (used for the Austromyrma profiles, October 2026)
 
 ```bash

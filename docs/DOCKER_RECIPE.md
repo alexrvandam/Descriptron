@@ -166,7 +166,9 @@ the command line, download the large one into your project folder:
 DINOLand uses Meta's DINOv3, which is gated: accept the licence at
 https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m, create a read
 token in your Hugging Face settings, and pass it with `-e HF_TOKEN`. The weights
-then download once into the `descriptron-weights` volume.
+then download once into the `descriptron-weights` volume. DINOMask uses the ViT-L/16
+(https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m); request access to it too. Step by step:
+[HUGGINGFACE_TOKEN.md](HUGGINGFACE_TOKEN.md).
 
 **SAM2-PAL (Linux, NVIDIA GPU):**
 

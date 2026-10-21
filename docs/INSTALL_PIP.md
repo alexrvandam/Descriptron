@@ -143,7 +143,8 @@ SAM 3 lives in its own environment. With the Descriptron environment **not** act
 
 Request access at https://huggingface.co/facebook/sam3, create a read token in your Hugging Face settings, and log
 in once: `pipx run --spec huggingface_hub hf auth login`. The GUI's dark green **Find all instances (SAM 3)**
-button then finds it.
+button then finds it. Step by step (account, access, token, Windows/macOS/Linux), also for the DINOv3 models used by
+DINOMask and DINOLand: [HUGGINGFACE_TOKEN.md](HUGGINGFACE_TOKEN.md).
 
 ## If something goes wrong
 

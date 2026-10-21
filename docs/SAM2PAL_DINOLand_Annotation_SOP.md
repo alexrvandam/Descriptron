@@ -137,7 +137,10 @@ not mirrored changed the median error from 3.2% to 3.9% in one test and not at
 all (2.4%) in the other. **If you do not know how your specimens were imaged,
 switch both on.**
 
-**Model and layer:** the default (DINOv3 ViT-B/16, layer 6) is a good start.
+**Model and layer:** the default (DINOv3 ViT-B/16, layer 6) is a good start. Both DINOv3 models are gated on
+Hugging Face ([ViT-B/16](https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m),
+[ViT-L/16](https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m)): request access and set up a token once,
+see [HUGGINGFACE_TOKEN.md](HUGGINGFACE_TOKEN.md).
 ViT-L/16 with layer 12 was slightly better on psyllid wings (median error 4.0%
 vs 4.7%) and slower; the last layer (23) was worse (5.2%) — deep features match
 *which structure* but not *where exactly*.
