@@ -66,9 +66,33 @@ def measure():
     _run("measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py", sys.argv[1:])
 
 
+DINOMASK_MODEL = "facebook/dinov3-vitl16-pretrain-lvd1689m"   # 2.8.1: every published DINOMask result used the ViT-L
+
+
+def _hf_token_from_store() -> None:
+    """2.8.1: HF_TOKEN not set -> take it from Descriptron's key store (~/.config/descriptron/credentials, as DINOLand
+    does). Only reads; never prompts. The environment always wins."""
+    if os.environ.get("HF_TOKEN"):
+        return
+    try:
+        from descriptron_core.cli import tools_dir as _core_tools
+        sys.path.append(str(_core_tools()))
+        import descriptron_credentials
+        descriptron_credentials.load_into_environment()
+    except Exception:
+        pass
+
+
+def _dinomask_argv() -> list[str]:
+    """2.8.1: ViT-L unless the user passes --model (argparse keeps the last value, so theirs wins)."""
+    _hf_token_from_store()
+    return ["--model", DINOMASK_MODEL, *sys.argv[1:]]
+
+
 # 2.8.0: DINOMask (frozen DINOv3 + per-patch classifier) and BioRAG-Probe (literature labels x DINOv3 tokens)
-def dinomask():       _run("dinomask_train_predict_v4.py", sys.argv[1:], "dinomask")
-def dinomask_rot4():  _run("dinomask_predict_rot4_v1.py", sys.argv[1:], "dinomask")
+def dinomask():       _run("dinomask_train_predict_v4.py", _dinomask_argv(), "dinomask")
+def dinomask_rot4():  _run("dinomask_predict_rot4_v1.py", _dinomask_argv(), "dinomask")
+def dinomask_v5():    _run("dinomask_train_predict_v5.py", _dinomask_argv(), "dinomask")   # 2.8.1: v5 (token cache, --bg_keep, --grid)
 def probe():          _run("biorag_probe_v1.py", sys.argv[1:])
 
 

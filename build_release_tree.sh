@@ -56,7 +56,10 @@ descriptron-v2-v87.py descriptron-v2-v88.py descriptron-v2-v89.py descriptron-v2
 biorag_annotate_v1.py biorag_annotate_tokens_v1.py descriptron_folder_save_v1.py
 biorag_probe_v1.py biorag_probe_parts_v1.py biorag_probe_panels_v2.py
 wing_vein_unsupervised_eval_v1.py wing_spot_tokens_v1.py wing_vein_naming_rule_v1.py wing_fringe_character_v1.py wing_spot_pattern_v1.py
-annotation_scale_transfer_v1.py"
+annotation_scale_transfer_v1.py
+descriptron-v2-v91.py descriptron-v2-v92.py descriptron-v2-v93.py descriptron-v2-v94.py descriptron-v2-v95.py descriptron-v2-v96.py
+descriptron_category_nav_v1.py descriptron_dinomask_dialog_v1.py descriptron_undo_v1.py biorag_annotate_v2.py biorag_annotate_tokens_v2.py
+descriptron_ontology.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
@@ -95,7 +98,8 @@ LIVE_LIST="" copy_py "$GUI/torchvision_det" "$DST/descriptron/torchvision_det"
 LIVE_LIST="" copy_py "$GUI/dinomask" "$DST/descriptron/dinomask"
 cp "$GUI/dinomask/README.md" "$DST/descriptron/dinomask/"
 cp "$GUI/measure/BIORAG_PROBE_DESIGN.md" "$DST/descriptron/measure/"
-for t in test_folder_save test_biorag_annotate test_logic test_keypoints test_v87_fixes test_v88_context_tools; do
+for t in test_folder_save test_biorag_annotate test_logic test_keypoints test_v87_fixes test_v88_context_tools \
+         test_category_nav test_dinomask_dialog test_undo test_biorag_annotate_v2; do   # 2.8.1: + the v91-v96 module tests
   cp "$GUI/test_brush/$t.py" "$DST/descriptron/test_brush/"
 done
 for f in detectron2_training_and_filterV10_and_kpts-17.py \
@@ -126,6 +130,8 @@ cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || t
 cp "$GUI/marmot.jpg" "$DST/descriptron/" 2>/dev/null || true
 # v2.7.5: the descriptive-character vocabulary the GUI panel and the converter read (copy_py takes .py/.sh only)
 cp "$GUI/descriptron_descriptive_characters.json" "$DST/descriptron/"
+# 2.8.1: the ontology templates the label menus read (descriptron_ontology.py finds the json beside itself)
+cp "$GUI/descriptron_ontology_templates.json" "$DST/descriptron/"
 [ -d "$GUI/icons" ] && cp -r "$GUI/icons" "$DST/descriptron/" || true
 # 2.5.1: SAM 3's text vocabulary (CLIP, MIT) - the sam3 wheel on PyPI leaves it out
 [ -d "$GUI/sam3_assets" ] && mkdir -p "$DST/descriptron/sam3_assets" \

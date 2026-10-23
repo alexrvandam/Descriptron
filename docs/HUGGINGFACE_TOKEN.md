@@ -20,9 +20,10 @@ a free account, access to each model, and a token on your computer.
 
 SAM2, SAM2-PAL and the Florence-2 scale-bar reader are **not** gated; they need no token.
 
-Note for DINOMask: pass `--model facebook/dinov3-vitl16-pretrain-lvd1689m` as in the
-[DINOMask recipe](../descriptron/dinomask/README.md). Without `--model` the script falls back to the much smaller
-ViT-S/16; all our reported DINOMask results used the ViT-L.
+Note for DINOMask: all our reported DINOMask results used the ViT-L above. From 2.8.1 the commands
+`descriptron-dinomask`, `descriptron-dinomask-rot4` and `descriptron-dinomask-v5` (pip and Docker) and the GUI's DINOMask
+dialog use it by default; when you run a DINOMask `.py` file directly, pass `--model facebook/dinov3-vitl16-pretrain-lvd1689m`
+as in the [DINOMask recipe](../descriptron/dinomask/README.md) - without it the script falls back to the much smaller ViT-S/16.
 
 ## Step 1 - make a Hugging Face account
 
@@ -84,8 +85,9 @@ Windows - PowerShell, current window only: `$env:HF_TOKEN = "hf_xxxxxxxxxxxxxxxx
     descriptron-keys --set HF_TOKEN
 
 saves it in `~/.config/descriptron/credentials` (private to your user). DINOLand also asks for the token by itself the
-first time it needs one and saves it there. **In 2.8.0 only DINOLand and the GUI read this file; DINOMask, BioRAG
-Annotate and BioRAG-Probe do not** - for those use A or B.
+first time it needs one and saves it there. DINOLand, the GUI and - from 2.8.1 - the DINOMask commands
+(`descriptron-dinomask`, `-rot4`, `-v5`, also in Docker) read this file when `HF_TOKEN` is not set.
+**BioRAG Annotate and BioRAG-Probe do not** read it (nor did DINOMask in 2.8.0) - for those use A or B.
 
 ### Docker
 
@@ -97,7 +99,8 @@ downloaded weights in the `descriptron-weights` volume so they download only onc
       ghcr.io/alexrvandam/descriptron:latest dinomask --model facebook/dinov3-vitl16-pretrain-lvd1689m ...
 
 The saved-key route (`-v "$HOME/.config/descriptron:/config"` and `keys --set HF_TOKEN`, see
-[DOCKER_RECIPE.md](DOCKER_RECIPE.md)) works for DINOLand; use `-e HF_TOKEN` for DINOMask.
+[DOCKER_RECIPE.md](DOCKER_RECIPE.md)) works for DINOLand and, from image 2.8.1, for the `dinomask`, `dinomask-rot4` and
+`dinomask-v5` commands; with an older image use `-e HF_TOKEN` for DINOMask.
 
 ## Step 5 - test the download (optional, about 1 minute)
 
@@ -116,5 +119,5 @@ no token is needed again for that model - also not offline (`export HF_HUB_OFFLI
 | `403` / `Access to model ... is restricted` / `gated repo` | the token is fine but access is not granted (yet) for **this** model: check https://huggingface.co/settings/gated-repos, request access on the model page (step 2) |
 | a fine-grained token gets `403` although access was accepted | edit the token and tick *Read access to contents of all public gated repos you can access*, or make a *Read* token instead |
 | `model type 'dinov3_vit' ... Transformers does not recognize this architecture` | `transformers` is too old for DINOv3 (needs 4.56 or newer): `pip install -U "transformers>=4.56"`, or `pip install --upgrade descriptron` |
-| DINOLand works but DINOMask is refused | the token is only in Descriptron's key store (C); use A or B |
+| DINOLand works but DINOMask is refused | Descriptron 2.8.0 or older: DINOMask did not read the key store (C); upgrade (`pip install --upgrade descriptron`) or use A or B. BioRAG Annotate / BioRAG-Probe never read it: use A or B |
 | a shared lab machine or cluster without internet on the compute nodes | download once on a node with internet (step 5), point everyone to the same cache with `HF_HOME=/shared/path`, and run with `HF_HUB_OFFLINE=1`; see [SHARED_VM_RECIPE.md](SHARED_VM_RECIPE.md) |

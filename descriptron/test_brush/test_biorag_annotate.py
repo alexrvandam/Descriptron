@@ -11,8 +11,12 @@ import cv2
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-import biorag_annotate_v1 as ba      # noqa: E402
-import biorag_annotate_tokens_v1 as bat  # noqa: E402
+import importlib  # noqa: E402
+# BRA_TEST_DEV=1 tests the development copies (biorag_annotate_v1_dev.py + its _dev tokens script)
+_TSFX = "_dev" if os.environ.get("BRA_TEST_DEV") else ""
+ba = importlib.import_module("biorag_annotate_v1" + _TSFX)
+bat = importlib.import_module("biorag_annotate_tokens_v1" + _TSFX)
+print("testing", os.path.basename(ba.__file__), "+", os.path.basename(bat.__file__))
 
 PASS, FAIL = [], []
 
@@ -374,6 +378,103 @@ _m_frac = ba.selection_to_mask(_sp, (640, 640), None)                           
 _m_px = ba.selection_to_mask(_sp, (640, 640), None, min_px=256)                   # 1 patch (16 x 16 px here)
 check("min_px = 1 patch keeps a lone selected patch (setae), 0.1% rule drops it", _m_px[5 * 16 + 8, 5 * 16 + 8] == 1 and _m_frac[5 * 16 + 8, 5 * 16 + 8] == 0)
 check("brush start with min_frac=0 keeps a lone patch", ba.selection_to_work_mask(_sp, np.full((640, 640), 0.5, np.float32), min_frac=0)[88, 88] == 1)
+
+
+# ---- "not this" (negative) brush, 19 Oct
+def _ref_module():
+    """The module as it was before the not-this brush (backup if present, else the live file when testing dev)."""
+    from importlib.machinery import SourceFileLoader
+    import importlib.util
+    gui = os.path.dirname(HERE)
+    bak = os.path.join(gui, "biorag_annotate_v1.py.bak_pre_notthis_20261019")
+    src = bak if os.path.isfile(bak) else os.path.join(gui, "biorag_annotate_v1.py")
+    loader = SourceFileLoader("bra_ref_pre_notthis", src)
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    mod = importlib.util.module_from_spec(spec)
+    loader.exec_module(mod)
+    return mod, src
+
+
+_ref, _ref_src = _ref_module()
+_rng = np.random.default_rng(7)
+_X = _rng.normal(size=(300, 6)).astype(np.float32)
+_y = _X[:, 0] + 0.3 * _X[:, 1] > 0.4
+_m_new = ba.train_logreg(_X, _y, sample_weight=None)
+_m_old = _ref.train_logreg(_X, _y)
+check("train_logreg(sample_weight=None) bit-identical to the pre-not-this version (" + os.path.basename(_ref_src) + ")",
+      all(np.array_equal(_m_new[k], _m_old[k]) for k in ("mean", "std", "w")) and _m_new["b"] == _m_old["b"])
+_vis = _rng.random(300) > 0.1
+_k, _yt, _w, _info = ba.learned_training_set(_y, _vis, np.zeros(300, bool))
+check("learned training set without explicit negatives = visible patches, selection, no weights",
+      np.array_equal(_k, _vis) and np.array_equal(_yt, _y) and _w is None and _info == {})
+_mk = ba.train_logreg(_X[_k], _yt[_k], sample_weight=_w)
+_mo = _ref.train_logreg(_X[_vis], _y[_vis])
+check("learned rule without explicit negatives: identical to the old training on the visible patches",
+      all(np.array_equal(_mk[k], _mo[k]) for k in ("mean", "std", "w")) and _mk["b"] == _mo["b"])
+
+# synthetic tokens: positives A, dirt B close to A, background C far away
+_A = _rng.normal([0, 0, 0, 0], 0.3, size=(60, 4))
+_B = _rng.normal([0, 1.2, 0, 0], 0.15, size=(12, 4))
+_C = _rng.normal([8, 0, 0, 0], 0.6, size=(600, 4))
+_XS = np.concatenate([_A, _B, _C]).astype(np.float32)
+_isA = np.r_[np.ones(60, bool), np.zeros(612, bool)]
+_isB = np.r_[np.zeros(60, bool), np.ones(12, bool), np.zeros(600, bool)]
+_visS = np.ones(len(_XS), bool)
+_k0, _y0, _w0, _ = ba.learned_training_set(_isA, _visS, None)
+_p0 = ba.logreg_proba(_XS, ba.train_logreg(_XS[_k0], _y0[_k0], sample_weight=_w0))
+_negS = np.zeros(len(_XS), bool)
+_negS[np.flatnonzero(_isB)[:4]] = True                       # the user paints "not this" on 4 of the 12 dirt patches
+_k1, _y1, _w1, _info1 = ba.learned_training_set(_isA, _visS, _negS)
+_p1 = ba.logreg_proba(_XS, ba.train_logreg(_XS[_k1], _y1[_k1], sample_weight=_w1))
+check("without explicit negatives the dirt cluster next to the positives is accepted", (_p0[_isB] >= 0.5).mean() > 0.9,
+      (_p0[_isB] >= 0.5).mean())
+check("with 4 explicit negatives on the dirt the whole dirt cluster is rejected", (_p1[_isB] >= 0.5).mean() == 0,
+      (_p1[_isB] >= 0.5).mean())
+check("... and the positives are still accepted", (_p1[_isA] >= 0.5).mean() > 0.9, (_p1[_isA] >= 0.5).mean())
+check("explicit negatives together weigh as much as all positives (weight recorded)",
+      _info1["lr_n_explicit_neg"] == 4 and abs(_info1["lr_explicit_neg_weight"] - 612 / 4) < 1e-3
+      and "lr_weighting" in _info1)
+_wE, _fE = ba.explicit_negative_weights(_y1, _negS)
+_n1, _n0 = int(_y1.sum()), int((~_y1).sum())
+_cw = np.where(_y1, len(_y1) / (2.0 * _n1), len(_y1) / (2.0 * _n0))
+check("weighted explicit negatives >= all positives (balanced weights x factor)",
+      (_cw * _wE)[_negS].sum() >= (_cw * _wE)[_y1].sum() - 1e-6)
+check("explicit negatives are never positives in training", not (_y1 & _negS).any())
+
+# pixel masks: negative wins, last stroke wins
+_pos = np.zeros((64, 64), np.uint8)
+_pos[:, :32] = 1                                             # left half selected (pixel selection)
+_neg = np.zeros((64, 64), np.uint8)
+ba.paint_not_this(_neg, _pos, (16, 0), (16, 63), 6)          # vertical not-this stroke inside the selection
+check("not this over selected pixels removes them from the selection (negative wins)",
+      _neg[32, 16] == 1 and _pos[32, 16] == 0 and _pos[32, 2] == 1 and not (_pos.astype(bool) & _neg.astype(bool)).any())
+ba.paint_positive(_pos, _neg, (16, 20), (16, 40), 6)         # brush back over part of the not-this paint
+check("brush over not-this paint removes the paint there (last stroke wins)",
+      _pos[30, 16] == 1 and _neg[30, 16] == 0 and _neg[5, 16] == 1 and _pos[5, 16] == 0)
+ba.paint_not_this(_neg, None, (60, 60), (60, 60), 2)
+check("not this without a pixel selection only paints the negative mask", _neg[60, 60] == 1)
+_np_ = np.zeros((64, 64), np.uint8)
+_np_[:16, :8] = 1                                            # half of patch (0,0)
+_np_[16:32, 16:20] = 1                                       # a quarter of patch (1,1)
+_ng = ba.negative_patches(_np_, (4, 4))
+check("a patch is an explicit negative if >= 50% of its pixels are painted", _ng[0, 0] and not _ng[1, 1] and _ng.sum() == 1)
+_mn = ba.map_negatives(np.ones((32, 32), np.uint8), (100, 100, 200, 200), (400, 400), (0, 0, 400, 400), (200, 200))
+check("not-this paint of a region maps onto the whole-image view", _mn[75, 75] == 1 and _mn[25, 25] == 0 and _mn[120, 120] == 0
+      and abs(int(_mn.sum()) - 50 * 50) < 200, int(_mn.sum()))
+
+# similar / colour-window selections exclude explicit negatives
+_rgbS = np.zeros((16, 3), np.float32)
+_rgbS[:, 0] = 1.0                                            # all red -> all inside a red window
+_wins = [{"on": True, "c": 0.0, "w": 60, "lo": 0, "hi": 100}, {"on": False, "c": 0, "w": 30, "lo": 0, "hi": 100, "near": 0}]
+_cs, _, _ = ba.colour_window_selection(_rgbS, [(0, (4, 4))], _wins)
+_negv = np.zeros(16, bool)
+_negv[[3, 7]] = True
+check("colour-window selection minus explicit negatives", _cs.all() and np.array_equal(ba.drop_negatives(_cs, _negv), ~_negv))
+_F = ba.normalize_rows(_rng.normal(size=(16, 5)).astype(np.float32))
+_ss = ba.cosine_to(_F, _F[3]) >= -2
+check("similar selection minus explicit negatives", _ss.all() and not ba.drop_negatives(_ss, _negv)[[3, 7]].any()
+      and ba.drop_negatives(_ss, _negv).sum() == 14)
+check("drop_negatives(sel, None) leaves the selection unchanged", ba.drop_negatives(_ss, None) is _ss)
 
 print(f"\n{len(PASS)} passed, {len(FAIL)} failed")
 if FAIL:

@@ -24,7 +24,10 @@ Opened from Descriptron v89 (tab "6  BioRAG Annotate"). The window
      as the plot) to the clicked patch, or to the mean of the selection if the click is inside it,
      threshold slider updates live. Brush / eraser on the strip edit a per-image PIXEL selection (start:
      selected patches upsampled + guided filter); a patch counts as selected on the plot if >= 50% of its
-     pixels are; Escape cancels a stroke, Ctrl+Z undoes the last stroke.
+     pixels are; Escape cancels a stroke, Ctrl+Z undoes the last stroke. "Not this" (19 Oct) paints a
+     per-image NEGATIVE pixel mask with the same brush: it removes those pixels from the selection
+     (negative wins; a later Brush stroke removes not-this paint again), selections / masks never include
+     it, and the learned rule trains on those patches as explicit (up-weighted) negatives.
   5. ASSIGN: right-click -> category (the editor's category menu). Selected patches -> mask (patch grid
      -> guided filter on the grey working image -> original size, threshold 0.5, tiny components
      removed); brush-edited images use their pixel mask as is. Crop masks map back into the image. The
@@ -712,9 +715,10 @@ def colour_window_selection(rgb, grids, windows):
     return m1 | m2, m1, m2
 
 
-def train_logreg(X, y, l2=1.0, iters=400, lr=0.05, seed=0):
+def train_logreg(X, y, l2=1.0, iters=400, lr=0.05, seed=0, sample_weight=None):
     """Logistic regression, numpy only (deterministic): standardised features, balanced class weights, L2,
-    Adam on the full batch. -> {'mean', 'std', 'w', 'b'}."""
+    Adam on the full batch. -> {'mean', 'std', 'w', 'b'}. sample_weight (19 Oct, optional): per-sample
+    multipliers on the balanced weights (None = unchanged)."""
     X = np.asarray(X, np.float32)
     y = np.asarray(y, bool)
     mean = X.mean(0)
@@ -722,6 +726,8 @@ def train_logreg(X, y, l2=1.0, iters=400, lr=0.05, seed=0):
     Z = (X - mean) / std
     n1, n0 = max(1, int(y.sum())), max(1, int((~y).sum()))
     sw = np.where(y, len(y) / (2.0 * n1), len(y) / (2.0 * n0)).astype(np.float32)
+    if sample_weight is not None:              # 19 Oct: explicit "not this" negatives up-weighted
+        sw = (sw * np.asarray(sample_weight, np.float32)).astype(np.float32)
     w = np.zeros(Z.shape[1], np.float32)
     b = 0.0                       # a Python float: a numpy float64 scalar would turn every product into float64
     mw, vw, mb, vb = np.zeros_like(w), np.zeros_like(w), 0.0, 0.0
@@ -743,6 +749,89 @@ def train_logreg(X, y, l2=1.0, iters=400, lr=0.05, seed=0):
 def logreg_proba(X, m):
     Z = (np.asarray(X, np.float32) - m["mean"]) / m["std"]
     return 1.0 / (1.0 + np.exp(-np.clip(Z @ m["w"] + m["b"], -30, 30)))
+
+
+# ------------------------------------------------------------ "not this" (negative) brush, 19 Oct
+NOT_THIS_WEIGHTING = ("explicit negatives x max(1, n_negatives / n_explicit), so together they weigh at least as "
+                      "much as all positives; balanced class weights otherwise unchanged")
+_KEEP_NEG = object()          # undo entries without a not-this mask to restore
+
+
+def paint_stroke(m, pa, pb, rad, val):
+    """One brush segment (as the strip brush): a line of width 2 rad + 1 with round ends, in place."""
+    cv2.line(m, pa, pb, int(val), thickness=2 * rad + 1)
+    cv2.circle(m, pa, rad, int(val), -1)
+    cv2.circle(m, pb, rad, int(val), -1)
+    return m
+
+
+def paint_not_this(neg, pos, pa, pb, rad):
+    """Not-this stroke: marks neg and removes the same pixels from pos (negative wins; pos may be None)."""
+    paint_stroke(neg, pa, pb, rad, 1)
+    if pos is not None:
+        paint_stroke(pos, pa, pb, rad, 0)
+
+
+def paint_positive(pos, neg, pa, pb, rad):
+    """Brush stroke: adds to pos and removes not-this paint there (last stroke wins; neg may be None)."""
+    paint_stroke(pos, pa, pb, rad, 1)
+    if neg is not None:
+        paint_stroke(neg, pa, pb, rad, 0)
+
+
+def negative_patches(neg_pix, grid, thresh=0.5):
+    """Not-this pixel mask -> patch grid: a patch is an explicit negative if >= thresh of its pixels are."""
+    return pix_to_patch_sel(neg_pix, grid, thresh)
+
+
+def drop_negatives(sel, neg):
+    """Selection minus explicit negatives (any shape; neg None = unchanged)."""
+    if neg is None:
+        return sel
+    return np.asarray(sel, bool) & ~np.asarray(neg, bool)
+
+
+def map_negatives(neg_work, src_box, image_hw, dst_box, dst_work_hw):
+    """Not-this paint of one view (working size, covering src_box of the image) -> working-size mask of
+    another view of the same image (dst_box, dst_work_hw); zero outside src_box."""
+    full = work_mask_to_image(neg_work, image_hw, src_box)
+    x0, y0, x1, y1 = [int(v) for v in dst_box]
+    nh, nw = int(dst_work_hw[0]), int(dst_work_hw[1])
+    q = cv2.resize(full[y0:y1, x0:x1].astype(np.float32), (nw, nh), interpolation=cv2.INTER_LINEAR)
+    return (q > 0.5).astype(np.uint8)
+
+
+def explicit_negative_weights(y, neg):
+    """-> (sample weights | None, factor). Explicit negatives (never positives) get factor
+    max(1, n_negatives / n_explicit) on top of the balanced class weights, everything else 1."""
+    y = np.asarray(y, bool)
+    neg = np.asarray(neg, bool) & ~y
+    ne = int(neg.sum())
+    if ne == 0:
+        return None, 1.0
+    f = max(1.0, int((~y).sum()) / float(ne))
+    w = np.ones(len(y), np.float32)
+    w[neg] = f
+    return w, float(f)
+
+
+def learned_training_set(sel, vis, neg=None):
+    """Training set of the learned rule -> (keep, y, sample_weight | None, info for the rule).
+    No explicit negatives: keep = vis, y = sel, no weights (the training before 19 Oct, bit-identical).
+    With them: positives vs explicit negatives + the other unselected visible patches; explicit negatives
+    are kept even outside the foreground, are never positive and are up-weighted (explicit_negative_weights).
+    sample_weight is over the kept patches (X[keep])."""
+    sel = np.asarray(sel, bool)
+    vis = np.asarray(vis, bool)
+    if neg is None or not np.asarray(neg, bool).any():
+        return vis, sel, None, {}
+    neg = np.asarray(neg, bool)
+    keep = vis | neg
+    y = sel & ~neg
+    w, f = explicit_negative_weights(y[keep], neg[keep])
+    info = {"lr_n_explicit_neg": int(neg[keep].sum()), "lr_explicit_neg_weight": round(f, 4),
+            "lr_weighting": NOT_THIS_WEIGHTING}
+    return keep, y, w, info
 
 
 def rule_foreground(F, rule):
@@ -895,6 +984,7 @@ class BioRAGAnnotateWindow:
         self.P = self.pca_rgb = self.colors = self.vis = self.sel = self.show_idx = None
         self.catidx, self.cat_names, self.cat_cols, self._cat_per, self._cid2idx = None, [], [], None, {}
         self.pix, self._stroke, self._undo_strokes = {}, None, []
+        self.neg_pix = {}                        # 19 Oct: "not this" pixel masks per image (working size)
         self.sim, self._sim_base, self._sim_label = None, None, ""
         self._featn = {}
         self.dm, self.dm_classes, self.dm_cols, self.dm_run = {}, [], [], None
@@ -1103,6 +1193,7 @@ class BioRAGAnnotateWindow:
         self.ax_s.tick_params(colors="#bbbbbb", labelsize=7)
         self.sc_all = self.ax_s.scatter([], [], s=2, linewidths=0, rasterized=True)
         self.sc_sel = self.ax_s.scatter([], [], s=16, linewidths=0.7, edgecolors="white", zorder=3)
+        self.sc_neg = self.ax_s.scatter([], [], s=14, linewidths=0, c="red", zorder=4)   # 19 Oct: not this
         self.cv_s = FigureCanvasTkAgg(self.fig_s, master=top)
         self.cv_s.get_tk_widget().pack(fill="both", expand=True)
         self.lasso_s = LassoSelector(self.ax_s, self._on_lasso_scatter, button=MouseButton.LEFT,
@@ -1114,6 +1205,7 @@ class BioRAGAnnotateWindow:
         self.ax_i.set_axis_off()
         self.im_photo = self.ax_i.imshow(np.zeros((2, 2, 3), np.uint8), interpolation="antialiased")
         self.im_over = self.ax_i.imshow(np.zeros((2, 2, 4), np.float32), interpolation="nearest", zorder=2)
+        self.im_neg = self.ax_i.imshow(np.zeros((2, 2, 4), np.float32), interpolation="nearest", zorder=3)
         self.im_sel = self.ax_i.imshow(np.zeros((2, 2, 4), np.float32), interpolation="nearest", zorder=4)
         self.cursor = Circle((0, 0), 10, fill=False, ec="yellow", lw=1.2, visible=False, zorder=8)
         self.ax_i.add_patch(self.cursor)
@@ -1127,6 +1219,9 @@ class BioRAGAnnotateWindow:
         self.b_brush.pack(side="left")
         self.b_eraser = tk.Button(tools, text="Eraser: OFF", bg="#fbdcb8", command=lambda: self.set_tool("eraser"))
         self.b_eraser.pack(side="left")
+        self.b_notthis = tk.Button(tools, text="Not this: OFF", bg="#f4b6c2", command=lambda: self.set_tool("notthis"))
+        self.b_notthis.pack(side="left")
+        tk.Button(tools, text="Clear not-this", command=self.clear_not_this).pack(side="left")
         tk.Label(tools, text="size (image px)").pack(side="left", padx=(4, 0))
         tk.Scale(tools, from_=1, to=400, orient="horizontal", variable=self.v_brush, length=150,
                  command=lambda v: self._update_cursor_radius()).pack(side="left")
@@ -1433,6 +1528,7 @@ class BioRAGAnnotateWindow:
         self.P = self.colors = self.vis = None
         self.sel = np.zeros(off, bool)
         self.pix, self._undo_strokes, self.sim, self._featn = {}, [], None, {}
+        self.neg_pix = {}
         self.catidx = None
         msg = f"{len(recs)} token set(s) ({params.get('token_source', '')}), {off} patches."
         if self.failed:
@@ -1748,7 +1844,42 @@ class BioRAGAnnotateWindow:
             out = base & ~new
         else:
             out = new.copy()
-        return out & self.vis if self.vis is not None else out
+        out = out & self.vis if self.vis is not None else out
+        if self.neg_pix:                          # 19 Oct: never select "not this" patches
+            out = drop_negatives(out, self._neg_vec(len(out)))
+        return out
+
+    def _neg_vec(self, n=None):
+        """Explicit-negative patches of all images (>= 50% of a patch's pixels painted 'not this')."""
+        n = (len(self.sel) if self.sel is not None else 0) if n is None else n
+        out = np.zeros(n, bool)
+        for i, nm in self.neg_pix.items():
+            if nm is not None and i < len(self.recs) and nm.any():
+                r = self.recs[i]
+                if r.offset + r.n <= n:
+                    out[r.offset:r.offset + r.n] = negative_patches(nm, r.grid).ravel()
+        return out
+
+    def _drop_neg_patches(self, i):
+        nm = self.neg_pix.get(i)
+        if nm is not None and nm.any() and self.sel is not None:
+            r = self.recs[i]
+            sl = slice(r.offset, r.offset + r.n)
+            self.sel[sl] = drop_negatives(self.sel[sl], negative_patches(nm, r.grid).ravel())
+
+    def clear_not_this(self):
+        """Remove the not-this paint of this image (Ctrl+Z brings it back; the selection is not changed)."""
+        r, i = self._rec(), self.cur
+        nm = self.neg_pix.get(i)
+        if r is None or nm is None or self.sel is None:
+            self.win.bell()
+            return
+        pm = self.pix.get(i)
+        self._undo_strokes.append((i, None if pm is None else pm.copy(), self.sel[r.offset:r.offset + r.n].copy(), nm))
+        del self._undo_strokes[:-30]
+        del self.neg_pix[i]
+        self._redraw_scatter()
+        self._redraw_image()
 
     def _apply_selection(self, new):
         self._sel_origin = "lasso"
@@ -1859,6 +1990,8 @@ class BioRAGAnnotateWindow:
                                relief="sunken" if t == "brush" else "raised")
         self.b_eraser.configure(text="Eraser: ON" if t == "eraser" else "Eraser: OFF",
                                 relief="sunken" if t == "eraser" else "raised")
+        self.b_notthis.configure(text="Not this: ON" if t == "notthis" else "Not this: OFF",
+                                 relief="sunken" if t == "notthis" else "raised")
         self.lasso_i.set_active(not t and not self._space)
         if not t:
             self._hide_cursor()
@@ -1877,6 +2010,9 @@ class BioRAGAnnotateWindow:
             r = self.recs[i]
             s = self.sel[r.offset:r.offset + r.n].reshape(r.grid)
             self.pix[i] = selection_to_work_mask(s, r.grey(), min_frac=0)   # 18 Oct: keep every selected part
+            nm = self.neg_pix.get(i)
+            if nm is not None:
+                self.pix[i][nm > 0] = 0                  # 19 Oct: not this
         return self.pix[i]
 
     def _to_work(self, r, x, y):
@@ -1885,6 +2021,9 @@ class BioRAGAnnotateWindow:
         return (x - x0) * nw / (x1 - x0), (y - y0) * nh / (y1 - y0)
 
     def _paint(self, x0, y0, x1, y1):
+        if self.v_tool.get() == "notthis":            # 19 Oct
+            self._paint_neg(x0, y0, x1, y1)
+            return
         st = self._stroke
         r = self.recs[st["i"]]
         m = self.pix[st["i"]]
@@ -1896,6 +2035,17 @@ class BioRAGAnnotateWindow:
         cv2.line(m, pa, pb, val, thickness=2 * rad + 1)
         cv2.circle(m, pa, rad, val, -1)
         cv2.circle(m, pb, rad, val, -1)
+        if val == 1 and self.neg_pix.get(st["i"]) is not None:
+            paint_stroke(self.neg_pix[st["i"]], pa, pb, rad, 0)        # 19 Oct: last stroke wins
+
+    def _paint_neg(self, x0, y0, x1, y1):
+        st = self._stroke
+        r = self.recs[st["i"]]
+        a = self._to_work(r, x0, y0)
+        b = self._to_work(r, x1, y1)
+        rad = max(1, int(round(self.v_brush.get() * r.work_hw[1] / (r.box[2] - r.box[0]))))
+        pa, pb = (int(round(a[0])), int(round(a[1]))), (int(round(b[0])), int(round(b[1])))
+        paint_not_this(self.neg_pix[st["i"]], self.pix.get(st["i"]), pa, pb, rad)
 
     def _stroke_begin(self, x, y):
         r = self._rec()
@@ -1905,7 +2055,15 @@ class BioRAGAnnotateWindow:
         prev = self.pix.get(i)
         self._stroke = {"i": i, "prev": None if prev is None else prev.copy(),
                         "prev_sel": self.sel[r.offset:r.offset + r.n].copy(), "last": (x, y)}
-        self._ensure_pix(i)
+        pn = self.neg_pix.get(i)
+        self._stroke["prev_neg"] = None if pn is None else pn.copy()
+        if self.v_tool.get() == "notthis":            # 19 Oct: pixel selection only where there is one
+            if i not in self.neg_pix:
+                self.neg_pix[i] = np.zeros(r.work_hw, np.uint8)
+            if i in self.pix or self.sel[r.offset:r.offset + r.n].any():
+                self._ensure_pix(i)
+        else:
+            self._ensure_pix(i)
         self._paint(x, y, x, y)
         self._redraw_image(fast=True)
 
@@ -1927,16 +2085,24 @@ class BioRAGAnnotateWindow:
         st, self._stroke = self._stroke, None
         if st is None:
             return
-        self._undo_strokes.append((st["i"], st["prev"], st["prev_sel"]))
+        self._undo_strokes.append((st["i"], st["prev"], st["prev_sel"], st.get("prev_neg", _KEEP_NEG)))
         del self._undo_strokes[:-30]
-        self.sim = None
-        self._sel_origin = "brush"
-        self._sync_sel_from_pix(st["i"])
+        if self.v_tool.get() != "notthis":         # 19 Oct: not this keeps how the selection was made
+            self.sim = None
+            self._sel_origin = "brush"
+        if st["i"] in self.pix:
+            self._sync_sel_from_pix(st["i"])
+        self._drop_neg_patches(st["i"])
         self._redraw_scatter()
         self._redraw_image()
 
-    def _restore(self, i, prev, prev_sel):
+    def _restore(self, i, prev, prev_sel, prev_neg=_KEEP_NEG):
         r = self.recs[i]
+        if prev_neg is not _KEEP_NEG:                  # 19 Oct: not-this paint
+            if prev_neg is None:
+                self.neg_pix.pop(i, None)
+            else:
+                self.neg_pix[i] = prev_neg
         if prev is None:
             self.pix.pop(i, None)
         else:
@@ -1948,7 +2114,7 @@ class BioRAGAnnotateWindow:
     def _cancel_stroke(self):
         st, self._stroke = self._stroke, None
         if st is not None:
-            self._restore(st["i"], st["prev"], st["prev_sel"])
+            self._restore(st["i"], st["prev"], st["prev_sel"], st.get("prev_neg", _KEEP_NEG))
 
     def undo_stroke(self):
         if self._stroke is not None:
@@ -1996,7 +2162,7 @@ class BioRAGAnnotateWindow:
             if ev.inaxes is self.ax_i and ev.xdata is not None:
                 self.cursor.center = (ev.xdata, ev.ydata)
                 self.cursor.set_radius(max(1, int(self.v_brush.get())))
-                self.cursor.set_edgecolor("yellow" if self.v_tool.get() == "brush" else "red")
+                self.cursor.set_edgecolor({"brush": "yellow", "notthis": "magenta"}.get(self.v_tool.get(), "red"))
                 self.cursor.set_visible(True)
                 if self._stroke is not None:
                     self._stroke_to(ev.xdata, ev.ydata)
@@ -2121,6 +2287,7 @@ class BioRAGAnnotateWindow:
         if self._applied_mode:                 # 18 Oct: applied results carry no tokens -> no plot
             self.sc_all.set_offsets(np.zeros((0, 2)))
             self.sc_sel.set_offsets(np.zeros((0, 2)))
+            self.sc_neg.set_offsets(np.zeros((0, 2)))
             self.ax_s.set_xlabel("applied (fine) results: no token plot - edit / assign on the image below",
                                  color="#cccccc", fontsize=9)
             self.ax_s.set_ylabel("")
@@ -2130,6 +2297,7 @@ class BioRAGAnnotateWindow:
         if self.P is None:
             self.sc_all.set_offsets(np.zeros((0, 2)))
             self.sc_sel.set_offsets(np.zeros((0, 2)))
+            self.sc_neg.set_offsets(np.zeros((0, 2)))
             self.cv_s.draw_idle()
             return
         xy = self._xy()
@@ -2153,6 +2321,10 @@ class BioRAGAnnotateWindow:
             self.sc_sel.set_facecolors(self.colors[sidx])
         else:
             self.sc_sel.set_offsets(np.zeros((0, 2)))
+        nidx = np.flatnonzero(self._neg_vec(len(xy))) if self.neg_pix else np.zeros(0, int)   # 19 Oct
+        if len(nidx) > MAX_HILITE:
+            nidx = np.sort(np.random.default_rng(3).choice(nidx, MAX_HILITE, replace=False))
+        self.sc_neg.set_offsets(xy[nidx] if len(nidx) else np.zeros((0, 2)))
         self.cv_s.draw_idle()
         self._update_selinfo()
 
@@ -2174,6 +2346,9 @@ class BioRAGAnnotateWindow:
                f"{int(self.sel.sum())} on {n_img} image(s)")
         if self.pix.get(self.cur) is not None:
             txt += "  (brush-edited)"
+        nm = self.neg_pix.get(self.cur)
+        if nm is not None and nm.any():
+            txt += f"  not this: {int(negative_patches(nm, r.grid).sum())} patches"
         if self.sim is not None:
             txt += f"   | {self._sim_label} >= {float(self.v_sim.get()):.2f}"
             if len(per) > 1:
@@ -2341,6 +2516,22 @@ class BioRAGAnnotateWindow:
                 cs = self.ax_i.contour(xs, ys, cgrid.astype(np.float32), levels=[0.5], colors="white",
                                        linewidths=1.3, zorder=5)
                 self._contours = [cs]
+        ng = np.zeros((2, 2, 4), np.float32)                  # 19 Oct: not-this paint, under the halo
+        nm = self.neg_pix.get(self.cur)
+        if nm is not None and nm.any():
+            nh, nw = nm.shape
+            s = min(1.0, 1400.0 / max(nh, nw))
+            dh, dw = max(1, int(nh * s)), max(1, int(nw * s))
+            m = cv2.resize(nm, (dw, dh), interpolation=cv2.INTER_NEAREST) > 0
+            ng = np.zeros((dh, dw, 4), np.float32)
+            ng[m] = (1.0, 0.1, 0.45, 0.45)
+            if not fast:
+                xs = bx0 + (np.arange(dw) + 0.5) * (bx1 - bx0) / dw
+                ys = by0 + (np.arange(dh) + 0.5) * (by1 - by0) / dh
+                self._contours.append(self.ax_i.contour(xs, ys, m.astype(np.float32), levels=[0.5], colors="red",
+                                                        linewidths=1.1, zorder=3.5))
+        self.im_neg.set_data(ng)
+        self.im_neg.set_extent(bext)
         self.im_sel.set_data(sg)
         self.im_sel.set_extent(sext)
         self.ax_i.set_aspect("equal")
@@ -2503,10 +2694,13 @@ class BioRAGAnnotateWindow:
             return
         self._busy = True
         jobs = []
+        negs = []                                      # 19 Oct: not-this paint per job
         for k in ks:
             r = self.recs[k]
             pm = self.pix.get(k)
             jobs.append((r, self.sel[r.offset:r.offset + r.n].reshape(r.grid).copy(), None if pm is None else pm.copy()))
+            nm = self.neg_pix.get(k)
+            negs.append(nm.copy() if nm is not None and nm.any() else None)
         params = self.current_params()
         regs = [[r.name, [int(v) for v in r.box], self._crop_sz(r.path, r.box)] for r, _, _ in jobs if r.is_crop]
         if regs:
@@ -2530,6 +2724,8 @@ class BioRAGAnnotateWindow:
                         m = selection_to_mask(s, r.image_hw, r.grey(), box=r.box, min_px=mpx)
                         if getattr(r, "fine", False):
                             r._grey = None                  # fine working images are large: not kept
+                    if negs[k - 1] is not None:             # 19 Oct: masks never include "not this" paint
+                        m[work_mask_to_image(negs[k - 1], r.image_hw, r.box) > 0] = 0
                     if r.path in out:
                         out[r.path] = (np.maximum(out[r.path][0], m), out[r.path][1] + int(s.sum()))
                     else:
@@ -2704,6 +2900,8 @@ class BioRAGAnnotateWindow:
         if prm["fg"]:
             rule.update({"t": prm["t"], "fg_hi": prm["fg_hi"]})
         targets = [r.path] if self.v_apply_scope.get() == "image" else list(self.paths)
+        self._apply_negs_pending = [(self.recs[i].path, self.recs[i].box, nm.copy()) for i, nm in self.neg_pix.items()
+                                    if nm is not None and nm.any() and i < len(self.recs)]   # 19 Oct
         if kind == "colour windows":
             wins = self._window_params()
             if wins is None or not any(w["on"] for w in wins):
@@ -2724,18 +2922,20 @@ class BioRAGAnnotateWindow:
                 thr = 0.5
             rule["threshold"] = thr
             recs, sel, vis = list(self.recs), self.sel.copy(), self.vis.copy()
+            negv = self._neg_vec(len(sel))                 # 19 Oct: "not this" = explicit negatives
             self._busy = True
             self.v_status.set("Training the learned rule (logistic regression) on the region tokens ...")
 
             def work():
                 try:
                     X = np.concatenate([token_features(q.T, q.grid, rule["variant"]) for q in recs], 0)
-                    keep = vis
-                    m = train_logreg(X[keep], sel[keep])
-                    acc = float(((logreg_proba(X[keep], m) >= thr) == sel[keep]).mean())
+                    keep, sel_t, sw_t, ninfo = learned_training_set(sel, vis, negv)
+                    m = train_logreg(X[keep], sel_t[keep], sample_weight=sw_t)
+                    acc = float(((logreg_proba(X[keep], m) >= thr) == sel_t[keep]).mean())
                     rule.update({"lr_mean": m["mean"], "lr_std": m["std"], "lr_w": m["w"], "lr_b": m["b"],
-                                 "lr_train_accuracy": round(acc, 4), "lr_n_pos": int(sel[keep].sum()),
-                                 "lr_n_neg": int((~sel[keep]).sum())})
+                                 "lr_train_accuracy": round(acc, 4), "lr_n_pos": int(sel_t[keep].sum()),
+                                 "lr_n_neg": int((~sel_t[keep]).sum())})
+                    rule.update(ninfo)
                     self.q.put(("rule", (rule, targets)))
                 except Exception as e:
                     self.q.put(("error", f"Learned rule failed: {e}"))
@@ -2752,6 +2952,7 @@ class BioRAGAnnotateWindow:
             self.v_status.set(f"Cannot write the rule: {e}")
             return
         self._apply_rid, self._apply_targets = rid, list(targets)
+        self._apply_negs = list(getattr(self, "_apply_negs_pending", []))   # 19 Oct
         self._applied_rule_summary = dict(rule_summary(rule), rule_id=rid, rule_file=os.path.basename(path))
         self._apply_from = self._rec().path if self._rec() is not None else None
         extra = f", train acc {rule['lr_train_accuracy']}" if "lr_train_accuracy" in rule else ""
@@ -2798,6 +2999,17 @@ class BioRAGAnnotateWindow:
         self._applied_colors = colormaps["turbo"](np.clip((score - lo) / max(hi - lo, 1e-6), 0, 1))[:, :3].astype(np.float32)
         self.colors = self._applied_colors
         self.pix, self._undo_strokes, self.sim, self._featn, self.catidx, self._hue_base = {}, [], None, {}, None, None
+        self.neg_pix = {}
+        for k, q in enumerate(recs):            # 19 Oct: the region's not-this paint carries to its own image
+            for p, box, nm in getattr(self, "_apply_negs", []):
+                if p == q.path:
+                    mm = map_negatives(nm, box, q.image_hw, q.box, q.work_hw)
+                    self.neg_pix[k] = mm if k not in self.neg_pix else np.maximum(self.neg_pix[k], mm)
+        for k in list(self.neg_pix):
+            if self.neg_pix[k].any():
+                self._drop_neg_patches(k)
+            else:
+                del self.neg_pix[k]
         self._sel_origin = "applied"
         if self.v_colour.get() == "mask category":
             self._load_categories(self._cat_path(), quiet=True)

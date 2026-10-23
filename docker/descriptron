@@ -13,6 +13,17 @@ CONDA_RUN="conda run --no-capture-output -n"
 
 have_env() { [ -d "/opt/conda/envs/$1" ]; }
 
+# 2.8.1: DINOMask takes HF_TOKEN from the key store (/config/credentials, `keys --set HF_TOKEN`) when -e HF_TOKEN is
+# not given - as DINOLand does. Read only; the environment always wins.
+hf_token_from_store() {
+  [ -n "${HF_TOKEN:-}" ] && return 0
+  local t
+  t="$(/opt/conda/envs/samm/bin/python -c 'import sys; sys.path.insert(0, sys.argv[1]); import descriptron_credentials as c; print(c.read_file().get("HF_TOKEN", ""))' "$GUI/measure" 2>/dev/null)" || t=""
+  [ -n "$t" ] && export HF_TOKEN="$t"
+  return 0
+}
+DINOMASK_MODEL="facebook/dinov3-vitl16-pretrain-lvd1689m"   # 2.8.1: ViT-L unless --model is given (the last --model wins)
+
 need_env() {
   if ! have_env "$1"; then
     echo "This image was built without the '$1' environment." >&2
@@ -38,6 +49,7 @@ descriptron <command> [args...]
   dinoland            DINOv3 landmark transfer                [samm]
   dinomask            DINOMask part segmentation: train + predict (DINOv3 tokens)  [samm]
   dinomask-rot4       DINOMask prediction with test-time rotation                  [samm]
+  dinomask-v5         DINOMask v5: + token cache, --bg_keep, --grid, --curve_json   [samm]
   probe               BioRAG-Probe: literature labels x DINOv3 tokens               [samm]
   measure             measurements from COCO                  [measure_env]
   pipeline            the full BioRAG v2 pipeline             [measure_env]
@@ -72,7 +84,7 @@ case "$cmd" in
       echo "    -v \"\$PWD:/data\" descriptron:latest gui" >&2
       exit 3
     fi
-    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v90.py" "$@" ;;   # 2.8.0: v90 (v89 BioRAG Annotate tab + folder-session save fix; v73-v89 kept)
+    exec $CONDA_RUN samm python "$GUI/descriptron-v2-v96.py" "$@" ;;   # 2.8.1: v96 (undo/redo + save prompt; v73-v95 kept)
   sam3)
     # 2.5.1: SAM 3 multi-instance proposals (own env, Python 3.12). Checkpoints are gated: request access at
     # huggingface.co/facebook/sam3, then pass your token: -e HF_TOKEN=... (cached in -v descriptron-weights:/weights)
@@ -103,10 +115,16 @@ case "$cmd" in
     exec $CONDA_RUN samm python "$GUI/dinov3_landmark_transfer_v52.py" "$@" ;;
   dinomask)
     need_env samm
-    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v4.py" "$@" ;;   # 2.8.0
+    hf_token_from_store
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v4.py" --model "$DINOMASK_MODEL" "$@" ;;   # 2.8.0; 2.8.1 ViT-L + key store
   dinomask-rot4)
     need_env samm
-    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_predict_rot4_v1.py" "$@" ;;    # 2.8.0
+    hf_token_from_store
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_predict_rot4_v1.py" --model "$DINOMASK_MODEL" "$@" ;;    # 2.8.0; 2.8.1 key store
+  dinomask-v5)
+    need_env samm
+    hf_token_from_store
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v5.py" --model "$DINOMASK_MODEL" "$@" ;;   # 2.8.1
   probe)
     need_env samm
     exec $CONDA_RUN samm python "$GUI/measure/biorag_probe_v1.py" "$@" ;;              # 2.8.0
