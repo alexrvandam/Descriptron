@@ -57,7 +57,7 @@ biorag_annotate_v1.py biorag_annotate_tokens_v1.py descriptron_folder_save_v1.py
 biorag_probe_v1.py biorag_probe_parts_v1.py biorag_probe_panels_v2.py
 wing_vein_unsupervised_eval_v1.py wing_spot_tokens_v1.py wing_vein_naming_rule_v1.py wing_fringe_character_v1.py wing_spot_pattern_v1.py
 annotation_scale_transfer_v1.py
-descriptron-v2-v91.py descriptron-v2-v92.py descriptron-v2-v93.py descriptron-v2-v94.py descriptron-v2-v95.py descriptron-v2-v96.py
+descriptron-v2-v91.py descriptron-v2-v92.py descriptron-v2-v93.py descriptron-v2-v94.py descriptron-v2-v95.py descriptron-v2-v96.py descriptron-v2-v97.py
 descriptron_category_nav_v1.py descriptron_dinomask_dialog_v1.py descriptron_undo_v1.py biorag_annotate_v2.py biorag_annotate_tokens_v2.py
 descriptron_ontology.py"
 
@@ -99,7 +99,8 @@ LIVE_LIST="" copy_py "$GUI/dinomask" "$DST/descriptron/dinomask"
 cp "$GUI/dinomask/README.md" "$DST/descriptron/dinomask/"
 cp "$GUI/measure/BIORAG_PROBE_DESIGN.md" "$DST/descriptron/measure/"
 for t in test_folder_save test_biorag_annotate test_logic test_keypoints test_v87_fixes test_v88_context_tools \
-         test_category_nav test_dinomask_dialog test_undo test_biorag_annotate_v2; do   # 2.8.1: + the v91-v96 module tests
+         test_category_nav test_dinomask_dialog test_undo test_biorag_annotate_v2 \
+         test_v97_folder_filter; do   # 2.8.1: + the v91-v96 module tests; 2.8.2: + v97 folder filter
   cp "$GUI/test_brush/$t.py" "$DST/descriptron/test_brush/"
 done
 for f in detectron2_training_and_filterV10_and_kpts-17.py \

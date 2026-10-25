@@ -113,7 +113,8 @@ EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptro
                    "descriptron-v2-v92.py", "descriptron-v2-v93.py",   # v2.8.1: MASKS row (v92); zoom without freezing (v93)
                    "descriptron-v2-v94.py", "descriptron_dinomask_dialog_v1.py",   # v2.8.1: DINOMask button + dialog (v94)
                    "descriptron-v2-v95.py", "biorag_annotate_v2.py", "biorag_annotate_tokens_v2.py",   # v2.8.1: BioRAG Annotate v2 (v95)
-                   "descriptron-v2-v96.py", "descriptron_undo_v1.py",  # v2.8.1: general undo / redo + save prompt (v96, default GUI)
+                   "descriptron-v2-v96.py", "descriptron_undo_v1.py",  # v2.8.1: general undo / redo + save prompt (v96)
+                   "descriptron-v2-v97.py",                            # v2.8.2: = v96 + Load Folder skips mask files (default GUI)
                    # v2.8.1: ontology templates for the label menus; the module finds the json beside itself
                    "descriptron_ontology.py", "descriptron_ontology_templates.json",
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
