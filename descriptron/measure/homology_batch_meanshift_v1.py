@@ -4,7 +4,7 @@
 Specimens photographed in different sessions (camera, magnification, lighting) can differ more by session than by
 species. This shifts every non-reference batch onto the reference batch by the mean per-feature difference between the
 two, estimated ONLY from species photographed in both batches (species-matched, so true species differences between
-batches do not leak into the correction). Tested on 65 Austromyrma heads (two montage sessions, 8 shared species): the
+batches do not leak into the correction). Tested on 65 heads of undescribed Tetramorium species (two montage sessions, 8 shared species): the
 same-species nearest neighbour across sessions rose from 0.04 to 0.36 on TPS grid cells, and the one specimen imaged in
 both sessions found its own other photo first on band and whole-table features; rescaling the spread as well (location-
 scale) was worse (ant_dorsal/texture_v1/PUBLICATION_texture_sculpture_20261012, result 8).

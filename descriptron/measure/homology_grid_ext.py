@@ -8,7 +8,7 @@ Added 12 Oct 2026. All of it is opt-in; with the defaults (--grid_ext 0, no occl
    the semilandmarks only.
 2. Occluders (--occluder_categories scape,antenna,...): annotations of those categories are removed from the foreground
    mask, so features are computed from VISIBLE pixels only, and every cell gets a visible fraction
-   = visible pixels / (visible + occluded pixels inside the outline). Tested on 65 Austromyrma heads by transplanting real
+   = visible pixels / (visible + occluded pixels inside the outline). Tested on 65 heads of undescribed Tetramorium species by transplanting real
    scape coverage between specimens through the TPS warps: sampling only visible pixels gave the lowest error (total
    variation 0.050 per damaged cell, band-level bias 0.0004); dropping cells under 60% visible, coverage weighting and
    mirror filling were no better or worse (ant_dorsal/texture_v1/PUBLICATION_texture_sculpture_20261012, result 7).

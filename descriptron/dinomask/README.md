@@ -30,7 +30,7 @@ Request access on that page and set up a token once: step by step in [docs/HUGGI
 The token can be in the environment (`HF_TOKEN`), saved with `hf auth login`, or - from 2.8.1, for the pip commands, the
 GUI and the Docker `dinomask` commands - in Descriptron's key store (`descriptron-keys --set HF_TOKEN`).
 
-## Recipe (used for the Austromyrma profiles, October 2026)
+## Recipe (used for the profiles of undescribed Tetramorium species, October 2026)
 
 ```bash
 VOCAB=eye,gaster,head_capsule,mesosoma,...      # the full list of structures you annotate
@@ -65,7 +65,7 @@ All are intersection-over-union against hand-drawn masks on images the model nev
 |---|---|---|---|
 | Trigonopterus weevils, lateral, 11 parts | leave-one-specimen-out over 12 hand-annotated images, ViT-L 2048 + guided filter | 0.60 (0.63 with SAM2 prompted by each mask on the same image) | SAM2-PAL with one template 0.54; SAM2-PAL fine-tuned on 11 images 0.52 |
 | Ant mesosoma | 67 held-out images with reviewed masks, ViT-L 1344 | 0.84 | SAM2-PAL one template 0.81; SAM2-PAL fine-tuned on 12 0.85 |
-| Austromyrma profiles, 12 structures | 4-fold cross-validation over 8 hand-corrected images (2 held out per fold), native resolution, recipe above; patch-level IoU | mean 0.65 (gaster 0.90, head capsule 0.87, petiole 0.82, eye 0.79; hind-leg segments 0.37-0.49) | adding 12 profiles from another source with a mapped vocabulary: 0.64 |
+| Tetramorium profiles (undescribed species), 12 structures | 4-fold cross-validation over 8 hand-corrected images (2 held out per fold), native resolution, recipe above; patch-level IoU | mean 0.65 (gaster 0.90, head capsule 0.87, petiole 0.82, eye 0.79; hind-leg segments 0.37-0.49) | adding 12 profiles from another source with a mapped vocabulary: 0.64 |
 | Micro-CT renders of ant heads / mesosoma | 5 held-out species, ViT-L 1024 | head 0.82, mesosoma 0.71 | ViT-S 336 + SAM2 0.71 / 0.49 |
 
 Weevil parts where DINOMask was clearly better than SAM2-PAL: femur, tibia, head, ventrites, coxa; SAM2-PAL kept the
