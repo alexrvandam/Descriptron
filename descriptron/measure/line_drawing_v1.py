@@ -37,6 +37,12 @@ sub = dict(d); sub['annotations'] = [x for x in d['annotations'] if cid[x['categ
 if not sub['annotations']: raise SystemExit(f'no annotations of {LINES} in {a.coco}')
 lc = os.path.join(a.out_dir, 'line_coco.json'); json.dump(sub, open(lc, 'w'))
 v35 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py')
+if not os.path.exists(v35):   # 2.8.4: pip installs ship V35 in descriptron-vision, not beside this script
+    try:
+        from descriptron_vision.cli import tools_dir as _vision_tools
+        v35 = str(_vision_tools() / os.path.basename(v35))
+    except ImportError:
+        pass
 met = os.path.join(a.out_dir, 'line_metrics.csv')
 cmd = [sys.executable, v35, '--json', lc, '--image_dir', a.image_dir, '--output_dir', os.path.join(a.out_dir, 'v35_skeleton'),
        '--method', 'skeleton', '--save_results', '--output_file', met] + (['--mm_scale', str(a.mm_scale)] if a.mm_scale else [])
@@ -74,6 +80,9 @@ for im in d['images']:
     if rows.empty: continue
     outl = {c: (tps_outline(c, fn) if tps_outline(c, fn) is not None else mask_outline(c, im)) for c in OUTL}
     pts = [np.array(ast.literal_eval(s), float) for s in rows['segmentation_coords']]
+    pts = [p.reshape(-1, 2) for p in pts if p.size >= 2]   # 2.8.4: a mask with an empty skeleton has no points
+    if not pts:
+        print(f'{fn}: no skeleton points, no drawing'); continue
     allp = np.vstack([p for p in list(outl.values()) + pts if p is not None and len(p)])
     X0, Y0 = np.floor(allp.min(0)) - a.margin; X1, Y1 = np.ceil(allp.max(0)) + a.margin; U = a.upsample
     canvas = np.zeros((int(Y1 - Y0) * U, int(X1 - X0) * U), np.float32)

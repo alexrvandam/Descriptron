@@ -748,8 +748,13 @@ def measure_metrics_pca(contour, mask, pixels_per_mm=None, img_id=None, ann_idx=
 
 def preprocess_mask_for_skeleton(mask):
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=2)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+    opened = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=2)
+    # 2.8.4: the opening erases or cuts masks only a few pixels wide (thin setae, sutures); if it removes more than a
+    # fifth of the mask or splits it into more pieces, skeletonize the mask without the opening (closing only)
+    if (np.count_nonzero(opened) < 0.8 * np.count_nonzero(mask)
+            or cv2.connectedComponents((opened > 0).astype(np.uint8))[0] > cv2.connectedComponents((mask > 0).astype(np.uint8))[0]):
+        opened = mask
+    mask = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernel, iterations=2)
     return mask
 
 
@@ -762,6 +767,53 @@ def skeletonize_skimage(mask):
 
 def measure_length_skeleton(skeleton):
     return np.count_nonzero(skeleton)
+
+
+def measure_length_skeleton_path(skeleton, smooth=7):
+    """2.8.4: length along the skeleton. measure_length_skeleton counts pixels, so a diagonal step counted 1 instead of
+    sqrt(2) (a 45-degree line came out 29% short). Here, per connected piece of the skeleton, the longest path between
+    two of its ends is followed (8-neighbour steps, side spurs ignored), the path is smoothed with a moving average of
+    `smooth` points to remove the pixel staircase, and the lengths of its segments are summed. Pieces are added up."""
+    from scipy.sparse import coo_matrix
+    from scipy.sparse.csgraph import dijkstra, connected_components
+    sk = (np.asarray(skeleton) > 0)
+    yx = np.argwhere(sk)
+    if len(yx) < 2:
+        return float(len(yx))
+    idx = -np.ones(sk.shape, dtype=np.int64); idx[yx[:, 0], yx[:, 1]] = np.arange(len(yx))
+    r, c, w = [], [], []
+    H, W = sk.shape
+    for dy, dx in ((0, 1), (1, 0), (1, 1), (1, -1)):
+        y2, x2 = yx[:, 0] + dy, yx[:, 1] + dx
+        ok = (y2 >= 0) & (y2 < H) & (x2 >= 0) & (x2 < W)
+        j = np.full(len(yx), -1); j[ok] = idx[y2[ok], x2[ok]]
+        k = j >= 0
+        r.append(np.nonzero(k)[0]); c.append(j[k]); w.append(np.full(k.sum(), np.hypot(dy, dx)))
+    r, c, w = np.concatenate(r), np.concatenate(c), np.concatenate(w)
+    G = coo_matrix((w, (r, c)), shape=(len(yx), len(yx))).tocsr()
+    n, lab = connected_components(G, directed=False)
+    total = 0.0
+    for comp in range(n):
+        nodes = np.nonzero(lab == comp)[0]
+        if len(nodes) < 2:
+            total += 1.0; continue
+        d0 = dijkstra(G, directed=False, indices=nodes[0])
+        a_ = nodes[np.argmax(np.where(np.isfinite(d0[nodes]), d0[nodes], -1))]
+        d1, pred = dijkstra(G, directed=False, indices=a_, return_predecessors=True)
+        b_ = nodes[np.argmax(np.where(np.isfinite(d1[nodes]), d1[nodes], -1))]
+        path = [b_]
+        while path[-1] != a_ and pred[path[-1]] >= 0:
+            path.append(pred[path[-1]])
+        pts = yx[np.array(path[::-1])].astype(float)
+        k = min(smooth, len(pts))
+        if k >= 3:
+            ker = np.ones(k) / k
+            pad = k // 2
+            sm = np.column_stack([np.convolve(np.pad(pts[:, i], pad, mode='edge'), ker, mode='valid') for i in (0, 1)])
+            sm[0], sm[-1] = pts[0], pts[-1]
+            pts = sm
+        total += float(np.sum(np.hypot(*np.diff(pts, axis=0).T))) + 1.0   # +1: the end pixels' own extent, as the old count
+    return total
 
 
 def measure_width_skeleton(mask, skeleton):
@@ -1794,10 +1846,13 @@ def main():
                             logging.error(f"Skeletonization error: {e}")
                             continue
                         skeleton = sk_z if np.count_nonzero(sk_z) > np.count_nonzero(sk_g) else sk_g
+                        if not np.any(skeleton):   # 2.8.4: nothing left to measure (mask too small even without opening)
+                            logging.warning(f"Empty skeleton for {image_basename} annotation {ann_idx + 1} ({category_name}); skipped")
+                            continue
                         
                         metrics.update({
                             "method": "Skeletonization",
-                            "length_pixels": measure_length_skeleton(skeleton),
+                            "length_pixels": measure_length_skeleton_path(skeleton),
                             "average_width_pixels": measure_width_skeleton(binary_mask, skeleton)
                         })
                         if px_per_mm: #args.mm_scale:
