@@ -60,6 +60,9 @@ ap.add_argument('--within_coco', default='', help='DINOMask predictions (RLE or 
 ap.add_argument('--within', default='', help='comma list of parts: keep only detections inside these (needs --within_coco)')
 ap.add_argument('--ablate', action='store_true', help='also cross-validate each layer alone and layers 6+23')
 ap.add_argument('--seed', type=int, default=0)
+ap.add_argument('--point_type', default='', help='use only clicks of this GUI point type (v98 "Point type", saved as keypoint_types, '
+                'e.g. seta); positives and negatives alike. Files without keypoint_types are untyped and used only when '
+                'this is not given (default: every click, as before)')
 a = ap.parse_args(); out = Path(a.out); out.mkdir(parents=True, exist_ok=True); rng = np.random.default_rng(a.seed)
 dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -73,8 +76,9 @@ def click_files(spec):
     return fs
 
 
-def read_clicks(files, images_dir):
-    """{image path: (positives Nx2, negatives Mx2)} in original image pixels, from 'keypoints_clicked' (or 'keypoints')."""
+def read_clicks(files, images_dir, point_type=None):
+    """{image path: (positives Nx2, negatives Mx2)} in original image pixels, from 'keypoints_clicked' (or 'keypoints').
+    point_type: keep only the clicks whose 'keypoint_types' entry equals it (annotations without the list are skipped)."""
     clicks = {}
     for f in files:
         d = json.load(open(f)); ims = {im['id']: im for im in d.get('images', [])}
@@ -86,7 +90,13 @@ def read_clicks(files, images_dir):
                      os.path.join(os.path.dirname(os.path.abspath(f)), os.path.basename(fn))]
             path = next((c for c in cands if os.path.isfile(c)), None)
             if path is None: print(f'[probe] image not found for {fn} ({f}); skipped'); continue
-            k = np.asarray(kp, float).reshape(-1, 3); pos = k[k[:, 2] > 0, :2]; neg = k[(k[:, 2] <= 0) & (k[:, :2].sum(1) > 0), :2]
+            k = np.asarray(kp, float).reshape(-1, 3)
+            if point_type:                                   # v98 point types: one name per click, same order
+                kt = an.get('keypoint_types')
+                if not isinstance(kt, list) or len(kt) != len(k): continue
+                k = k[np.array([t == point_type for t in kt], bool)]
+                if not len(k): continue                      # no click of that type on this image
+            pos = k[k[:, 2] > 0, :2]; neg = k[(k[:, 2] <= 0) & (k[:, :2].sum(1) > 0), :2]
             p0, n0 = clicks.get(path, (np.zeros((0, 2)), np.zeros((0, 2))))
             clicks[path] = (np.vstack([p0, pos]), np.vstack([n0, neg]))
     return clicks
@@ -287,7 +297,9 @@ EXT = ('.jpg', '.jpeg', '.png', '.tif', '.tiff', '.bmp')
 if a.run:
     import joblib; probe = joblib.load(Path(a.run) / 'probe.joblib')
 else:
-    cl = read_clicks(click_files(a.points), a.images)
+    cl = read_clicks(click_files(a.points), a.images, a.point_type or None)
+    if a.point_type: print(f'[probe] --point_type {a.point_type}: {sum(len(p) for p, _ in cl.values())} positive / '
+                           f'{sum(len(n) for _, n in cl.values())} negative clicks of that type on {len(cl)} image(s)')
     if not cl: sys.exit('[probe] no clicks found: pass --points with the GUI keypoint save(s)')
     probe = train(cl)
 targets = []

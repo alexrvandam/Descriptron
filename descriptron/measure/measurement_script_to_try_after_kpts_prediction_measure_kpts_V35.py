@@ -15,7 +15,10 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from PIL import Image
 from skimage.morphology import skeletonize
 from scipy.cluster.hierarchy import dendrogram, linkage
-import easyocr
+try:   # 2.8.5: optional (pip extra descriptron-vision[ocr]); only the OCR scale-bar reading needs it
+    import easyocr
+except ImportError:
+    easyocr = None
 import umap
 import seaborn as sns
 import pandas as pd
@@ -333,6 +336,10 @@ def load_annotations(json_path, image_id=None, category_name=None):
 
 # --- Modified EasyOCR initialization function with GPU check ---
 def ensure_easyocr_models_present(languages=['en'], cache_dir=None):
+    if easyocr is None:   # 2.8.5: run without OCR; scale bars are then read by Florence-2 or --mm_scale only
+        logging.warning("easyocr is not installed: OCR scale-bar reading is off (scale from Florence-2 if it loads, or give --mm_scale). "
+                        'To enable it: pip install "descriptron-vision[ocr]"')
+        return None
     try:
         import torch
         use_gpu = torch.cuda.is_available()
@@ -404,6 +411,8 @@ def find_scale_bar_length_and_label(image, scale_bar_bbox, reader, args):
 
 
 def extract_scale_text(roi_image, reader):
+    if reader is None:   # 2.8.5: easyocr not installed
+        return ""
     roi_rgb = cv2.cvtColor(roi_image, cv2.COLOR_BGR2RGB)
     #results = reader.readtext(roi_rgb)
     # only let EasyOCR output digits, dots, commas and µ/u/m characters
@@ -496,6 +505,9 @@ def detect_image_scale(image, reader, args, expand_px=100):
     4) Compute and return pixels_per_unit using `calculate_pixels_per_mm`.
     Returns None if detection fails.
     """
+    if reader is None:   # 2.8.5: easyocr not installed (pip install "descriptron-vision[ocr]")
+        logging.warning("Scale detection via OCR skipped: easyocr is not installed. Using default mm_scale if provided.")
+        return None
     # Convert to RGB for EasyOCR
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     ocr_results = reader.readtext(rgb)
@@ -758,11 +770,20 @@ def preprocess_mask_for_skeleton(mask):
     return mask
 
 
+_SKIMAGE_SKELETON_LOGGED = False   # 2.8.5: the scikit-image fallback is announced once
+
+
 def skeletonize_skimage(mask):
     mask_bool = mask.astype(bool)
     skeleton = skeletonize(mask_bool)
     skeleton_uint8 = (skeleton * 255).astype(np.uint8)
     return skeleton_uint8
+
+
+def thin_skimage(mask):
+    """2.8.5: scikit-image thinning (Guo-Hall-type), the fallback partner of skeletonize_skimage when cv2.ximgproc is missing."""
+    from skimage.morphology import thin
+    return (thin(mask.astype(bool)) * 255).astype(np.uint8)
 
 
 def measure_length_skeleton(skeleton):
@@ -1843,8 +1864,17 @@ def main():
                             sk_z = cv2.ximgproc.thinning(pre, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN)
                             sk_g = cv2.ximgproc.thinning(pre, thinningType=cv2.ximgproc.THINNING_GUOHALL)
                         except AttributeError as e:
-                            logging.error(f"Skeletonization error: {e}")
-                            continue
+                            # 2.8.5: cv2.ximgproc is only in opencv-contrib (pip installs have opencv-python-headless):
+                            # thin with scikit-image instead of skipping every mask
+                            global _SKIMAGE_SKELETON_LOGGED
+                            if not _SKIMAGE_SKELETON_LOGGED:
+                                logging.warning(f"cv2.ximgproc not available ({e}); using the scikit-image skeleton")
+                                print("[V35] cv2.ximgproc (opencv-contrib) not available: using the scikit-image skeleton")
+                                _SKIMAGE_SKELETON_LOGGED = True
+                            # Zhang-Suen (skimage skeletonize) deletes some 2-px diagonal bands entirely; as with cv2, the
+                            # Guo-Hall-type thinning (skimage thin) is run too and the skeleton with more pixels kept
+                            sk_z = skeletonize_skimage(pre)
+                            sk_g = thin_skimage(pre)
                         skeleton = sk_z if np.count_nonzero(sk_z) > np.count_nonzero(sk_g) else sk_g
                         if not np.any(skeleton):   # 2.8.4: nothing left to measure (mask too small even without opening)
                             logging.warning(f"Empty skeleton for {image_basename} annotation {ann_idx + 1} ({category_name}); skipped")

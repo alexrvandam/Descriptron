@@ -425,6 +425,12 @@ def step_measurements(cfg: Dict, python: str, log_dir: Path) -> bool:
         return True
 
     script = SCRIPT_DIR / "measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py"
+    if not script.exists():   # 2.8.5: pip installs ship V35 in descriptron-vision, not beside this script
+        try:
+            from descriptron_vision.cli import tools_dir as _vision_tools
+            script = _vision_tools() / script.name
+        except ImportError:
+            pass
     cmd = [
         python, str(script),
         "--json", cfg["coco_json"],
