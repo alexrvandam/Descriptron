@@ -14,6 +14,7 @@ Files (all in this folder; run them from here or through the pip commands below)
 | `dinomask_train_predict_v4.py` | train on a COCO file, report held-out IoU, and optionally predict a folder or a list of images |
 | `dinomask_predict_rot4_v1.py` | predict with a trained run at 0/90/180/270 degrees and keep the most confident rotation (figures with the head on the right or sideways) |
 | `fg_mask_v1.py` | specimen foreground from a plain background, used by `--fg_mask border` |
+| `dinomask_hypercolumn_probe_v1.py` | 2.8.3: **points probe** - learn one small, repeated structure (setae, scales, punctures, pores) from keypoint clicks and find it on every image; see below |
 | `dinomask_train_predict_v5.py` | 2.8.1: v4 plus `--cache_dir` (DINOv3 tokens computed once per image and reused), `--bg_keep` (keep only this share of background patches far from the specimen), `--lr` / `--hidden` / `--wd`, `--curve_json` (per-epoch train and held-out loss, per-class held-out IoU) and `--grid` (several lr:hidden settings on the same tokens, curves only); less memory (training array built in place). Same defaults and outputs as v4; v4 stays the default and is what the GUI runs |
 
 Installed with pip (`descriptron-vision`): `descriptron-dinomask` (v4), `descriptron-dinomask-rot4` and, from 2.8.1,
@@ -56,6 +57,42 @@ Rotation-robust prediction with a trained run:
 ```bash
 descriptron-dinomask-rot4 --run <run_dir> --images <image_dir> --out <out_dir> [--list targets.txt] [--size 2048]
 ```
+
+## Points probe: small structures from a few clicks (2.8.3)
+
+DINOMask masks the parts; the points probe finds the small things *on* them. Read the same spot at several depths of
+DINOv3 (A. R. Van Dam's idea): the patch tokens of layers 6, 12, 18 and 23 are reduced to 64 PCA components each and
+concatenated into one 256-number "hypercolumn" per 16-px patch (shallow layers carry the fine detail, deep layers what the
+thing is; Hariharan et al. 2015 for the hypercolumn). Each feature has its local average inside the specimen subtracted
+(`--highpass 3`), so the probe learns the structure rather than the body region the clicks happen to sit on. A logistic
+regression separates the structure from its surroundings; four half-patch-shifted passes give ~8-px precision.
+
+How to use it:
+1. In the GUI, open an image and place **positive keypoints** on 15-30 examples of the structure, spread over the specimen
+   (and over two or three specimens if you can). Mark a few look-alikes it must ignore (glare, debris, empty sockets) as
+   **negative** points. Leaving the image auto-saves `<image>_keypoints.json`.
+2. DINOMask dialog -> *Points probe: learn one structure from clicks*: choose the save (or the folder of saves), name the
+   structure, and optionally a folder to predict.
+3. The result opens in the editor as points: delete the wrong ones, click the missed ones, save, run again. Each round is
+   a better probe.
+
+Automatic negatives come from the cuticle around each positive click (2-8 patches away, `--neg_dist` / `--neg_far`).
+Validation is printed and saved in `results.json`: leave-one-image-out when two or more images are clicked, otherwise a
+2-fold left/right split of the one image (`--ablate` adds each layer alone). Outputs: `probe.joblib`,
+`predictions_keypoints.json` (GUI keypoint format), `counts.json` (per image; per part with `--within_coco` = DINOMask
+predictions), `overlay_*.jpg`.
+
+```bash
+descriptron-vision dinomask/dinomask_hypercolumn_probe_v1.py --points Tri-20_keypoints.json --images <image_dir> \
+    --name scale_seta --out <run_dir> --predict_dir <folder> [--within_coco <dinomask predictions.json> --within elytron,pronotum]
+descriptron-vision dinomask/dinomask_hypercolumn_probe_v1.py --run <run_dir> --predict_dir <folder> --out <out_dir>
+```
+
+First test (Tri-20, *Trigonopterus*, cream appressed scale-like setae, dense colour-derived labels; taught on the pronotum,
+tested on the unseen elytra): AUC .997, AP .972; layer 23 alone .962 / .867, so combining depths is what sharpens it.
+With 25 sparse clicks and no negatives the first version learned "pronotum" instead of "scale" (automatic negatives from
+the whole body included the elytral scales); local negatives and the high-pass fixed that. Results from real clicks will be
+added here.
 
 ## Held-out results so far
 

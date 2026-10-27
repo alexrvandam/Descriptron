@@ -886,6 +886,12 @@ def main():
     df.to_csv(os.path.join(args.output_dir,
               f"texture_homology_features_{cat_name}.csv"), index=False)
 
+    # 25 Oct 2026: one specimen -> the per-cell texture features above are its description; the PCA, clustering and
+    # plots below compare specimens and need at least two
+    if X_filled.shape[0] < 2:
+        logging.info(f"Single specimen ({fns[0]}): per-cell texture features written; between-specimen analyses skipped.")
+        return
+
     # --- PCA ---
     sc = StandardScaler()
     X_scaled = sc.fit_transform(X_filled)

@@ -462,7 +462,10 @@ classifier is trained on a few hand-annotated images; prediction uses four shift
 cannot break it. Held out against hand masks it scored 0.60 mean IoU on 11 weevil parts (leave-one-specimen-out over
 12 images; SAM2-PAL with one template 0.54). Recipe, options and all held-out numbers:
 [descriptron/dinomask/README.md](descriptron/dinomask/README.md). Run it with `descriptron-dinomask` /
-`descriptron-dinomask-rot4` (pip) or `descriptron dinomask` / `dinomask-rot4` (Docker).
+`descriptron-dinomask-rot4` (pip) or `descriptron dinomask` / `dinomask-rot4` (Docker). From 2.8.3 the DINOMask
+dialog also has a **points probe** for small repeated structures (setae, scales, punctures): click 15-30 examples
+with the keypoint tool, and it finds the structure on every image as editable points
+(`descriptron-vision dinomask/dinomask_hypercolumn_probe_v1.py`; see the DINOMask README).
 
 **BioRAG-Probe** tests whether a character described in the literature (sculpture, setosity, vein setulae...) can be
 read from DINOv3 patch tokens inside a mask, with the taxon held out, a simple baseline and a shuffled-label null
@@ -549,6 +552,27 @@ mask, then colour measured in homologous cells, so the same cell covers the same
 **Texture**: ant heads placed by the texture of their head capsule, measured in homologous cells.
 
 ![Ant heads in texture space](docs/tutorial/showcase_texture_ant_heads.jpg)
+
+**Texture along a structure** (from 2.8.3): elytral texture profiles of 342 *Trigonopterus* species on a homologous
+grid, measured by a sculpture classifier trained only on ants, follow Riedel's published stria states (PERMANOVA
+R² = 0.448, p = 0.001). Shown: UPGMA of 42 species (14 per state); the colour bar is Riedel's wording and each row is
+that species' texture profile from front to back. One photograph per species, so this tests published character
+states, not species. Photographs from Riedel et al.'s open-access revisions in ZooKeys (CC BY 4.0).
+
+![Trigonopterus elytral texture band profiles clustered, coloured by Riedel's stria states](docs/tutorial/showcase_trigonopterus_texture_bands.png)
+
+Run it with `texture_band_profiles_v1` (`descriptron texture_band_profiles_v1 ...` with pip, `python
+measure/texture_band_profiles_v1.py ...` from the source tree): `bands` turns per-cell texture class shares on a
+homology grid (row 0 = anterior) into one profile per specimen, then `test` compares the profiles between groups
+(a published character state, or species when there are several specimens per species) with PERMANOVA and
+nearest-neighbour agreement against shuffled labels, and draws the band profiles and the dendrogram:
+
+```bash
+descriptron texture_band_profiles_v1 bands --cells cell_class_share_elytron.npy --ids ids_elytron.txt \
+    --rows 10 --cols 8 --pad 3 --classes <class1,class2,...> [--merge "<name>=<class>+<class>;..."] --out bands_elytron.npz
+descriptron texture_band_profiles_v1 test --bands bands_elytron.npz --labels labels.tsv --id_col file \
+    --group_col <state column> --out band_test/
+```
 
 **Statistics from your metadata.** Import a specimen table or a Darwin Core download, mark the columns, and one
 command runs the analyses the metadata support. Below, 96 psyllid forewings: species explain 72 % of forewing

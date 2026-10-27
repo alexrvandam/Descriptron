@@ -2249,8 +2249,11 @@ def main():
             except (TypeError, ValueError) as e:
                 logging.warning(f"UMAP failed for {cat_name} (n={ns}): {e}")
                 ur = None
-        dbl = DBSCAN(eps=.5, min_samples=5).fit_predict(ds)
-        hl = do_hclust(ds, od, cat_name, pc2, imgs, msks)
+        if ns >= 2:
+            dbl = DBSCAN(eps=.5, min_samples=5).fit_predict(ds)
+            hl = do_hclust(ds, od, cat_name, pc2, imgs, msks)
+        else:   # 25 Oct 2026: one specimen -> semilandmarks and shape outputs still written; clustering needs >= 2
+            dbl = np.full(ns, -1); hl = np.ones(ns, dtype=int)
         dd = {'filename':fns, 'PCA1':pc[:,0], 'PCA2':pc2[:,1], 'DBSCAN':dbl, 'Hierarchical':hl}
         if ur is not None: dd['UMAP1']=ur[:,0]; dd['UMAP2']=ur[:,1]
         else: dd['UMAP1']=np.nan; dd['UMAP2']=np.nan

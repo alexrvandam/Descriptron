@@ -9,6 +9,10 @@ Three modes:
   train_predict  train on a COCO file, then predict a folder of images   -> predictions_polygons.json (opens in the GUI)
   holdout        train on a COCO file with some images held out          -> per-part IoU on those images (results.json)
   predict_run    predict a folder with an already trained run (rot4)     -> predictions_polygons.json
+2.8.3 (25 Oct 2026), the hypercolumn probe (dinomask/dinomask_hypercolumn_probe_v1.py) for small repeated structures:
+  points_probe   learn one structure (setae, scales, punctures ...) from keypoint clicks, then predict a folder
+                 -> predictions_keypoints.json (opens as editable points; fix them and retrain)
+  probe_run      predict a folder with an already trained probe (probe.joblib)
 """
 import json
 import os
@@ -82,6 +86,30 @@ def coco_summary(coco_path):
     return [im.get("file_name", "") for im in d.get("images", [])], sorted(parts), n
 
 
+def points_summary(path):
+    """(image file_names, positive clicks, negative clicks) of a keypoint save: the GUI's COCO or <image>_keypoints.json
+    files; a folder = every *.json in it. Positive = visibility > 0, negative (not-this) = visibility 0 with a position."""
+    files = [os.path.join(path, f) for f in sorted(os.listdir(path)) if f.endswith(".json")] if os.path.isdir(path) else [path]
+    names, pos, neg = [], 0, 0
+    for f in files:
+        try:
+            d = json.load(open(f))
+        except Exception:
+            continue
+        ims = {im.get("id"): im.get("file_name", "") for im in d.get("images", [])}
+        for a in d.get("annotations", []):
+            kp = a.get("keypoints_clicked") or a.get("keypoints")
+            if not kp or a.get("image_id") not in ims:
+                continue
+            k = [kp[i:i + 3] for i in range(0, len(kp) - 2, 3)]
+            p_ = sum(1 for x, y, v in k if v > 0); n_ = sum(1 for x, y, v in k if v <= 0 and (x or y))
+            if p_ or n_:
+                pos += p_; neg += n_
+                if ims[a["image_id"]] not in names:
+                    names.append(ims[a["image_id"]])
+    return names, pos, neg
+
+
 def images_root(coco_path, file_names, folder=None):
     """--images for the training script: '/' when every file_name is absolute; else the folder that holds them
     (the COCO file's own folder first, then the GUI's current folder)."""
@@ -102,6 +130,18 @@ def build_cmd(v, sdir, python):
     predict_dir, test_list (list of file_names), run_dir, fg_border (bool), extra (str)."""
     sdir = Path(sdir)
     mode = v["mode"]
+    if mode in ("points_probe", "probe_run"):
+        cmd = [python, "-u", str(sdir / "dinomask_hypercolumn_probe_v1.py"), "--out", v["out"]]
+        if mode == "points_probe":
+            cmd += ["--points", v["coco"], "--images", v["images"], "--name", (v.get("name") or "structure").strip().replace(" ", "_"),
+                    "--model", v.get("model") or MODEL_VITL, "--size", str(int(v.get("size") or 2048) or 2048)]
+        else:
+            cmd += ["--run", v["run_dir"]]
+        if v.get("predict_dir"):
+            cmd += ["--predict_dir", v["predict_dir"]]
+        if v.get("extra", "").strip():
+            cmd += v["extra"].split()
+        return cmd
     if mode == "predict_run":
         cmd = [python, "-u", str(sdir / "dinomask_predict_rot4_v1.py"), "--run", v["run_dir"],
                "--images", v["predict_dir"], "--out", v["out"], "--model", v.get("model") or MODEL_VITL,
@@ -132,6 +172,22 @@ def check(v):
     m = v.get("mode")
     if not v.get("out"):
         return "Choose an output folder."
+    if m == "points_probe":
+        if not v.get("coco") or not os.path.exists(v["coco"]):
+            return "Choose your keypoint clicks (the GUI keypoint save, or a folder of <image>_keypoints.json)."
+        if v.get("n_pos", 0) < 5:
+            return "Click at least 5 examples of the structure (positive points); 15-30 spread over the specimen work best."
+        if v.get("n_found", 1) == 0:
+            return f"None of the clicked images was found under {v.get('images')}. Set the images folder."
+        if v.get("predict_dir") and not os.path.isdir(v["predict_dir"]):
+            return "The folder of images to predict does not exist (leave it empty to train only)."
+        return ""
+    if m == "probe_run":
+        if not os.path.isfile(os.path.join(v.get("run_dir", ""), "probe.joblib")):
+            return "The trained probe folder must hold probe.joblib (the output folder of an earlier points-probe run)."
+        if not v.get("predict_dir") or not os.path.isdir(v["predict_dir"]):
+            return "Choose the folder of images to predict."
+        return ""
     if m in ("train_predict", "holdout"):
         if not v.get("coco") or not os.path.isfile(v["coco"]):
             return "Choose the training annotations (COCO JSON with hand-drawn masks)."
@@ -152,6 +208,20 @@ def summarize(out_dir, mode):
     """Short text for the end-of-run message."""
     out = Path(out_dir)
     lines = []
+    if mode in ("points_probe", "probe_run"):
+        r = out / "results.json"
+        if r.is_file():
+            res = json.load(open(r))
+            lines.append(f"{res.get('name')}: {res.get('positive_clicks')} positive and {res.get('negative_clicks')} negative clicks; "
+                         f"{res.get('validation')}:")
+            lines += [f"  {k}: AUC {x['auc']:.3f}, AP {x['ap']:.3f} (chance {x['ap_chance']:.3f})"
+                      for k, x in res.get("results", {}).items() if x]
+        c = out / "counts.json"
+        if c.is_file():
+            cn = json.load(open(c))
+            lines.append(f"{len(cn)} images predicted, {sum(x.get('total', 0) for x in cn.values())} detections -> "
+                         f"{out / 'predictions_keypoints.json'}")
+        return "\n".join(lines) or f"Output in {out}"
     r = out / "results.json"
     if mode == "holdout" and r.is_file():
         res = json.load(open(r))
@@ -187,17 +257,36 @@ def open_dialog(root, gui_dir, folder=None, coco=None, open_results=None, ensure
         return
     win = tk.Toplevel(root)
     win.title("DINOMask - masks for every structure from a few annotated images")
-    V = {k: tk.StringVar() for k in ("coco", "images", "predict_dir", "out", "run_dir", "extra", "test_list")}
+    V = {k: tk.StringVar() for k in ("coco", "images", "predict_dir", "out", "run_dir", "extra", "test_list", "name")}
+    V["name"].set("scale_seta")
     V["coco"].set(coco or ""); V["predict_dir"].set(folder or "")
     mode = tk.StringVar(value="train_predict"); model = tk.StringVar(value=MODEL_VITL)
     size = tk.StringVar(value="2048"); epochs = tk.StringVar(value="30")
     aug = {a: tk.BooleanVar(value=a in ("rot180", "hflip")) for a in AUGS}
     partial = tk.BooleanVar(value=True); fg = tk.BooleanVar(value=False)
     info = tk.StringVar()
-    state = {"files": [], "parts": [], "n": 0}
+    state = {"files": [], "parts": [], "n": 0, "pos": 0, "neg": 0}
+    POINTS = ("points_probe", "probe_run")
 
     def refresh(*_):
         p = V["coco"].get().strip()
+        if mode.get() == "points_probe":
+            if p and os.path.exists(p):
+                try:
+                    files, pos, neg = points_summary(p)
+                except Exception as e:
+                    info.set(f"cannot read: {e}"); return
+                state.update(files=files, pos=pos, neg=neg)
+                if not V["images"].get().strip():
+                    V["images"].set(images_root(p if os.path.isfile(p) else os.path.join(p, "x.json"), files, folder))
+                found = count_found(V["images"].get().strip(), files)
+                info.set(f"{len(files)} clicked images ({found} found), {pos} positive and {neg} negative (not-this) clicks")
+                if not V["out"].get().strip():
+                    V["out"].set(os.path.join(p if os.path.isdir(p) else os.path.dirname(os.path.abspath(p)), "probe_run"))
+            else:
+                info.set("Click examples with the keypoint tool (positive = the structure, negative = look-alikes to ignore), "
+                         "save, and choose the save here.")
+            return
         if p and os.path.isfile(p):
             try:
                 files, parts, n = coco_summary(p)
@@ -222,6 +311,11 @@ def open_dialog(root, gui_dir, folder=None, coco=None, open_results=None, ensure
                      ("predict_run", "Predict with a trained run")):
         tk.Radiobutton(mf, text=txt, variable=mode, value=val, command=lambda: show()).pack(side="left", padx=4)
     r += 1
+    mf2 = tk.Frame(win); mf2.grid(row=r, column=1, columnspan=2, sticky="w")
+    tk.Label(mf2, text="Small structures:", fg="gray30").pack(side="left", padx=(4, 0))
+    for val, txt in (("points_probe", "Points probe: learn one structure from clicks"), ("probe_run", "Predict with a trained probe")):
+        tk.Radiobutton(mf2, text=txt, variable=mode, value=val, command=lambda: show()).pack(side="left", padx=4)
+    r += 1
     rows = {}
 
     def row(key, label, var, browse=None):
@@ -236,6 +330,7 @@ def open_dialog(root, gui_dir, folder=None, coco=None, open_results=None, ensure
         lambda: V["coco"].set(filedialog.askopenfilename(parent=win, filetypes=[("COCO JSON", "*.json"), ("All", "*.*")]) or V["coco"].get()))
     tk.Label(win, textvariable=info, fg="gray30", wraplength=560, justify="left").grid(row=r, column=1, columnspan=2, sticky="w", padx=5)
     rows["info"] = []; r += 1
+    row("name", "Structure name:", V["name"])
     row("images", "Training images folder:", V["images"],
         lambda: (V["images"].set(filedialog.askdirectory(parent=win) or V["images"].get()), refresh()))
     row("run_dir", "Trained run folder (head.pt):", V["run_dir"],
@@ -285,9 +380,14 @@ def open_dialog(root, gui_dir, folder=None, coco=None, open_results=None, ensure
 
     def show():
         m = mode.get()
-        vis = {"coco": m != "predict_run", "info": m != "predict_run", "images": m != "predict_run",
-               "run_dir": m == "predict_run", "predict_dir": m != "holdout", "test_list": m == "holdout",
-               "aug": m != "predict_run", "partial": m != "predict_run", "fg": m == "train_predict"}
+        trains = m in ("train_predict", "holdout", "points_probe")
+        vis = {"coco": trains, "info": trains, "images": trains, "name": m == "points_probe",
+               "run_dir": m in ("predict_run", "probe_run"), "predict_dir": m != "holdout", "test_list": m == "holdout",
+               "aug": m in ("train_predict", "holdout"), "partial": m in ("train_predict", "holdout"), "fg": m == "train_predict"}
+        rows["coco"][0].configure(text="Keypoint clicks (COCO / folder):" if m == "points_probe" else "Training annotations (COCO JSON):")
+        rows["run_dir"][0].configure(text="Trained probe folder (probe.joblib):" if m == "probe_run" else "Trained run folder (head.pt):")
+        rows["predict_dir"][0].configure(text="Images to predict (folder; optional):" if m == "points_probe" else "Images to predict (folder):")
+        refresh()
         for k, ws in rows.items():
             for w in ws:
                 (w.grid() if vis.get(k, True) else w.grid_remove())
@@ -299,8 +399,10 @@ def open_dialog(root, gui_dir, folder=None, coco=None, open_results=None, ensure
         v.update(mode=mode.get(), model=model.get().strip(), size=size.get(), epochs=epochs.get(),
                  augs=[a_ for a_ in AUGS if aug[a_].get()], partial=partial.get(), fg_border=fg.get(),
                  parts=state["parts"], test_list=[x for x in v["test_list"].split(",") if x])
-        if v["mode"] != "predict_run":
+        if v["mode"] in ("train_predict", "holdout", "points_probe"):
             v["n_found"] = count_found(v["images"], state["files"])
+        if v["mode"] == "points_probe":
+            v["n_pos"] = state["pos"]
         err = check(v)
         if err:
             messagebox.showerror("DINOMask", err, parent=win); return
@@ -343,9 +445,10 @@ def open_dialog(root, gui_dir, folder=None, coco=None, open_results=None, ensure
                 messagebox.showerror("DINOMask error", f"Exit code {proc.returncode}. Last lines of {log}:\n\n{t}")
                 return
             msg = summarize(v["out"], v["mode"])
-            pp = os.path.join(v["out"], "predictions_polygons.json")
+            pp = os.path.join(v["out"], "predictions_keypoints.json" if v["mode"] in POINTS else "predictions_polygons.json")
             if v["mode"] != "holdout" and os.path.isfile(pp) and open_results:
-                if messagebox.askyesno("DINOMask finished", msg + "\n\nOpen the predicted masks in the editor now?"):
+                what = "points" if v["mode"] in POINTS else "masks"
+                if messagebox.askyesno("DINOMask finished", msg + f"\n\nOpen the predicted {what} in the editor now?"):
                     open_results(v["predict_dir"], pp)
             else:
                 messagebox.showinfo("DINOMask finished", msg)

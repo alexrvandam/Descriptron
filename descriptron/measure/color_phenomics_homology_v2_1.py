@@ -1093,6 +1093,12 @@ def main():
     df.to_csv(os.path.join(args.output_dir,
               f"color_homology_features_{mode_tag}.csv"), index=False)
 
+    # 25 Oct 2026: one specimen -> the per-cell colour features above are its description; everything below
+    # (PCA, UMAP, clustering, heatmap, loadings) compares specimens and needs at least two
+    if X_scaled.shape[0] < 2:
+        logging.info(f"Single specimen ({fns[0]}): per-cell colour features written; between-specimen analyses skipped.")
+        return
+
     # --- PCA ---
     # Note: X_scaled is already appropriately scaled per-mode.
     # We do NOT re-StandardScaler here for combined mode (would un-do

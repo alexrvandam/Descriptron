@@ -41,7 +41,8 @@ EXTRA_VISION = ["torchvision_det",                   # whole directory
                 "dinomask",                           # v2.8.0: DINOMask (whole directory: train/predict v4, rot4, fg mask, README)
                 # v2.8.0: BioRAG-Probe and the DINOv3-token wing tools (need torch + transformers)
                 "measure/biorag_probe_v1.py", "measure/biorag_probe_parts_v1.py", "measure/biorag_probe_panels_v2.py",
-                "measure/wing_vein_unsupervised_eval_v1.py", "measure/wing_spot_tokens_v1.py"]
+                "measure/wing_vein_unsupervised_eval_v1.py", "measure/wing_spot_tokens_v1.py",
+                "measure/texture_hires_v3.py"]        # v2.8.3: high-resolution texture maps (DINOv3 teacher/student)
 # modules a core program imports that the inventory files elsewhere or does not list:
 # biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
 # because it CAN use Florence-2, which it loads lazily), and that imports
@@ -90,7 +91,9 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/validation/validate_hidden_semilandmarks_v1.py",   # v2.8.0 (v86): chord vs TPS on hidden stretches
               # v2.8.0: torch-free helpers of BioRAG-Probe / DINOMask work
               "measure/wing_vein_naming_rule_v1.py", "measure/wing_fringe_character_v1.py",
-              "measure/wing_spot_pattern_v1.py", "measure/annotation_scale_transfer_v1.py"]
+              "measure/wing_spot_pattern_v1.py", "measure/annotation_scale_transfer_v1.py",
+              "measure/line_drawing_v1.py",              # v2.8.3: line structures as skeletons + line drawings (pipeline step 2.5)
+              "measure/texture_band_profiles_v1.py"]     # v2.8.3: anterior-posterior texture band profiles, tested against groups
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)

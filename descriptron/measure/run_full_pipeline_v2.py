@@ -85,6 +85,7 @@ STEP_NAMES = [
     "completeness",
     "measurements",
     "semilandmarks",
+    "line_drawing",
     "color",
     "color_homology",
     "texture",
@@ -436,6 +437,8 @@ def step_measurements(cfg: Dict, python: str, log_dir: Path) -> bool:
     ]
     if cfg.get("grouping_file"):
         cmd += ["--grouping_file", cfg["grouping_file"]]
+    if cfg.get("mm_scale"):   # 25 Oct 2026: known px/mm for every image (overrides scale-bar detection)
+        cmd += ["--mm_scale", str(cfg["mm_scale"])]
 
     return _run_step(cmd, "step1_measurements", log_dir, cfg["dry_run"])
 
@@ -637,6 +640,27 @@ def step_color_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
             _batch_correct(cfg, python, out_dir, "color_homology_features", cat, log_dir)
 
     return all_ok
+
+
+def step_line_drawing(cfg: Dict, python: str, log_dir: Path) -> bool:
+    """2.8.3: sutures / carinae / striae marked as masks -> V35 skeleton lengths + one line drawing per image (V42 outlines)."""
+    if not cfg.get("line_categories"):
+        logger.info("  No --line_categories given, skipping")
+        return True
+    out_dir = Path(cfg["output_base"]) / "line_drawing"
+    if (out_dir / "line_metrics.csv").exists() and not cfg["force"]:
+        logger.info("  Already complete (line_metrics.csv exists), skipping")
+        return True
+    cmd = [python, str(SCRIPT_DIR / "line_drawing_v1.py"),
+           "--coco", cfg["coco_json"], "--image_dir", cfg["image_dir"], "--out_dir", str(out_dir),
+           "--semilandmarks_dir", str(Path(cfg["output_base"]) / "semilandmarks"),
+           "--line_categories", cfg["line_categories"],
+           "--merge_px", str(cfg.get("line_merge_px", 3.0))]
+    if cfg.get("line_outline_categories"):
+        cmd += ["--outline_categories", cfg["line_outline_categories"]]
+    if cfg.get("mm_scale"):
+        cmd += ["--mm_scale", str(cfg["mm_scale"])]
+    return _run_step(cmd, "step2b_line_drawing", log_dir, cfg["dry_run"])
 
 
 def step_texture_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
@@ -2163,6 +2187,7 @@ ALL_STEPS = {
     "completeness":    (0.5, step_completeness),
     "measurements":    (1, step_measurements),
     "semilandmarks":   (2, step_semilandmarks),
+    "line_drawing":    (2.5, step_line_drawing),
     "color":           (3, step_color_extraction),
     "color_homology":  (4, step_color_homology),
     "texture":         (5, step_texture_homology),
@@ -2205,7 +2230,7 @@ ALL_STEPS = {
 V2_STEPS = ["annotation_screen", "key_matrix", "char_signal", "key_build", "diagnoses", "calibrate", "reexamine", "describe_v2", "descriptive_states", "trait_stats_states", "char_reliability",
             "char_figures", "subjective_check", "confab_check_v2", "type_material", "char_gate",
             "ontology_v2", "treatments_docx"]
-V2_WORKFLOW = ["coco_clean", "completeness", "measurements", "semilandmarks", "color", "color_homology", "texture",
+V2_WORKFLOW = ["coco_clean", "completeness", "measurements", "semilandmarks", "line_drawing", "color", "color_homology", "texture",
                "landmark_gpa", "compile", "trait_stats", "phylo", "annotation_screen", "key_matrix", "char_signal", "biorag", "key_build", "diagnoses", "calibrate", "reexamine", "describe_v2",
                "descriptive_states", "trait_stats_states", "char_reliability", "char_figures", "subjective_check",
                "confab_check_v2", "type_material", "char_gate",
@@ -2246,6 +2271,15 @@ def parse_args():
                     help="User prompt questions file (.docx/.csv)")
     p.add_argument("--exclude_list", default=None,
                     help="Outlier exclusion CSV (for compile step)")
+    p.add_argument("--line_categories", default="",
+                    help="2.8.3: comma list of LINE structures marked as masks (e.g. suture,carina): V35 skeleton lengths + line drawings")
+    p.add_argument("--line_outline_categories", default="",
+                    help="parts drawn as outlines in the line drawings (e.g. head,pronotum)")
+    p.add_argument("--line_merge_px", type=float, default=3.0,
+                    help="line drawings: merge parallel skeleton branches closer than this (px); 0 = off")
+    p.add_argument("--mm_scale", type=float, default=None,
+                    help="Pixels per mm for all images, passed to V35 measurements (e.g. a scale bar measured on the plate); "
+                         "default: V35 detects scale bars itself")
     p.add_argument("--grouping_file", default=None,
                     help="Grouping file for measurement UMAP (often same as group_labels)")
     p.add_argument("--label_dir", default=None,

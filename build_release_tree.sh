@@ -59,7 +59,8 @@ wing_vein_unsupervised_eval_v1.py wing_spot_tokens_v1.py wing_vein_naming_rule_v
 annotation_scale_transfer_v1.py
 descriptron-v2-v91.py descriptron-v2-v92.py descriptron-v2-v93.py descriptron-v2-v94.py descriptron-v2-v95.py descriptron-v2-v96.py descriptron-v2-v97.py
 descriptron_category_nav_v1.py descriptron_dinomask_dialog_v1.py descriptron_undo_v1.py biorag_annotate_v2.py biorag_annotate_tokens_v2.py
-descriptron_ontology.py"
+descriptron_ontology.py
+line_drawing_v1.py texture_band_profiles_v1.py texture_hires_v3.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0

@@ -52,4 +52,35 @@ t(dm._version_ok("4.56.0") and dm._version_ok("5.7.0") and not dm._version_ok("4
 os.makedirs(os.path.join(tmp, "o"), exist_ok=True)
 json.dump({"classes": ["background", "head"], "ious": {"head": [0.8, 10]}}, open(os.path.join(tmp, "o", "results.json"), "w"))
 t("0.80" in dm.summarize(os.path.join(tmp, "o"), "holdout"), "summary")
+# 2.8.3: hypercolumn points probe
+kpc = {"images": [{"id": "a.tif", "file_name": "a.tif"}, {"id": "b.tif", "file_name": "b.tif"}],
+       "categories": [{"id": 1, "name": "keypoints"}],
+       "annotations": [{"id": 1, "image_id": "a.tif", "category_id": 1, "keypoints": [10, 10, 2, 0, 0, 0, 30, 30, 2],
+                        "keypoints_clicked": [10, 10, 2, 20, 20, 0, 30, 30, 2]},
+                       {"id": 2, "image_id": "b.tif", "category_id": 1, "keypoints": [5, 5, 2]}]}
+kp_path = os.path.join(tmp, "clicks.json"); json.dump(kpc, open(kp_path, "w"))
+names, npos, nneg = dm.points_summary(kp_path)
+t(names == ["a.tif", "b.tif"] and npos == 3 and nneg == 1, "points summary: positives, not-this negatives from keypoints_clicked")
+kdir = os.path.join(tmp, "kp"); os.makedirs(kdir, exist_ok=True); json.dump(kpc, open(os.path.join(kdir, "a_keypoints.json"), "w"))
+t(dm.points_summary(kdir)[1] == 3, "points summary of a folder of <image>_keypoints.json")
+t(dm.points_summary(cp)[1] == 1, "mask COCO: only its keypoint annotation counts")
+pb = dict(base, coco=kp_path, name="scale seta", predict_dir=tmp, size="2048", extra="--ablate")
+c = dm.build_cmd(dict(pb, mode="points_probe"), sd, "PY")
+t(c[2].endswith("dinomask_hypercolumn_probe_v1.py") and c[c.index("--points") + 1] == kp_path, "probe script + clicks")
+t(c[c.index("--name") + 1] == "scale_seta" and c[c.index("--model") + 1] == dm.MODEL_VITL, "name (spaces -> _) + ViT-L")
+t(c[c.index("--predict_dir") + 1] == tmp and c[-1] == "--ablate" and "--aug" not in c, "probe predict dir + extra, no mask flags")
+c = dm.build_cmd(dict(pb, mode="points_probe", predict_dir=""), sd, "PY")
+t("--predict_dir" not in c, "probe: train only when no folder")
+c = dm.build_cmd(dict(pb, mode="probe_run", run_dir="/p"), sd, "PY")
+t(c[c.index("--run") + 1] == "/p" and "--points" not in c and "--predict_dir" in c, "probe_run")
+t(dm.check(dict(pb, mode="points_probe", n_pos=20, n_found=2)) == "", "probe valid")
+t("at least 5" in dm.check(dict(pb, mode="points_probe", n_pos=3, n_found=2)), "probe needs clicks")
+t("None of the clicked images" in dm.check(dict(pb, mode="points_probe", n_pos=20, n_found=0)), "probe images missing")
+t("probe.joblib" in dm.check(dict(pb, mode="probe_run", run_dir=tmp)), "probe_run needs probe.joblib")
+po = os.path.join(tmp, "po"); os.makedirs(po, exist_ok=True)
+json.dump({"name": "scale_seta", "positive_clicks": 25, "negative_clicks": 4, "validation": "leave-one-image-out",
+           "results": {"hypercolumn L6+L12+L18+L23": {"auc": 0.95, "ap": 0.8, "ap_chance": 0.06}}}, open(os.path.join(po, "results.json"), "w"))
+json.dump({"a.tif": {"total": 40}, "b.tif": {"total": 2}}, open(os.path.join(po, "counts.json"), "w"))
+sm = dm.summarize(po, "points_probe")
+t("AUC 0.950" in sm and "42 detections" in sm and "predictions_keypoints.json" in sm, "probe summary")
 print(f"{ok}/{ok} passed  (python chosen here: {py} [{why}])")
