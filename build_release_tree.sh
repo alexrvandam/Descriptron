@@ -114,6 +114,8 @@ mkdir -p "$DST/descriptron/torchvision_det/tests" "$DST/descriptron/measure/test
 cp "$GUI/torchvision_det/tests/"*.py "$DST/descriptron/torchvision_det/tests/" 2>/dev/null || true
 find "$GUI/measure/tests" -maxdepth 1 -name 'test_*.py' ! -name '*.bak*' \
      -exec cp {} "$DST/descriptron/measure/tests/" \; 2>/dev/null || true
+# 2.8.6: test fixtures (the scale-bar crop for test_scalebar_florence_v1)
+[ -d "$GUI/measure/tests/data" ] && rsync -a --exclude '*.bak*' "$GUI/measure/tests/data" "$DST/descriptron/measure/tests/"
 # validation against R (RRPP, geomorph): the scripts that make the docs figures
 mkdir -p "$DST/descriptron/measure/validation"
 find "$GUI/measure/validation" -maxdepth 1 \( -name 'validate_*.py' -o -name '*_benchmark_*.py' -o -name 'colour_benchmark_*.R' \

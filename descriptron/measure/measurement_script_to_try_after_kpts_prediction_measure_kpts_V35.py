@@ -51,7 +51,20 @@ def _load_florence2():
         logging.info(f"Florence-2-base loaded on {device}")
         return _FLORENCE2_MODEL, _FLORENCE2_PROCESSOR
     except Exception as e:
-        logging.warning(f"Florence-2 unavailable ({e}), will use EasyOCR only")
+        first_error = e
+    # 2.8.6: transformers >= 4.56 (needed for DINOv3) breaks Microsoft's remote Florence-2 code; newer transformers
+    # ship Florence-2 natively, with the converted weights in florence-community/Florence-2-base
+    try:
+        import torch
+        from transformers import AutoProcessor, Florence2ForConditionalGeneration
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        _FLORENCE2_PROCESSOR = AutoProcessor.from_pretrained('florence-community/Florence-2-base')
+        _FLORENCE2_MODEL = Florence2ForConditionalGeneration.from_pretrained('florence-community/Florence-2-base').to(device)
+        logging.info(f"Florence-2-base (transformers native) loaded on {device}")
+        return _FLORENCE2_MODEL, _FLORENCE2_PROCESSOR
+    except Exception as e:
+        _FLORENCE2_MODEL = _FLORENCE2_PROCESSOR = None
+        logging.warning(f"Florence-2 unavailable (remote code: {first_error}; native: {e}), will use EasyOCR only")
         return None, None
 
 # ----------------------------

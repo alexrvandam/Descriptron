@@ -1,0 +1,11 @@
+{
+  "image": "scalebar_100um_ref.png",
+  "scale_text": "100 um",
+  "bar_length_px": 116,
+  "expected_px_per_mm": 1160.0,
+  "tolerance_fraction": 0.02,
+  "source_image": "Kenya_Scan 005_morph_kenya_1_metaleg_m_ch00_SV.tif",
+  "crop_xywh_in_source": [0, 894, 390, 130],
+  "reference": "combined_scales.csv (Florence-2 scale factors used for the published Diaphorina measurements): 1160.0 px/mm for the source image",
+  "note": "Only the scale bar, its number and empty background; cropped without resizing, so px/mm is the same as in the source image."
+}
