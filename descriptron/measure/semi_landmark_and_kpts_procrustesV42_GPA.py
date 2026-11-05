@@ -129,12 +129,29 @@ def parse_args():
     parser.add_argument('--shape_pca', choices=['covariance', 'standardized'], default='covariance',
                         help='V42: shape PCA on the covariance of the Procrustes coordinates (default, as geomorph '
                              'gm.prcomp) or on standardised coordinates (V34 behaviour)')
+    parser.add_argument('--slid_on_outline', choices=['project', 'none'], default='project',
+                        help='V42 (5 Nov 2026): sliding moves points along tangents in shape space, so back on the image '
+                             'they sit slightly off the specimen\'s outline (forewings: median 1.1%% of size). project '
+                             '(default) puts each slid point on the nearest point of the specimen\'s own outline in the '
+                             'back-transformed (image) outputs that colour/texture homology grids read; Procrustes '
+                             'coordinates and all shape statistics are unchanged. none = old output.')
     parser.add_argument('--slide_max_iter', type=int, default=10, help='V42 sliding: at most this many rounds (geomorph 10)')
     parser.add_argument('--slide_tol', type=float, default=1e-4, help='V42 sliding: convergence tolerance (geomorph 1e-4)')
 
     # Group labels & MANOVA
     parser.add_argument('--group_labels', required=False)
     parser.add_argument('--perform_manova', action='store_true')
+    parser.add_argument('--keypoint_category', default='keypoints',
+                        help="Comma list of category names holding landmarks (default 'keypoints' = previous behaviour; "
+                             "the Descriptron GUI saves manual landmarks as 'line_keypoints')")
+    parser.add_argument('--stats_pcs', type=int, default=3,
+                        help='Shape PCs used by MANOVA, form-space MANOVA and allometry (default 3 = previous behaviour). '
+                             '0 = auto: fewest PCs reaching 95%% of shape variance, capped at n_specimens - n_groups - 1 '
+                             '(the residual degrees of freedom MANOVA needs)')
+    parser.add_argument('--cva_pcs', type=int, default=10, help='Shape PCs entering the CVA (default 10 = previous behaviour)')
+    parser.add_argument('--cva_permutations', type=int, default=0,
+                        help='Label permutations for the chance level of the CVA leave-one-out accuracy (0 = off, '
+                             'previous behaviour; 999 recommended). Writes permuted mean / 95th percentile and p = (k+1)/(N+1)')
 
     # UMAP
     parser.add_argument('--umap_n_neighbors', type=int, default=15)
@@ -253,6 +270,8 @@ def mk_mask(ann, h, w):
     seg = ann['segmentation']
     try:
         rle = maskUtils.merge(maskUtils.frPyObjects(seg, h, w)) if isinstance(seg, list) else seg
+        if isinstance(rle, dict) and isinstance(rle.get('counts'), list):   # 2026-11-03: the GUI writes UNcompressed RLE;
+            rle = maskUtils.frPyObjects(rle, *rle['size'])                    # decode() rejected it -> silently empty mask
         m = maskUtils.decode(rle)
     except: return np.zeros((h, w), np.uint8)
     b = (m > 0).astype(np.uint8); k = np.ones((5,5), np.uint8)
@@ -358,6 +377,19 @@ def procrustes(X, Y):
 def back_xform(pts, tf):
     """Invert Procrustes: Y = (Z @ R^T) * normY + mean_Y."""
     return (pts @ tf['R'].T) * tf['normY'] + tf['mean_Y']
+
+def project_onto_outline(pts, poly, closed=True):
+    """V42 (5 Nov 2026): nearest point on the polyline `poly` (closed or open) for each row of `pts`."""
+    P = np.asarray(poly, float)
+    A = P if closed else P[:-1]
+    B = np.roll(P, -1, axis=0) if closed else P[1:]
+    AB = B - A; L2 = np.maximum((AB ** 2).sum(1), 1e-12)
+    out = np.empty_like(np.asarray(pts, float))
+    for k, q in enumerate(np.asarray(pts, float)):
+        t = np.clip(((q - A) * AB).sum(1) / L2, 0, 1)
+        C = A + t[:, None] * AB
+        out[k] = C[np.argmin(((C - q) ** 2).sum(1))]
+    return out
 
 def reflect(c, axis):
     cen = c.mean(0); r = c.copy()
@@ -1113,6 +1145,21 @@ def do_hclust(X, od, cat, pc, imgs, msks, nc=3):
     plt.savefig(os.path.join(od, f"hclust_{clean_fn(cat)}.png"), dpi=300); plt.close()
     return labels
 
+def _resolve_stats_pcs(pc, gl, k):
+    """2026-11-03: number of shape PCs for MANOVA / form space / allometry. k > 0 = fixed (default 3);
+    k = 0 = auto: fewest PCs reaching 95% of shape variance, capped at the residual df (n - groups - 1)."""
+    if k and k > 0:
+        return k
+    valid = [g for g in gl if g is not None and g != 'Unknown']
+    cap = max(1, len(valid) - len(set(valid)) - 1)
+    var = pc.var(axis=0); cum = np.cumsum(var) / var.sum()
+    k95 = int(np.searchsorted(cum, 0.95) + 1)
+    n = max(1, min(k95, cap, pc.shape[1]))
+    logging.info(f"stats PCs auto: {k95} PCs reach 95% of shape variance, residual-df cap {cap} -> using {n} "
+                 f"({cum[n-1]*100:.1f}% of variance)")
+    return n
+
+
 def do_manova(pc, gl, od, max_pcs=3):
     try:
         n_pcs = min(max_pcs, pc.shape[1])
@@ -1237,7 +1284,7 @@ def _confidence_ellipse(x, y, ax, n_std=1.96, **kw):
     ax.add_patch(e)
 
 
-def do_cva(pc, gl, od, cat_name, max_pcs=10):
+def do_cva(pc, gl, od, cat_name, max_pcs=10, n_perm=0):
     try:
         v_mask = np.array([(g is not None and g != 'Unknown') for g in gl])
         labels = np.array(gl)[v_mask]
@@ -1305,9 +1352,26 @@ def do_cva(pc, gl, od, cat_name, max_pcs=10):
         acc = np.mean(y_pred == labels2) * 100
         conf = pd.crosstab(pd.Series(labels2, name='True'),
                            pd.Series(y_pred, name='Predicted'))
+        # 2026-11-03: chance level of the LOO accuracy (labels shuffled, same PCs, same LOO); off unless --cva_permutations
+        perm_lines = []
+        if n_perm and n_perm > 0:
+            rng = np.random.default_rng(0); perm = np.empty(n_perm)
+            for k in range(n_perm):
+                yp = rng.permutation(labels2)
+                perm[k] = np.mean(cross_val_predict(LinearDiscriminantAnalysis(), scores2, yp, cv=loo) == yp) * 100
+            p_val = (np.sum(perm >= acc) + 1) / (n_perm + 1)
+            props = pd.Series(labels2).value_counts(normalize=True).values
+            perm_lines = [f"Specimens: {len(labels2)} in {len(usable)} groups with n >= 2; PCs used: {n_pcs}",
+                          f"Proportional chance (sum of squared group shares): {np.sum(props**2)*100:.1f}%",
+                          f"Permutation chance ({n_perm} label shuffles, same PCs + LOO): mean {perm.mean():.1f}%, "
+                          f"95th percentile {np.percentile(perm, 95):.1f}%, max {perm.max():.1f}%",
+                          f"p (accuracy >= observed) = {p_val:.4f}"]
+            logging.info(f"CVA permutation chance {perm.mean():.1f}%, p = {p_val:.4f}")
         with open(os.path.join(od, 'cva_classification.txt'), 'w') as f:
             f.write(f"Leave-one-out cross-validated classification accuracy: "
                     f"{acc:.1f}%\n\n")
+            if perm_lines:
+                f.write("\n".join(perm_lines) + "\n\n")
             f.write("Confusion matrix:\n")
             f.write(conf.to_string())
             f.write("\n")
@@ -1853,7 +1917,10 @@ def main():
     all_anns, imgs_info, cats_l, cats_d = load_annotations(args.json, args.image_id)
     if not all_anns: print("No annotations."); return
 
-    kp_cids = [c for c, n in cats_d.items() if n.lower() == "keypoints"]
+    # 2026-11-03: --keypoint_category (default 'keypoints' = previous behaviour); the GUI saves manual landmarks as
+    # 'line_keypoints' (annotations derived from lines carry source_line_category and are skipped)
+    kp_names = {s.strip().lower() for s in args.keypoint_category.split(',') if s.strip()}
+    kp_cids = [c for c, n in cats_d.items() if n.lower() in kp_names]
 
     # detect line categories
     expl = set(n.strip().lower() for n in args.line_categories.split(',') if n.strip()) if args.line_categories else set()
@@ -1933,10 +2000,22 @@ def main():
                 resampled = resample_closed(cp, nlm)
 
             akp = []
-            for a in anns:
-                if a['category_id'] in kp_cids: akp.extend(get_kpts(a))
+            if kp_idx:   # 2026-11-03: pick the requested landmark NUMBERS first, then check visibility
+                raw = []  # (previously invisible points were dropped first, which renumbered every later point)
+                for a in anns:
+                    if a['category_id'] in kp_cids and not a.get('source_line_category'):
+                        k3 = a.get('keypoints', [])
+                        raw.extend([tuple(k3[i:i+3]) for i in range(0, len(k3) - len(k3) % 3, 3)])
+                sel = [raw[j] for j in kp_idx if j < len(raw)]
+                if len(sel) == len(kp_idx) and all(v > 0 for _, _, v in sel):
+                    akp = [(x, y) for x, y, _ in sel]
+                elif raw:
+                    logging.warning(f"{bn}: requested keypoints {[j+1 for j in kp_idx]} not all present/visible "
+                                    f"-> keypoints not used for this specimen")
+            else:
+                for a in anns:
+                    if a['category_id'] in kp_cids and not a.get('source_line_category'): akp.extend(get_kpts(a))
             if args.require_keypoints_and_segmentation and not akp: continue
-            if kp_idx and akp: akp = [akp[j] for j in range(len(akp)) if j in kp_idx]
 
             sl = f"{bn}_{iid}"
             shapes.append(resampled)
@@ -2215,6 +2294,21 @@ def main():
 
         viz_aligned(aligned, fns, od, cat_name, mean, is_line)
         pd.DataFrame(mean, columns=['x','y']).to_csv(os.path.join(od, "gpa_mean.csv"), index=False)
+        # 2026-11-03: shape-outlier screen for every outline (was dorsal-margin mode only). New file, no other output
+        # changes: Procrustes distance of each aligned specimen to the consensus, robust z (median / 1.4826 MAD);
+        # flagged = z > 5 (the convention of the BioRAG shape-residual screen). Flags are to LOOK AT: an aberrant
+        # specimen and a bad annotation look the same here.
+        try:
+            _pd = np.array([np.sqrt(((np.asarray(a_)[:len(mean)] - mean) ** 2).sum()) for a_ in aligned])
+            _mad = 1.4826 * np.median(np.abs(_pd - np.median(_pd))) or 1e-12
+            _z = (_pd - np.median(_pd)) / _mad
+            pd.DataFrame({'filename': fns, 'group': gls, 'procrustes_dist_to_mean': _pd, 'robust_z': _z,
+                          'flag_gt5MAD': _z > 5}).sort_values('robust_z', ascending=False).to_csv(
+                os.path.join(od, f"shape_outliers_{clean_fn(cat_name)}.csv"), index=False)
+            if (_z > 5).any():
+                logging.warning(f"shape outliers (> 5 MAD) in '{cat_name}': {[f for f, z in zip(fns, _z) if z > 5]}")
+        except Exception as e:
+            logging.warning(f"shape-outlier screen: {e}")
 
         # --- KEYPOINTS (separate Procrustes, non-cyclic) ---
         iwk = [i for i, a in enumerate(kpts_all) if a.shape[0] > 0]
@@ -2336,14 +2430,15 @@ def main():
             logging.warning(f"Shape spatial heatmap: {e}")
             import traceback; traceback.print_exc()
         if args.perform_manova:
-            do_manova(pc, gls, od)
-            do_cva(pc, gls, od, cat_name)
+            sp = _resolve_stats_pcs(pc, gls, args.stats_pcs)   # 2026-11-03: was fixed at 3 (still the default)
+            do_manova(pc, gls, od, max_pcs=sp)
+            do_cva(pc, gls, od, cat_name, max_pcs=args.cva_pcs, n_perm=args.cva_permutations)
             do_pairwise_heatmap(pc, gls, od, cat_name)
             do_mahalanobis_tree(pc, gls, od, cat_name)
             do_shape_network(pc, gls, od, cat_name)
             do_size_anova(csizes, gls, od, cat_name)
-            do_form_space(pc, csizes, gls, od, cat_name)
-            do_allometry(pc, csizes, gls, od, cat_name)
+            do_form_space(pc, csizes, gls, od, cat_name, max_pcs=sp)
+            do_allometry(pc, csizes, gls, od, cat_name, max_pcs=sp)
 
         # --- PRE-ALIGNMENT OUTPUT ---
         try:
@@ -2358,6 +2453,11 @@ def main():
         # --- BACK-TRANSFORM ---
         try:
             bs = [back_xform(aligned[i], tfs[i]) for i in range(len(aligned))]
+            # V42 (5 Nov 2026): slid points back onto the specimen's own outline (eq[i] is in this frame, reflected
+            # with it); shape-space coordinates above are untouched
+            if args.slide_method != 'none' and getattr(args, 'slid_on_outline', 'project') == 'project':
+                bs = [project_onto_outline(b, eq[i], closed=not is_line) for i, b in enumerate(bs)]
+                logging.info(f"Slid semilandmarks projected onto each specimen's outline in the back-transformed output")
             # V42: on the specimen's own image (colour homology and homology frames look pixels up here)
             bs = [b * np.array([-1.0, 1.0]) if mflags[i] else b for i, b in enumerate(bs)]
             bkp = [back_xform(akps[j], ktfs[j]) for j in range(len(akps))] if akps else []

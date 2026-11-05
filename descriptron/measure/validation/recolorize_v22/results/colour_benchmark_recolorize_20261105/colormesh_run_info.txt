@@ -1,0 +1,10 @@
+unwarp_seconds=91.2
+measure_seconds=16.6
+total_seconds=112.9
+num_passes=3
+px_radius=2
+flip_delaunay=TRUE
+n_landmarks_total=72
+n_semilandmarks=55
+n_interior_points=824
+n_perimeter_points=72

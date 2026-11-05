@@ -28,7 +28,7 @@ Method (fixed in advance; every number is computed with whole taxa held out, nev
 Outputs (--out): report.txt, scores_<config>.tsv, specimen_scores_primary.tsv (incl. unlabelled images, predicted from all
   labelled taxa), sheet_primary.jpg (one image per taxon: native crop x2 | patch probability map | dark dots).
 """
-import argparse, json, os, re, csv, sys, time
+import argparse, json, os, re, csv, sys, time, zlib
 import numpy as np, cv2, torch, torch.nn.functional as F
 from PIL import Image
 from sklearn.decomposition import PCA
@@ -44,15 +44,18 @@ ap.add_argument('--labels', required=True); ap.add_argument('--positive', defaul
 ap.add_argument('--taxon_regex', default=r'^([^_]+)_'); ap.add_argument('--out', required=True)
 ap.add_argument('--model', default='facebook/dinov3-vitl16-pretrain-lvd1689m'); ap.add_argument('--layers', default='12,18')
 ap.add_argument('--scales', default='1,2'); ap.add_argument('--primary_layer', type=int, default=18)
+ap.add_argument('--centre_numeric', action='store_true', help='numeric tasks: subtract each fold\'s training mean from its held-out predictions '
+                '(v1d, 4 Nov 2026; without it a weak model returns roughly the training mean, which moves opposite to the held-out taxon, so rho runs negative)')
 ap.add_argument('--dilate_px', type=int, default=8); ap.add_argument('--margin_px', type=int, default=48)
 ap.add_argument('--patches_per_image', type=int, default=256); ap.add_argument('--null', type=int, default=100, help='label permutations for method A'); ap.add_argument('--null_b', type=int, default=30, help='label permutations for the PRIMARY method-B result (slow)')
 ap.add_argument('--region_px', type=int, default=0, help='>0: resize each region so its SHORT side is this many px (x --scales); 0 = native'); ap.add_argument('--region_max_up', type=float, default=8.0)
 ap.add_argument('--tile', type=int, default=1024); ap.add_argument('--max_images', type=int, default=0)
+ap.add_argument('--maps_all', action='store_true', help='4 Nov 2026: also save the held-out patch-probability map of EVERY image (maps_all.npz: map, crop box, score, taxon) and maps_all_sheet.jpg; the per-taxon sheet is unchanged')
 ap.add_argument('--exclude', default='', help='comma list of COCO categories (from any --coco file) to SUBTRACT from the region, e.g. veins from a wing'); ap.add_argument('--exclude_dilate_px', type=int, default=10)
 ap.add_argument('--input', default='colour', choices=['colour', 'grey'], help='v1d: grey = luminance copied to 3 channels (grey beat colour for ant sculpture and weevil pilosity)')
 ap.add_argument('--norm', default='none', choices=['none', 'zscore'], help='v1d: zscore = per-image, per-channel mean/sd inside the region set to 128/48 (brightness normalisation)')
 ap.add_argument('--clahe', type=float, default=0, help='v1d: CLAHE clip limit on L* before the above (0 = off)')
-ap.add_argument('--fold_groups', default='', help='v1c: TSV taxon<TAB>group; cross-validation holds out whole groups (e.g. source paper) instead of single taxa'); ap.add_argument('--keep_majority_cluster', type=int, default=0, help='K>=2: inside the region, k-means the tokens (layer --primary_layer) into K groups per image and keep only the LARGEST group (e.g. wing membrane without veins, no vein model needed); 0 = off')
+ap.add_argument('--primary_scale', type=float, default=1.0, help='29 Oct (AVD: row streaks only visible at x4): scale of the PRIMARY result; must be in --scales'); ap.add_argument('--subsample_windows', type=int, default=0, help='29 Oct (AVD): at scales >= --subsample_min_scale use N random native windows (--window_px) inside the region, each upscaled and tiled into a mosaic, instead of the whole region (x4 of a whole wing is ~75 tiles); 0 = off'); ap.add_argument('--window_px', type=int, default=256); ap.add_argument('--subsample_min_scale', type=float, default=2.0); ap.add_argument('--hypercolumn', default='', help='29 Oct (AVD): comma list of layers (each must be in --layers) whose tokens are concatenated per patch into one extra config "HC" (fine detail + context, e.g. 6,18 for rows: L6 streaks + L18 moire); HC becomes the PRIMARY layer'); ap.add_argument('--fold_groups', default='', help='v1c: TSV taxon<TAB>group; cross-validation holds out whole groups (e.g. source paper) instead of single taxa'); ap.add_argument('--keep_majority_cluster', type=int, default=0, help='K>=2: inside the region, k-means the tokens (layer --primary_layer) into K groups per image and keep only the LARGEST group (e.g. wing membrane without veins, no vein model needed); 0 = off')
 a = ap.parse_args(); os.makedirs(a.out, exist_ok=True); rng = np.random.default_rng(0)
 LAYERS = [int(x) for x in a.layers.split(',')]; SCALES = [float(x) for x in a.scales.split(',')]
 log_f = open(os.path.join(a.out, 'report.txt'), 'w')
@@ -113,6 +116,21 @@ def region_crop(f, scale):
         m = m & (1 - cv2.dilate(e, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * a.exclude_dilate_px + 1,) * 2)))
     ys, xs = np.nonzero(m); y0, y1 = max(0, ys.min() - a.margin_px), min(H, ys.max() + a.margin_px + 1); x0, x1 = max(0, xs.min() - a.margin_px), min(W, xs.max() + a.margin_px + 1)
     C, M = I[y0:y1, x0:x1], m[y0:y1, x0:x1]
+    if a.subsample_windows and scale >= a.subsample_min_scale:   # 29 Oct: mosaic of N random, almost fully in-region windows, each x scale
+        Wn = a.window_px; cov = cv2.boxFilter(M.astype(np.float32), -1, (Wn, Wn), normalize=True, borderType=cv2.BORDER_CONSTANT)
+        cy, cx = np.nonzero(cov[Wn // 2:M.shape[0] - Wn // 2:32, Wn // 2:M.shape[1] - Wn // 2:32] >= 0.6)   # veins are cut out of the mask
+        if len(cy):
+            r_ = np.random.default_rng(zlib.crc32(f.encode())); pick = []
+            for j in r_.permutation(len(cy)):   # non-overlapping windows, spread over the region
+                if all(max(abs(cy[j] - cy[q]), abs(cx[j] - cx[q])) * 32 >= Wn for q in pick): pick.append(j)
+                if len(pick) == a.subsample_windows: break
+            S_ = int(round(Wn * scale)); nc = int(np.ceil(np.sqrt(len(pick)))); nr = int(np.ceil(len(pick) / nc))
+            Cm = np.zeros((nr * S_, nc * S_, 3), np.uint8); Mm = np.zeros((nr * S_, nc * S_), np.uint8)
+            for q, j in enumerate(pick):
+                yy, xx = cy[j] * 32, cx[j] * 32; r0, c0 = (q // nc) * S_, (q % nc) * S_
+                Cm[r0:r0 + S_, c0:c0 + S_] = cv2.resize(C[yy:yy + Wn, xx:xx + Wn], (S_, S_), interpolation=cv2.INTER_CUBIC)
+                Mm[r0:r0 + S_, c0:c0 + S_] = cv2.resize(M[yy:yy + Wn, xx:xx + Wn], (S_, S_), interpolation=cv2.INTER_NEAREST)
+            return prep(Cm, Mm), Mm, (x0, y0)
     if a.region_px: scale = scale * min(a.region_max_up, a.region_px / max(1, min(np.ptp(ys), np.ptp(xs))))   # 18 Oct: every region upsampled to the same size (Riedel lesson)
     if scale != 1: C = cv2.resize(C, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC); M = cv2.resize(M, (C.shape[1], C.shape[0]), interpolation=cv2.INTER_NEAREST)
     h16, w16 = max(16, C.shape[0] // 16 * 16), max(16, C.shape[1] // 16 * 16); C, M = C[:h16, :w16], M[:h16, :w16]
@@ -134,11 +152,13 @@ def dark_dots(C, M):
     length = (sk > 0).sum() if sk is not None else max(M.shape) ; return len(ys) / max(1, length) * 100, np.stack([xs, ys], 1)
 # ---------- extraction ----------
 CFG = [(s, L, v) for s in SCALES for L in LAYERS for v in ('raw', 'hp')]
+HCL = [int(x) for x in a.hypercolumn.split(',')] if a.hypercolumn else []
+assert all(L in LAYERS for L in HCL), '--hypercolumn layers must all be in --layers'
 AGG = {c: {} for c in CFG}; PAT = {c: {} for c in CFG}; DOTS = {}; KEPT = {}; t0 = time.time()
 for i, f in enumerate(files):
     for s in SCALES:
         C, M, _ = region_crop(f, s)
-        if s == 1: DOTS[f] = dark_dots(C, M)[0]
+        if s == (1.0 if 1.0 in SCALES else SCALES[0]): DOTS[f] = dark_dots(C, M)[0]   # 29 Oct: also when scale 1 is not run
         x = (C.astype(np.float32) / 255 - MEAN) / STD; Gs = layer_grids(x); gh, gw = Gs[LAYERS[0]].shape[:2]
         w = cv2.resize(M.astype(np.float32), (gw, gh), interpolation=cv2.INTER_AREA); inside = w >= 0.5
         if inside.sum() < 3: continue
@@ -149,13 +169,17 @@ for i, f in enumerate(files):
             sub = np.zeros(inside.sum(), bool); sub[kl == np.bincount(kl).argmax()] = True; inside = inside.copy(); inside[inside] = sub
             if s == 1: KEPT[f] = float(sub.mean())
         wt = torch.from_numpy(inside.astype(np.float32)).to(dev); ii = torch.from_numpy(np.flatnonzero(inside)).to(dev)
+        if HCL: kh = rng.choice(int(inside.sum()), min(int(inside.sum()), a.patches_per_image), replace=False)   # same patches in every layer
         for L in LAYERS:
             for v, G in (('raw', Gs[L]), ('hp', highpass(Gs[L], wt))):
                 T = G.reshape(-1, DIM)[ii].cpu().numpy(); AGG[(s, L, v)][f] = np.concatenate([T.mean(0), np.percentile(T, 90, axis=0)]).astype(np.float32)
-                k = rng.choice(len(T), min(len(T), a.patches_per_image), replace=False); PAT[(s, L, v)][f] = T[k].astype(np.float16)
+                k = kh if HCL else rng.choice(len(T), min(len(T), a.patches_per_image), replace=False); PAT[(s, L, v)][f] = T[k].astype(np.float16)
+        for v in (('raw', 'hp') if HCL else ()):
+            AGG.setdefault((s, 'HC', v), {})[f] = np.concatenate([AGG[(s, L, v)][f] for L in HCL]); PAT.setdefault((s, 'HC', v), {})[f] = np.concatenate([PAT[(s, L, v)][f] for L in HCL], 1)
         del Gs
     if (i + 1) % 25 == 0 or i + 1 == len(files): log(f'  extracted {i + 1}/{len(files)}  {time.time() - t0:.0f}s')
-np.savez_compressed(os.path.join(a.out, 'aggregates.npz'), files=np.array(files), **{f'{s}_{L}_{v}': np.stack([AGG[(s, L, v)].get(f, np.zeros(2 * DIM, np.float32)) for f in files]) for (s, L, v) in CFG})
+if HCL: CFG += [(s, 'HC', v) for s in SCALES for v in ('raw', 'hp')]; a.primary_layer = 'HC'; log(f'hypercolumn HC = layers {HCL} (primary)')
+np.savez_compressed(os.path.join(a.out, 'aggregates.npz'), files=np.array(files), **{f'{s}_{L}_{v}': np.stack([AGG[(s, L, v)].get(f, np.zeros_like(next(iter(AGG[(s, L, v)].values())))) for f in files]) for (s, L, v) in CFG})
 # ---------- evaluation ----------
 yv = lambda fs: np.array([LAB[taxon(f)] for f in fs]); grp = lambda fs: np.array([taxon(f) for f in fs])
 def score(fs, sc):
@@ -176,14 +200,14 @@ def method_A(c, fs):
     X = np.stack([AGG[c][f] for f in fs])
     def fp(tr, te, y):
         k = min(32, tr.sum() - 1); mdl = make_pipeline(StandardScaler(), PCA(k, random_state=0), Ridge(1.0) if numeric else LogisticRegression(C=0.5, class_weight='balanced', max_iter=2000))
-        mdl.fit(X[tr], y[tr]); return mdl.predict(X[te]) if numeric else mdl.predict_proba(X[te])[:, 1]
+        mdl.fit(X[tr], y[tr]); return (mdl.predict(X[te]) - (y[tr].mean() if a.centre_numeric else 0)) if numeric else mdl.predict_proba(X[te])[:, 1]
     return fp
 def method_B(c, fs):
     P_ = [PAT[c][f] for f in fs]
     def fp(tr, te, y):
         Xt = np.vstack([P_[j] for j in np.flatnonzero(tr)]).astype(np.float32); Yt = np.concatenate([np.full(len(P_[j]), y[j]) for j in np.flatnonzero(tr)])
         mdl = make_pipeline(StandardScaler(), PCA(64, random_state=0), Ridge(1.0) if numeric else LogisticRegression(C=0.5, class_weight='balanced', max_iter=2000)); mdl.fit(Xt, Yt)
-        return np.array([(mdl.predict(P_[j].astype(np.float32)) if numeric else mdl.predict_proba(P_[j].astype(np.float32))[:, 1]).mean() for j in np.flatnonzero(te)])
+        return np.array([(mdl.predict(P_[j].astype(np.float32)) if numeric else mdl.predict_proba(P_[j].astype(np.float32))[:, 1]).mean() for j in np.flatnonzero(te)]) - (Yt.mean() if numeric and a.centre_numeric else 0)
     return fp
 def null_scores(fp, fs, n):
     global LAB
@@ -192,28 +216,30 @@ def null_scores(fp, fs, n):
         perm = dict(zip(tg, rng.permutation([tv[t] for t in tg]))); LAB = {**keep, **perm}; yp = yv(fs); sc = logo(fp, fs, yp); ok = ~np.isnan(sc)
         try: vals.append(score(list(np.array(fs)[ok]), sc[ok])[0])
         except ValueError: pass
-    LAB = keep; return np.nanpercentile(vals, 95) if vals else np.nan
+    LAB = keep
+    if vals and numeric and a.centre_numeric: log(f'    null ({len(vals)} shuffles): median {np.nanmedian(vals):.3f}, 5-95% {np.nanpercentile(vals, 5):.3f} to {np.nanpercentile(vals, 95):.3f}')
+    return np.nanpercentile(vals, 95) if vals else np.nan
 fs = [f for f in lab_files if all(f in AGG[c] for c in CFG)]; y = yv(fs)
 if KEPT: log(f'keep_majority_cluster {a.keep_majority_cluster}: kept share of region patches median {np.median(list(KEPT.values())):.2f} (min {min(KEPT.values()):.2f}, max {max(KEPT.values()):.2f})')
 log(f'\nEVALUATION on {len(fs)} labelled images, {len(set(grp(fs)))} taxa; task = {"numeric (Spearman)" if numeric else "binary (AUC), positive = " + a.positive}')
 if not numeric: log('  taxa:', {t: (int(LAB[t]), int((grp(fs) == t).sum())) for t in sorted(set(grp(fs)))})
 d_ = np.array([DOTS[f] for f in fs]); log(f'BASELINE dark-dot density (no training): taxon-level {score(fs, d_)[0]:.3f}, image-level {score(fs, d_)[1]:.3f}')
 rows = []
-for c in CFG + [(s, L, 'raw+hp') for s in SCALES for L in LAYERS]:
+for c in CFG + [(s, L, 'raw+hp') for s in SCALES for L in LAYERS + (['HC'] if HCL else [])]:
     if c[2] == 'raw+hp':
         for f in fs: AGG[c] = AGG.get(c, {}); AGG[c][f] = np.concatenate([AGG[(c[0], c[1], 'raw')][f], AGG[(c[0], c[1], 'hp')][f]])
         PAT[c] = {f: np.concatenate([PAT[(c[0], c[1], 'raw')][f], PAT[(c[0], c[1], 'hp')][f]], 1) for f in PAT[(c[0], c[1], 'raw')]}
     for mname, mk in (('A', method_A), ('B', method_B)):
         fp = mk(c, fs); sc = logo(fp, fs, y); ok = ~np.isnan(sc); s_t, s_i = score(list(np.array(fs)[ok]), sc[ok])
-        prim = (mname == 'B' and c == (1.0, a.primary_layer, 'raw+hp'))
+        prim = (mname == 'B' and c == (a.primary_scale, a.primary_layer, 'raw+hp'))
         nl = null_scores(fp, fs, a.null if mname == 'A' else a.null_b) if (mname == 'A' or prim) else np.nan
         rows.append((mname, c, s_t, s_i, nl)); log(f'  {"PRIMARY " if prim else ""}{mname} scale {c[0]:g} L{c[1]} {c[2]:7s}: taxon {s_t:.3f}  image {s_i:.3f}  null95 {nl:.3f}')
         with open(os.path.join(a.out, f'scores_{mname}_s{c[0]:g}_L{c[1]}_{c[2]}.tsv'), 'w') as fh:
             fh.write('file\ttaxon\tlabel\tscore\n'); [fh.write(f'{f}\t{taxon(f)}\t{LAB[taxon(f)]}\t{v:.4f}\n') for f, v in zip(fs, sc)]
 # ---------- primary model on all labelled taxa -> unlabelled images + sheet ----------
-c = (1.0, a.primary_layer, 'raw+hp'); allf = [f for f in files if f in PAT[(1.0, a.primary_layer, 'raw')]]
+c = (a.primary_scale, a.primary_layer, 'raw+hp'); allf = [f for f in files if f in PAT[(a.primary_scale, a.primary_layer, 'raw')]]
 for f in allf:
-    if f not in PAT[c]: PAT[c][f] = np.concatenate([PAT[(1.0, a.primary_layer, 'raw')][f], PAT[(1.0, a.primary_layer, 'hp')][f]], 1)
+    if f not in PAT[c]: PAT[c][f] = np.concatenate([PAT[(a.primary_scale, a.primary_layer, 'raw')][f], PAT[(a.primary_scale, a.primary_layer, 'hp')][f]], 1)
 Xt = np.vstack([PAT[c][f] for f in fs]).astype(np.float32); Yt = np.concatenate([np.full(len(PAT[c][f]), LAB[taxon(f)]) for f in fs])
 mdl = make_pipeline(StandardScaler(), PCA(64, random_state=0), Ridge(1.0) if numeric else LogisticRegression(C=0.5, class_weight='balanced', max_iter=2000)).fit(Xt, Yt)
 pred = lambda T: mdl.predict(T) if numeric else mdl.predict_proba(T)[:, 1]
@@ -223,23 +249,47 @@ with open(os.path.join(a.out, 'specimen_scores_primary.tsv'), 'w') as fh:
 log('wrote specimen_scores_primary.tsv (unlabelled images scored by the model fitted on all labelled taxa)')
 # sheet: one image per taxon, held-out patch map for labelled taxa
 sc_prim = dict(zip(fs, logo(method_B(c, fs), fs, y))); tiles = []
-for t in sorted({taxon(f) for f in allf}):
-    f = sorted(x for x in allf if taxon(x) == t)[0]; C, M, _ = region_crop(f, 1.0); x = (C.astype(np.float32) / 255 - MEAN) / STD; Gs = layer_grids(x); gh, gw = Gs[a.primary_layer].shape[:2]
+_mdl_cache, MAPS = {}, {}
+_jobs = [(t, f) for t in (sorted({taxon(f) for f in allf}) if a.primary_scale == 1 else [])   # sheet drawn at scale 1 only
+         for f in (sorted(x for x in allf if taxon(x) == t) if a.maps_all else sorted(x for x in allf if taxon(x) == t)[:1])]
+for t, f in _jobs:
+    _first = f == sorted(x for x in allf if taxon(x) == t)[0]; C, M, _ = region_crop(f, 1.0); x = (C.astype(np.float32) / 255 - MEAN) / STD; Gs = layer_grids(x); gh, gw = Gs[LAYERS[0]].shape[:2]
     w = cv2.resize(M.astype(np.float32), (gw, gh), interpolation=cv2.INTER_AREA); inside = w >= 0.5; wt = torch.from_numpy(inside.astype(np.float32)).to(dev)
-    G = Gs[a.primary_layer]; T = torch.cat([G, highpass(G, wt)], -1).reshape(-1, 2 * DIM).cpu().numpy()
+    G = torch.cat([Gs[L] for L in HCL], -1) if a.primary_layer == 'HC' else Gs[a.primary_layer]; T = torch.cat([G, highpass(G, wt)], -1).reshape(-1, 2 * G.shape[-1]).cpu().numpy()
     if t in LAB:   # held-out map: refit without this taxon
-        tr = grp(fs) != t; Xt_ = np.vstack([PAT[c][g] for g, k in zip(fs, tr) if k]).astype(np.float32); Yt_ = np.concatenate([np.full(len(PAT[c][g]), LAB[taxon(g)]) for g, k in zip(fs, tr) if k])
-        m_ = make_pipeline(StandardScaler(), PCA(64, random_state=0), Ridge(1.0) if numeric else LogisticRegression(C=0.5, class_weight='balanced', max_iter=2000)).fit(Xt_, Yt_)
+        if t not in _mdl_cache:
+            tr = grp(fs) != t; Xt_ = np.vstack([PAT[c][g] for g, k in zip(fs, tr) if k]).astype(np.float32); Yt_ = np.concatenate([np.full(len(PAT[c][g]), LAB[taxon(g)]) for g, k in zip(fs, tr) if k])
+            _mdl_cache[t] = make_pipeline(StandardScaler(), PCA(64, random_state=0), Ridge(1.0) if numeric else LogisticRegression(C=0.5, class_weight='balanced', max_iter=2000)).fit(Xt_, Yt_)
+        m_ = _mdl_cache[t]
         p = m_.predict(T) if numeric else m_.predict_proba(T)[:, 1]
     else: p = pred(T)
-    pm = np.where(inside.ravel(), p, np.nan).reshape(gh, gw); lo, hi = (0, 1) if not numeric else (np.nanmin(list(LAB.values())), np.nanmax(list(LAB.values())))
+    pm = np.where(inside.ravel(), p, np.nan).reshape(gh, gw); MAPS[f] = (pm.astype(np.float32), t, C[:, :, ::-1].copy()); lo, hi = (0, 1) if not numeric else (np.nanmin(list(LAB.values())), np.nanmax(list(LAB.values())))
     col = cv2.applyColorMap(np.uint8(255 * np.clip((np.nan_to_num(pm, nan=lo) - lo) / max(1e-6, hi - lo), 0, 1)), cv2.COLORMAP_MAGMA)
     col = cv2.resize(col, (C.shape[1], C.shape[0]), interpolation=cv2.INTER_NEAREST); col[cv2.resize(inside.astype(np.uint8), (C.shape[1], C.shape[0]), interpolation=cv2.INTER_NEAREST) == 0] = 255
     _, pts = dark_dots(C, M); dd = C[:, :, ::-1].copy()
     for (px, py) in pts: cv2.circle(dd, (int(px), int(py)), 4, (0, 255, 0), 1)
     Z = 2; blk = np.vstack([cv2.resize(im, None, fx=Z, fy=Z, interpolation=cv2.INTER_CUBIC) for im in (C[:, :, ::-1], col, dd)])[:, :1800]
     hdr = np.full((28, blk.shape[1], 3), 255, np.uint8); s_ = sc_prim.get(f, pred(PAT[c][f].astype(np.float32)).mean())
-    cv2.putText(hdr, f'{t} | label {LAB.get(t, "unlabelled")} | score {s_:.2f} ({"held out" if t in LAB else "all-taxa model"}) | {f[:40]}', (4, 20), 0, 0.55, (0, 0, 0), 1); tiles.append(np.vstack([hdr, blk]))
+    cv2.putText(hdr, f'{t} | label {LAB.get(t, "unlabelled")} | score {s_:.2f} ({"held out" if t in LAB else "all-taxa model"}) | {f[:40]}', (4, 20), 0, 0.55, (0, 0, 0), 1)
+    if _first: tiles.append(np.vstack([hdr, blk]))
     del Gs
-Wd = max(x.shape[1] for x in tiles); S = np.vstack([cv2.copyMakeBorder(x, 0, 10, 0, Wd - x.shape[1], cv2.BORDER_CONSTANT, value=(255, 255, 255)) for x in tiles])
-cv2.imwrite(os.path.join(a.out, 'sheet_primary.jpg'), S, [cv2.IMWRITE_JPEG_QUALITY, 85]); log('wrote sheet_primary.jpg (native crop x2 | held-out P map | dark dots)'); log('DONE')
+if a.maps_all and MAPS:   # 4 Nov 2026: every image's held-out map, compact sheet (crop | map side by side), grouped by taxon
+    np.savez_compressed(os.path.join(a.out, 'maps_all.npz'), **{f'{k}__map': v[0] for k, v in MAPS.items()}, **{f'{k}__taxon': np.array(v[1]) for k, v in MAPS.items()})
+    lo_, hi_ = (0, 1) if not numeric else (np.nanmin(list(LAB.values())), np.nanmax(list(LAB.values()))); ts = []
+    for k, (pm_, t_, C_) in MAPS.items():
+        col_ = cv2.applyColorMap(np.uint8(255 * np.clip((np.nan_to_num(pm_, nan=lo_) - lo_) / max(1e-6, hi_ - lo_), 0, 1)), cv2.COLORMAP_MAGMA); col_ = cv2.resize(col_, (C_.shape[1], C_.shape[0]), interpolation=cv2.INTER_NEAREST)
+        col_[cv2.resize(np.isfinite(pm_).astype(np.uint8), (C_.shape[1], C_.shape[0]), interpolation=cv2.INTER_NEAREST) == 0] = 255
+        tl = np.hstack([C_, col_]); tl = cv2.resize(tl, (720, int(720 * tl.shape[0] / tl.shape[1]))); hd = np.full((24, 720, 3), 255, np.uint8)
+        cv2.putText(hd, f'{t_} | label {LAB.get(t_, "-")} | mean {np.nanmean(pm_):.2f} | {k[:34]}', (4, 17), 0, 0.45, (0, 0, 0), 1); ts.append(np.vstack([hd, tl]))
+    Hm = max(x.shape[0] for x in ts); ts = [cv2.copyMakeBorder(x, 0, Hm - x.shape[0], 0, 0, cv2.BORDER_CONSTANT, value=(255, 255, 255)) for x in ts]
+    while len(ts) % 4: ts.append(np.full_like(ts[0], 255))
+    G_ = np.vstack([np.hstack(ts[q:q + 4]) for q in range(0, len(ts), 4)])
+    for k0 in range(0, len(G_), 60000): cv2.imwrite(os.path.join(a.out, 'maps_all_sheet.jpg' if len(G_) <= 60000 else f'maps_all_sheet_part{k0 // 60000 + 1}.jpg'), G_[k0:k0 + 60000], [cv2.IMWRITE_JPEG_QUALITY, 85])
+    log(f'wrote maps_all.npz + maps_all_sheet ({len(MAPS)} images: crop | held-out patch map)')
+if tiles:
+    Wd = max(x.shape[1] for x in tiles); S = np.vstack([cv2.copyMakeBorder(x, 0, 10, 0, Wd - x.shape[1], cv2.BORDER_CONSTANT, value=(255, 255, 255)) for x in tiles])
+    for k0 in range(0, len(S), 60000):   # 29 Oct: JPEG max 65,535 px high - cv2.imwrite failed silently on tall sheets; write parts
+        nm = 'sheet_primary.jpg' if len(S) <= 60000 else f'sheet_primary_part{k0 // 60000 + 1}.jpg'
+        ok_ = cv2.imwrite(os.path.join(a.out, nm), S[k0:k0 + 60000], [cv2.IMWRITE_JPEG_QUALITY, 85]); log(f'{"wrote" if ok_ else "FAILED to write"} {nm} (native crop x2 | held-out P map | dark dots)')
+else: log('no sheet (primary scale != 1)')
+log('DONE')

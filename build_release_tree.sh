@@ -60,7 +60,8 @@ annotation_scale_transfer_v1.py
 descriptron-v2-v91.py descriptron-v2-v92.py descriptron-v2-v93.py descriptron-v2-v94.py descriptron-v2-v95.py descriptron-v2-v96.py descriptron-v2-v97.py descriptron-v2-v98.py descriptron_point_types_v1.py
 descriptron_category_nav_v1.py descriptron_dinomask_dialog_v1.py descriptron_undo_v1.py biorag_annotate_v2.py biorag_annotate_tokens_v2.py
 descriptron_ontology.py
-line_drawing_v1.py texture_band_profiles_v1.py texture_hires_v3.py"
+line_drawing_v1.py texture_band_profiles_v1.py texture_hires_v3.py
+FHS_and_CLAHE_V22.py descriptron-v2-v99.py homology_landmarks_v1.py"
 
 is_live() {  # is_live <basename>
   [ -z "$LIVE_LIST" ] && return 0
@@ -101,7 +102,7 @@ cp "$GUI/dinomask/README.md" "$DST/descriptron/dinomask/"
 cp "$GUI/measure/BIORAG_PROBE_DESIGN.md" "$DST/descriptron/measure/"
 for t in test_folder_save test_biorag_annotate test_logic test_keypoints test_v87_fixes test_v88_context_tools \
          test_category_nav test_dinomask_dialog test_undo test_biorag_annotate_v2 \
-         test_v97_folder_filter test_point_types test_point_types_gui test_probe_point_type gui_boot_withdrawn; do   # 2.8.1: + the v91-v96 module tests; 2.8.2: + v97 folder filter; 2.8.5: + v98 point types
+         test_v97_folder_filter test_point_types test_point_types_gui test_probe_point_type gui_boot_withdrawn test_v99_recolorize; do   # 2.8.1: + the v91-v96 module tests; 2.8.2: + v97 folder filter; 2.8.5: + v98 point types
   cp "$GUI/test_brush/$t.py" "$DST/descriptron/test_brush/"
 done
 for f in detectron2_training_and_filterV10_and_kpts-17.py \
@@ -126,6 +127,8 @@ find "$GUI/measure/validation" -maxdepth 1 \( -name 'validate_*.py' -o -name '*_
 rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/moths_nokelainen2024" "$DST/descriptron/measure/validation/"
 # v2.6.0: open-set benchmark against BioCLIP / BioCLIP 2 / BIOSCAN-5M (needs open_clip + timm: its own env, see its README)
 rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/open_set_benchmark" "$DST/descriptron/measure/validation/"
+# 2.8.7: V22 --recolorize vs R recolorize (moths + recolorize's beetles): scripts, result tables, figures
+rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/validation/recolorize_v22" "$DST/descriptron/measure/validation/"
 # v2.7.6: worked examples (community_example: Darwin Core metadata, trees, tip map, traits, README)
 rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/examples" "$DST/descriptron/measure/"
 

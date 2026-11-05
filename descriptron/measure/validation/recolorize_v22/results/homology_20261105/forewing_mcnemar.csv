@@ -1,0 +1,16 @@
+set_a,set_b,n_common,acc_a,acc_b,only_a_right,only_b_right,mcnemar_P
+Descriptron_colour,Descriptron_colour_recolorize,48,0.9375,0.875,4,1,0.375
+Descriptron_colour,Descriptron_colour_photo,48,0.9375,0.9166666666666666,1,0,1.0
+Descriptron_colour,Descriptron_texture,48,0.9375,0.9375,1,1,1.0
+Descriptron_colour,patternize,48,0.9375,0.875,3,0,0.25
+Descriptron_colour,Colormesh,48,0.9375,0.75,9,0,0.00390625
+Descriptron_colour_recolorize,Descriptron_colour_photo,48,0.875,0.9166666666666666,1,3,0.625
+Descriptron_colour_recolorize,Descriptron_texture,48,0.875,0.9375,0,3,0.25
+Descriptron_colour_recolorize,patternize,48,0.875,0.875,4,4,1.0
+Descriptron_colour_recolorize,Colormesh,48,0.875,0.75,6,0,0.03125
+Descriptron_colour_photo,Descriptron_texture,48,0.9166666666666666,0.9375,1,2,1.0
+Descriptron_colour_photo,patternize,48,0.9166666666666666,0.875,3,1,0.625
+Descriptron_colour_photo,Colormesh,48,0.9166666666666666,0.75,8,0,0.0078125
+Descriptron_texture,patternize,48,0.9375,0.875,4,1,0.375
+Descriptron_texture,Colormesh,48,0.9375,0.75,9,0,0.00390625
+patternize,Colormesh,48,0.875,0.75,9,3,0.14599609375

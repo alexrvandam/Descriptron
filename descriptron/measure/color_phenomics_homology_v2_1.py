@@ -189,12 +189,23 @@ def resolve_image_path(fn_from_gpa, image_dir):
     if not os.path.isdir(image_dir):
         return None
 
-    candidates = os.listdir(image_dir)
+    # 2026-11-04: skip the derived files V20-V22 write next to each colour image
+    # (_gray/_bin/_labels/... also start with labavg_ and contain the specimen name)
+    _derived = ("_gray.png", "_bin.png", "_binary.png", "_labels.png", "_palette.csv",
+                "_granularity.png", "_adjacency.png", "_efa_overlay.png")
+    candidates = sorted(f for f in os.listdir(image_dir) if not f.lower().endswith(_derived))
     
     # --- PRIORITY 1: Look for labavg_median images (V20 calibrated output) ---
     for f in candidates:
         f_lower = f.lower().replace(".", "").replace("_", "")
         if f.lower().startswith("labavg_median"):
+            if base_clean in f_lower or base_noext_clean in f_lower:
+                return os.path.join(image_dir, f)
+
+    # --- PRIORITY 1b: FHS_and_CLAHE_V22 --recolorize output (recolorize_dE<cutoff>_*) ---
+    for f in candidates:
+        f_lower = f.lower().replace(".", "").replace("_", "")
+        if f.lower().startswith("recolorize_de"):
             if base_clean in f_lower or base_noext_clean in f_lower:
                 return os.path.join(image_dir, f)
 
@@ -407,8 +418,11 @@ def extract_cell_color_features(img_lab, cell_mask, specimen_lab_means,
       dominant_proportion    : proportion of most common color bin
 
     The absolute L_mean_abs / a_mean_abs / b_mean_abs columns are new in
-    v2.1.  They are the untransformed per-cell CIELAB means (skimage
-    convention: L in [0,100], a and b in ~[-128, 127]).  These enable
+    v2.1.  They are per-cell CIELAB means (L in [0,100], a and b centred
+    on 0).  Until 2026-11-04 they were written in OpenCV 8-bit LAB units
+    (L x 2.55, a/b + 128) although this docstring said CIELAB; they are now
+    converted.  The relative and std features stay in OpenCV units (L x 2.55);
+    every analysis z-scores each column, so results do not change.  These enable
     honest ancestral-state reconstruction of per-cell colour at internal
     nodes without needing to re-combine relative values with specimen
     means from a separate CSV.
@@ -437,9 +451,9 @@ def extract_cell_color_features(img_lab, cell_mask, specimen_lab_means,
 
     # absolute L*a*b* means (v2.1 — for ancestral state reconstruction
     # of per-cell colour without needing specimen_lab_means separately)
-    features.append(L_mean_abs)
-    features.append(a_mean_abs)
-    features.append(b_mean_abs)
+    features.append(L_mean_abs * 100.0 / 255.0)   # 2026-11-04: OpenCV 8-bit -> CIELAB
+    features.append(a_mean_abs - 128.0)
+    features.append(b_mean_abs - 128.0)
 
     # within-cell standard deviations (color variability)
     features.append(float(L_vals.std()) if len(L_vals) > 1 else 0.0)  # L_std
@@ -541,6 +555,8 @@ def extract_specimen_hue_features(img_lab, fg_bool, lab_offset=None):
                      else 0.0
 
     L_mean = float(L_vals.mean())
+    if lab_offset:                                  # 2026-11-04: OpenCV 8-bit L (0-255) -> CIE L* (0-100)
+        L_mean *= 100.0 / 255.0
     a_mean = float(a_vals.mean()) - float(lab_offset)
     b_mean = float(b_vals.mean()) - float(lab_offset)
 
@@ -608,7 +624,7 @@ def combine_pattern_and_hue(X_pattern, X_hue, hue_weight=1.0):
 
 def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
                      image_dir, mask_lookup, ctrl_step=5, color_bins=8,
-                     occluder_lookup=None, coverage_out=None):
+                     occluder_lookup=None, coverage_out=None, landmarks=None):
     """Process one specimen: TPS warp grid, extract per-cell color."""
 
     # resolve image path
@@ -683,6 +699,8 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
         ctrl_idx = list(range(0, n, max(1, n // 10)))
     ctrl_mean = mean_pts[ctrl_idx]
     ctrl_spec = spec_pts[ctrl_idx]
+    if landmarks is not None:   # 2026-11-04: fixed landmarks join the outline semilandmarks (homology_landmarks_v1.py)
+        ctrl_mean, ctrl_spec = landmarks.controls(fn_gpa, ctrl_mean, ctrl_spec)
 
     # build TPS warp: mean → specimen
     try:
@@ -873,6 +891,11 @@ def parse_args():
                         'asymmetry (~500 pattern cols vs 6 hue cols). '
                         '>1.0 pushes clustering toward hue; <1.0 toward '
                         'pattern. Ignored in pattern/hue-only modes.')
+    try:   # 2026-11-04: --landmarks auto|none and the keypoint options (homology_landmarks_v1.py)
+        from homology_landmarks_v1 import add_cli as _lm_cli
+        _lm_cli(p)
+    except ImportError:
+        pass
     return p.parse_args()
 
 
@@ -897,6 +920,16 @@ def main():
 
     # --- Load GPA outputs ---
     mean_shape, specimens = load_gpa_outputs(args.gpa_dir)
+    landmarks = None   # 2026-11-04: fixed landmarks as extra TPS control points (homology_landmarks_v1.py)
+    if getattr(args, 'landmarks', 'none') != 'none':
+        from homology_landmarks_v1 import from_args as _lm_from_args
+        landmarks = _lm_from_args(args, specimens, mean_shape)
+        if landmarks is not None:
+            os.makedirs(args.output_dir, exist_ok=True)
+            with open(os.path.join(args.output_dir, 'tps_landmarks_used.json'), 'w') as _f:
+                json.dump(dict(landmarks.info, names=landmarks.names,
+                               consensus=[[None if not np.isfinite(v) else round(float(v), 6) for v in r] for r in landmarks.mean_lm],
+                               per_specimen={k: landmarks.n_for(k) for k in specimens}), _f, indent=1)
 
     # --- Build mask lookup from ORIGINAL COCO ---
     cat_name = args.category_name or 'category'
@@ -938,7 +971,8 @@ def main():
                                 args.image_dir, mask_lookup,
                                 ctrl_step=ctrl_step,
                                 color_bins=color_bins,
-                                occluder_lookup=occluder_lookup, coverage_out=coverage)
+                                occluder_lookup=occluder_lookup, coverage_out=coverage,
+                                landmarks=landmarks)
 
     items = list(specimens.items())
     results = []

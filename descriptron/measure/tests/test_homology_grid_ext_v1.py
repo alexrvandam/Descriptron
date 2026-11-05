@@ -93,9 +93,12 @@ def test_batch_mean_shift_removes_offset_from_shared_species():
 def test_pipeline_grid_options():
     sys.path.insert(0, os.path.dirname(HERE))
     import run_full_pipeline_v2 as rp
-    assert rp._homology_grid_opts({}) == []
+    # 2.8.7: landmarks join the semilandmarks as TPS controls by default (--landmarks auto); 'none' = previous behaviour
+    assert rp._homology_grid_opts({}) == ['--landmarks', 'auto']
+    assert rp._homology_grid_opts({'homology_landmarks': 'none', 'keypoints_json': 'k.json'}) == ['--landmarks', 'none']
+    assert rp._homology_grid_opts({'keypoints_json': 'k.json'}) == ['--landmarks', 'auto', '--landmark_json', 'k.json']
     assert rp._homology_grid_opts({'grid_ext': 2, 'occluder_categories': 'scape', 'grid_figures_all': True}) == \
-        ['--grid_ext', '2', '--occluder_categories', 'scape', '--viz_specimens', '-1']
+        ['--grid_ext', '2', '--occluder_categories', 'scape', '--viz_specimens', '-1', '--landmarks', 'auto']
 
 
 def _coco_two_legs_and_body():

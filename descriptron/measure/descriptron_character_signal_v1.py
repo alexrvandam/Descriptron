@@ -51,14 +51,17 @@ def bh(p):
     return q
 
 
-def label_column(ax, xs, ys, labels, side_x=1.02, fontsize=5.6, gap_frac=1 / 34, colors=None):
-    """labels in a column right of the axes, spaced so they never overlap, each joined to its point by a thin line"""
+def label_column(ax, xs, ys, labels, side_x=1.02, fontsize=5.6, gap_frac=1 / 34, colors=None, spread=None):
+    """labels in a column right of the axes, spaced so they never overlap, each joined to its point by a thin line;
+    spread=(y_low, y_high): space the labels evenly over that y range instead, in the order of their points"""
     if not len(xs):
         return
     lo, hi = ax.get_ylim(); gap = (hi - lo) * gap_frac
     order = np.argsort(ys)[::-1]
     pos, last = [], hi + gap
-    for i in order:                                        # top-down, never closer than `gap`
+    if spread is not None:                                 # evenly spaced, top-down in the order of the points
+        pos = list(zip(order, np.linspace(spread[1], spread[0], len(order)) if len(order) > 1 else [spread[1]]))
+    for i in (order if spread is None else []):            # top-down, never closer than `gap`
         y = min(ys[i], last - gap); pos.append((i, y)); last = y
     shift = max(0.0, lo - min(y for _, y in pos))          # pushed below the axis: move the column up
     to_axes = ax.transAxes.inverted()
@@ -196,7 +199,8 @@ def _phylo_figure(A, out, a):
         short = [short_label(st, lb).replace("forewing: distance ", "").replace("distance ", "")
                  for st, lb in zip(above.structure, above.label)]
         label_column(ax2, 100 * above.top1.values, above.K.values, short, side_x=0.56, fontsize=4.8, gap_frac=1 / 75,
-                     colors=[C_ROBUST if x >= a.robust_x else C_WEAK for x in (above.top1 / above.chance_top1)])
+                     colors=[C_ROBUST if x >= a.robust_x else C_WEAK for x in (above.top1 / above.chance_top1)],
+                     spread=(1.06, float(above.K.max())) if getattr(a, "spread_labels", False) and len(above) > 1 else None)
     lab = D[sig & ~D.index.isin(above.index)].assign(sc=D.top1 / D.chance_top1).sort_values("sc", ascending=False).head(a.label_top)
     label_column(ax2, 100 * lab.top1.values, lab.K.values, [short_label(st, lb) for st, lb in zip(lab.structure, lab.label)],
                  colors=[C_ROBUST if x >= a.robust_x else C_WEAK for x in (lab.top1 / lab.chance_top1)])
@@ -248,8 +252,18 @@ def main(argv=None):
                          "times chance are drawn in blue (default 3)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out_dir", required=True)
+    ap.add_argument("--redraw_from", default=None,
+                    help="character_signal_all.tsv of an earlier run: redraw the phylogenetic figure from it into --out_dir "
+                         "(no recomputation; --matrix_dir is then not read)")
+    ap.add_argument("--spread_labels", action="store_true",
+                    help="phylogenetic figure: space the labels of the K > 1 characters evenly between K = 1.06 and the "
+                         "largest K, so that closely spaced points get legible labels")
     a = ap.parse_args(argv)
     md = Path(a.matrix_dir); out = Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
+    if a.redraw_from:
+        _phylo_figure(pd.read_csv(a.redraw_from, sep="\t"), out, a)
+        print(f"-> {out / 'character_phylo_signal.png'}")
+        return
     L = pd.read_csv(md / "specimen_matrix_long.csv")
     fd = pd.read_csv(md / "feature_dictionary.tsv", sep="\t").set_index("feature_id")
     tree_txt = Path(a.tree).read_text() if a.tree else None

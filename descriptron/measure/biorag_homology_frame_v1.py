@@ -235,7 +235,7 @@ def apply_M(M: np.ndarray, pts: np.ndarray) -> np.ndarray:
     return pts @ M[:, :2].T + M[:, 2]
 
 
-def build_tps_warp(src: np.ndarray, dst: np.ndarray, step: int = 5, smoothing: float = 1e-5):
+def build_tps_warp(src: np.ndarray, dst: np.ndarray, step: int = 5, smoothing: float = 1e-5, extra=None):
     """Thin-plate spline mapping src landmarks onto dst, as build_tps_warp does in
     color_phenomics_homology_v2_1.
 
@@ -247,6 +247,8 @@ def build_tps_warp(src: np.ndarray, dst: np.ndarray, step: int = 5, smoothing: f
     from scipy.interpolate import RBFInterpolator
     s = np.asarray(src, float)[::step]
     d = np.asarray(dst, float)[::step]
+    if extra is not None and len(extra[0]):     # 2026-11-04: fixed landmarks as extra control points
+        s = np.vstack([s, np.asarray(extra[0], float)]); d = np.vstack([d, np.asarray(extra[1], float)])
     wx = RBFInterpolator(s, d[:, 0], kernel="thin_plate_spline", smoothing=smoothing)
     wy = RBFInterpolator(s, d[:, 1], kernel="thin_plate_spline", smoothing=smoothing)
 
@@ -311,6 +313,10 @@ def main():
                          "the consensus and the landmark correspondence are taken from "
                          "gpa_mean.csv and back_transformed_coco.json instead of being recomputed, "
                          "so these frames share a consensus with the colour-homology cells")
+    ap.add_argument("--fixed_landmarks", choices=["auto", "none"], default="auto",
+                    help="auto (default): keypoints on the structure (from --fixed_landmark_json or --coco) join the "
+                         "semilandmarks as TPS control points of the grid (homology_landmarks_v1.py); none = before 4 Nov 2026")
+    ap.add_argument("--fixed_landmark_json", default="")
     a = ap.parse_args()
 
     out = Path(a.out_dir)
@@ -390,6 +396,24 @@ def main():
                                           [c["x1"], c["y1"]], [c["x0"], c["y1"]]], float)
                      for c in cells}
         warped_grids = {}
+        lmc = None   # 2026-11-04: fixed landmarks (homology_landmarks_v1.py), consensus positions in frame pixels
+        if a.fixed_landmarks != "none":
+            try:
+                from homology_landmarks_v1 import LandmarkControls
+                _sp = {}
+                for i_s, sid in enumerate(sids):
+                    _lm = recs[sid][0]
+                    _sp[recs[sid][1]] = np.roll(_lm, -int(shifts[i_s]), axis=0) if int(shifts[i_s]) else _lm
+                lmc = LandmarkControls.from_coco(a.fixed_landmark_json or a.coco, _sp, cons_px,
+                                                 allow_reflection=bool(a.allow_reflection))
+                if lmc.n_used:
+                    print(f"  {st}: {lmc.n_used} fixed landmarks join the semilandmarks as TPS control points"
+                          + (f"; outline and landmarks disagree for {len(lmc.info['outline_landmark_disagree'])}"
+                             if lmc.info.get("outline_landmark_disagree") else ""))
+                else:
+                    lmc = None
+            except ImportError:
+                lmc = None
         for i_s, sid in enumerate(sids):
             lm, fn, pts = recs[sid]
             if int(shifts[i_s]):
@@ -409,7 +433,11 @@ def main():
             Image.fromarray(placed).save(sdir / f"{sid}.png")
 
             # the grid follows the individual: consensus landmarks -> this specimen's
-            t_fwd = build_tps_warp(cons_px, lm_frame)      # consensus -> this specimen
+            _extra = None
+            if lmc is not None and lmc.n_for(fn):
+                _kp = lmc.spec_lm[fn]; _ok = np.isfinite(_kp[:, 0]) & np.isfinite(lmc.mean_lm[:, 0])
+                _extra = (lmc.mean_lm[_ok], apply_M(M, _kp[_ok]))
+            t_fwd = build_tps_warp(cons_px, lm_frame, extra=_extra)      # consensus -> this specimen
             warped_grids[sid] = {name: warp_points(t_fwd, poly).tolist()
                                  for name, poly in cell_poly.items()}
             np.save(sdir / f"{sid}_landmarks.npy", lm_frame)

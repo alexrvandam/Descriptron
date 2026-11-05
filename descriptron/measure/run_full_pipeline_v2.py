@@ -22,7 +22,9 @@ Steps:
   0. COCO JSON Cleanup          — validate and fix COCO JSON for pipeline compatibility
   1. Measurements (V35)         — morphometrics + Florence-2 scale bars
   2. Semilandmarks + GPA (V34)  — Procrustes shape analysis + foreground masks
-  3. Color Extraction (V21)     — FHS + CLAHE per-category color features
+  3. Color Extraction (V22)     — recolorize-style segmentation (default: 8 bins, average linkage,
+                                 dE 20; validated against R recolorize 0.2.0) or, with
+                                 --colour_method descriptron, FHS + CLAHE + LAB averaging
   4. Color Homology (v2.1)      — grid-based CIE LAB per homologous region
   5. Texture Homology           — GLCM + LBP per homologous region
   6. Landmark GPA (optional)    — discrete homologous landmark analysis
@@ -471,7 +473,7 @@ def step_semilandmarks(cfg: Dict, python: str, log_dir: Path) -> bool:
         "--num_landmarks", str(cfg.get("num_landmarks", 100)),
         "--anchor_method", "none",
         "--alignment_method", align,
-        *(["--slide_method", cfg["slide_method"]] if cfg.get("slide_method", "none") != "none" and "V42" in script.name else []),
+        *(["--slide_method", cfg["slide_method"]] if cfg.get("slide_method", "bending") != "none" and "V42" in script.name else []),
         "--perform_manova",
     ]
     if cfg.get("group_labels"):
@@ -511,12 +513,17 @@ def step_color_extraction(cfg: Dict, python: str, log_dir: Path) -> bool:
         logger.warning("  No foreground masks found in semilandmarks output")
         return True
 
-    script = SCRIPT_DIR / "FHS_and_CLAHE_V21.py"
+    # 2026-11-04: V22 (V21 + colour fixes + --recolorize). V21 stays for reproducing earlier runs.
+    script = SCRIPT_DIR / "FHS_and_CLAHE_V22.py"
+    if not script.exists():
+        script = SCRIPT_DIR / "FHS_and_CLAHE_V21.py"
+    recolorize = cfg.get("colour_method", "recolorize") == "recolorize" and script.name.endswith("V22.py")
     all_ok = True
 
     for cat in categories:
         out_dir = out_base / cat
-        check_file = list(out_dir.glob(f"color_traits_phylo_{cat}_adaptive.csv"))
+        done_glob = f"color_traits_phylo_{cat}_recolorize_dE*.csv" if recolorize else f"color_traits_phylo_{cat}_adaptive.csv"
+        check_file = list(out_dir.glob(done_glob))
         if check_file and not cfg["force"]:
             logger.info(f"    [{cat}] already complete, skipping")
             continue
@@ -532,6 +539,28 @@ def step_color_extraction(cfg: Dict, python: str, log_dir: Path) -> bool:
             "--input_dir", str(input_dir),
             "--output_dir", str(out_dir),
         ]
+        if recolorize:
+            # V22 --recolorize: bins^3 histogram -> linkage merge in Lab at the cutoff -> refit every pixel.
+            # No Felzenszwalb, CLAHE, shine removal or background shift (they change the colours being measured).
+            cmd += ["--recolorize",
+                    "--recolorize_cutoff", str(cfg.get("recolorize_cutoff", "20")),
+                    "--recolorize_bins", str(cfg.get("recolorize_bins", 8)),
+                    "--recolorize_linkage", cfg.get("recolorize_linkage", "average"),
+                    "--run_pattern_analysis", "--run_efa", "--category_name", cat]
+            if cfg.get("recolorize_normalize"):
+                # 2026-11-04 option: even out photographs from different sources first - background chromaticity
+                # (von Kries a*/b*, per image from the photo's own background) + CLAHE on lightness
+                cmd += ["--run_normalization", "--bg_normalize"]
+                if cfg.get("image_dir"):
+                    cmd += ["--bg_original_dir", cfg["image_dir"]]
+                if cfg.get("coco_json"):
+                    cmd += ["--bg_coco_json", cfg["coco_json"]]
+            logger.info(f"    [{cat}] Running color extraction (recolorize)...")
+            ok = _run_step(cmd, f"step3_color_{cat}", log_dir, cfg["dry_run"])
+            if not ok:
+                all_ok = False
+                logger.error(f"    [{cat}] FAILED")
+            continue
         if has_fhs:
             cmd.append("--skip_preprocessing")
         cmd += [
@@ -569,6 +598,11 @@ def _homology_grid_opts(cfg: Dict) -> list:
         o += ["--occluder_categories", cfg["occluder_categories"]]
     if cfg.get("grid_figures_all"):
         o += ["--viz_specimens", "-1"]
+    # 2026-11-04: fixed landmarks (keypoints) join the outline semilandmarks as TPS control points of the grids
+    # (homology_landmarks_v1.py); from --keypoints_json when given, else from the COCO file itself
+    o += ["--landmarks", cfg.get("homology_landmarks", "auto")]
+    if cfg.get("homology_landmarks", "auto") != "none" and cfg.get("keypoints_json"):
+        o += ["--landmark_json", cfg["keypoints_json"]]
     return o
 
 
@@ -626,11 +660,20 @@ def step_color_homology(cfg: Dict, python: str, log_dir: Path) -> bool:
         out_dir.mkdir(parents=True, exist_ok=True)
         gpa_dir = _gpa_dir_for(cfg, cat)   # v86
 
+        # 2026-11-04: the TPS grid reads the segmented colour images of step 3 (recolorize_dE* or labavg_median_*,
+        # same size as the photos) unless --colour_homology_input raw or step 3 left none for this category
+        img_dir = cfg["image_dir"]
+        seg_dir = Path(cfg["output_base"]) / "color_extraction" / cat
+        if cfg.get("colour_homology_input", "segmented") == "segmented" and seg_dir.is_dir() and any(
+                f.name.startswith(("recolorize_dE", "labavg_median")) for f in seg_dir.iterdir()):
+            img_dir = str(seg_dir)
+            logger.info(f"    [{cat}] colour homology on segmented images in {seg_dir}")
+
         cmd = [
             python, str(script),
             "--gpa_dir", str(gpa_dir),
             "--json", cfg["coco_json"],
-            "--image_dir", cfg["image_dir"],
+            "--image_dir", img_dir,
             "--output_dir", str(out_dir),
             "--category_name", cat,
             "--color_mode", "combined",
@@ -2293,9 +2336,10 @@ def parse_args():
 
     p.add_argument("--num_landmarks", type=int, default=100,
                     help="Number of semilandmarks (default 100)")
-    p.add_argument("--slide_method", choices=["none", "procd", "bending"], default="none",
-                    help="Semilandmark sliding as in geomorph (V42): none = fixed (default), procd = minimum "
-                         "Procrustes distance, bending = minimum bending energy")
+    p.add_argument("--slide_method", choices=["none", "procd", "bending"], default="bending",
+                    help="Semilandmark sliding as in geomorph (V42): bending = minimum bending energy (default since "
+                         "4 Nov 2026, as geomorph gpagen), procd = minimum Procrustes distance, none = fixed equal-arc-length "
+                         "points (the default before 4 Nov 2026)")
     # 2026-10-12 opt-in additions for the TPS homology grids (homology_grid_ext.py); defaults = previous behaviour
     p.add_argument("--repair_outline_with", default="",
                     help="Comma-separated categories hiding part of a structure (e.g. scape,antenna,leg); added back "
@@ -2336,6 +2380,28 @@ def parse_args():
     p.add_argument("--bg_normalize", action="store_true", default=True,
                     help="Enable background chromaticity correction (default on)")
     p.add_argument("--no_bg_normalize", action="store_false", dest="bg_normalize")
+    # 2026-11-04: colour step = FHS_and_CLAHE_V22
+    p.add_argument("--colour_method", choices=["recolorize", "descriptron"], default="recolorize",
+                    help="recolorize (default): V22 --recolorize, an original Python implementation of recolorize2 "
+                         "(Weller et al. 2024) that reproduces R recolorize 0.2.0; descriptron: Felzenszwalb + CLAHE + "
+                         "background correction + LAB averaging (use it to remove rig/lighting differences in hue)")
+    p.add_argument("--recolorize_cutoff", default="20",
+                    help="recolorize merge distance in Lab: a number (default 20), or median / mean of the per-image "
+                         "silhouette-best dE")
+    p.add_argument("--recolorize_bins", type=int, default=8,
+                    help="histogram bins per channel (default 8; recolorize2's own default is 2)")
+    p.add_argument("--recolorize_linkage", choices=["average", "complete", "single", "ward"], default="average",
+                    help="linkage for merging bin colours (default average; recolorize2's own default is complete)")
+    p.add_argument("--recolorize_normalize", action="store_true",
+                    help="with --colour_method recolorize: correct each photo's colour cast from its background "
+                         "(a*/b*) and equalise lightness (CLAHE) before the segmentation - for photographs from "
+                         "different rigs or collections. Off by default: it changes the colours measured")
+    p.add_argument("--homology_landmarks", choices=["auto", "none"], default="auto",
+                    help="colour and texture homology grids: auto (default) = landmarks (keypoints on the structure, from "
+                         "--keypoints_json or the COCO file) are TPS control points together with the outline "
+                         "semilandmarks; none = outline semilandmarks only (before 4 Nov 2026)")
+    p.add_argument("--colour_homology_input", choices=["segmented", "raw"], default="segmented",
+                    help="colour homology grid on the segmented colour images of step 3 (default) or on the photos")
 
     p.add_argument("--ratio_config", default=None,
                     help="TSV defining taxonomic ratios for compile step")

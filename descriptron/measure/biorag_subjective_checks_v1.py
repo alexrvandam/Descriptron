@@ -121,11 +121,13 @@ class ColourNamer:
         self.names = list(lookup.values())
         rgb = np.array(list(lookup.keys()), dtype=np.uint8).reshape(-1, 1, 3)
         self.lab8 = cv2.cvtColor(rgb, cv2.COLOR_RGB2LAB).reshape(-1, 3).astype(float)
-        self.tree = cKDTree(self.lab8)
+        # 2026-11-04: search in true CIELAB; the 8-bit OpenCV tree weighted L* about 2.5x too heavily
+        self.lab = cv2.cvtColor(rgb.astype(np.float32) / 255.0, cv2.COLOR_RGB2LAB).reshape(-1, 3).astype(float)
+        self.tree = cKDTree(self.lab)
         self.source = str(script)
 
     def name(self, L, a, b):
-        q = np.array([L * 255 / 100, a + 128, b + 128])
+        q = np.array([L, a, b], dtype=float)
         d, i = self.tree.query(q)
         return self.names[i], float(d)
 

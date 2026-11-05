@@ -52,9 +52,12 @@ except Exception:                                                         # prag
     TRANSFORMS = None
 
 
-def foreground(im: np.ndarray) -> np.ndarray:
-    """Specimen against a pale mount: darker than the bright mode of the image."""
+def foreground(im: np.ndarray, specimen: str = "darker") -> np.ndarray:
+    """Specimen against a pale mount: darker than the bright mode of the image.
+    2026-11-03: specimen='brighter' = lit specimen on a dark ground (micro-CT renders, black-background photos)."""
     g = im.mean(2)
+    if specimen == "brighter":
+        return (g > max(20.0, np.percentile(g, 40) * 1.5)).astype(np.uint8)
     return (g < np.percentile(g, 60) * 0.92).astype(np.uint8)
 
 
@@ -67,6 +70,8 @@ def main():
                     help="manual exclusion CSV (image_filename, category_name, ...): written back "
                          "out together with the flagged annotations as exclusion_list_merged.csv")
     ap.add_argument("--min_coverage", type=float, default=0.35)
+    ap.add_argument("--specimen", choices=["darker", "brighter"], default="darker",
+                    help="darker (default) = specimen on a pale mount; brighter = lit specimen on a dark ground (micro-CT renders)")
     ap.add_argument("--parent", default=None,
                     help="category every other annotation on the same image should fall inside "
                          "(e.g. whole_wing); omit to skip the containment check")
@@ -105,7 +110,7 @@ def main():
                                 "coco": f"{rec.get('width')}x{rec.get('height')}",
                                 "actual": f"{w}x{h}"})
             im = np.asarray(raw.convert("RGB").reduce(a.reduce)).astype(np.float32)
-        fg = foreground(im)
+        fg = foreground(im, a.specimen)
         if TRANSFORMS is not None:
             polys = [ann["segmentation"][0] for ann in anns
                      if isinstance(ann.get("segmentation"), list) and ann["segmentation"] and ann["segmentation"][0]]

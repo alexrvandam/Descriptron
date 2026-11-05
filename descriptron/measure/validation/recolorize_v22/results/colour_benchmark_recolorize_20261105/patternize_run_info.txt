@@ -1,0 +1,11 @@
+align_kmeans_seconds=739.4
+mask_seconds=169.6
+total_seconds=929.1
+n_wings_out=48
+k=3
+cropOffset=5,5,5,5
+res=300
+resampleFactor=NULL
+chosen_cluster=2
+cartoonID=Project_morph_sp2_3_forewing_m_ch00_SV
+n_pixels=90000

@@ -7,6 +7,7 @@ Images to measurements	texture_phenomics_homology.py	832	no	no	no	no	descriptron
 Images to measurements	color_phenomics_homology_v2_1.py	963	no	no	no	no	descriptron-core	writes 16 figures, 10 tables, 1 image
 Images to measurements	color_extraction_with_names-v8.py	823	no	no	no	no	descriptron-core	writes 2 figures, 1 image
 Images to measurements	FHS_and_CLAHE_V21.py	1313	no	no	no	no	descriptron-core	writes 4 figures, 2 tables, 6 images
+Images to measurements	FHS_and_CLAHE_V22.py	2031	no	no	no	no	descriptron-core	writes 4 figures, 3 tables, 7 images
 Images to measurements	landmark_gpa_V1.py	564	no	no	no	no	descriptron-core	writes 20 figures, 8 tables
 Images to measurements	measurement_script_to_try_after_kpts_prediction_measure_kpts_V35.py	1696	no	yes	no	no	descriptron-vision	writes 8 figures, 1 image, 3 arrays
 Images to measurements	semi_landmark_and_kpts_procrustesV34_GPA.py	1843	no	no	no	no	descriptron-core	writes 30 figures, 10 tables

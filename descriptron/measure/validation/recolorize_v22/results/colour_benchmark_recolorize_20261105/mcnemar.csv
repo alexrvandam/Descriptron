@@ -1,0 +1,11 @@
+set_a,set_b,n_common,acc_a,acc_b,only_a_right,only_b_right,mcnemar_P
+Descriptron_recolorize_norm,patternize_recolorize,48,0.9375,0.875,4,1,0.375
+Descriptron_recolorize_norm,Colormesh_recolorize,48,0.9375,0.8333333333333334,5,0,0.0625
+Descriptron_recolorize_norm,patternize_photo,48,0.9375,0.875,3,0,0.25
+Descriptron_recolorize_norm,Colormesh_photo,48,0.9375,0.75,9,0,0.00390625
+patternize_recolorize,Colormesh_recolorize,48,0.875,0.8333333333333334,6,4,0.75390625
+patternize_recolorize,patternize_photo,48,0.875,0.875,3,3,1.0
+patternize_recolorize,Colormesh_photo,48,0.875,0.75,9,3,0.14599609375
+Colormesh_recolorize,patternize_photo,48,0.8333333333333334,0.875,2,4,0.6875
+Colormesh_recolorize,Colormesh_photo,48,0.8333333333333334,0.75,6,2,0.2890625
+patternize_photo,Colormesh_photo,48,0.875,0.75,9,3,0.14599609375

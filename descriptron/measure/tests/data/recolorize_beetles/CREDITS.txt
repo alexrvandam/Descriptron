@@ -1,0 +1,5 @@
+The five Chrysochroa beetle images (*_fg_beetle.png, *_bin_beetle.png) are derived from the example images shipped in
+the extdata folder of the R package recolorize 0.2.0 (Weller, Hiller, Lord & Van Belleghem 2024, Methods in Ecology
+and Evolution; https://hiweller.github.io/recolorize/), licensed CC BY 4.0. They were split into foreground and
+mask PNGs for the test. R_*_palettes.csv, R_*_settings.txt and R_default_*_assign.png are outputs of recolorize 0.2.0
+run on these images (R 4.3.3), used as the reference in measure/tests/test_recolorize_v22.py.

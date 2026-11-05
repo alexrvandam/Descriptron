@@ -201,8 +201,12 @@ color_lookup = {
 colors = np.array(list(color_lookup.keys()))
 color_names = list(color_lookup.values())
 
-# Convert RGB to LAB color space for all colors in the lookup
-colors_lab = np.array([cv2.cvtColor(np.uint8([[c]]), cv2.COLOR_RGB2LAB)[0][0] for c in colors])
+# Convert RGB to LAB color space for all colors in the lookup.
+# 2026-11-04: true CIELAB (float input: L 0-100, a/b centred on 0). Until then the tree used OpenCV
+# 8-bit LAB (L x 2.55, a/b + 128), which weighted lightness about 2.5x too heavily in the name lookup.
+def _cielab(rgb_uint8):
+    return cv2.cvtColor(np.float32([[np.asarray(rgb_uint8, dtype=np.float32) / 255.0]]), cv2.COLOR_RGB2LAB)[0][0]
+colors_lab = np.array([_cielab(c) for c in colors])
 tree = KDTree(colors_lab)
 
 def closest_color_name(rgb):
@@ -211,7 +215,7 @@ def closest_color_name(rgb):
     using LAB distance in a KDTree.
     """
     rgb = np.round(rgb).astype(np.uint8)
-    lab = cv2.cvtColor(np.uint8([[rgb]]), cv2.COLOR_RGB2LAB)[0][0]
+    lab = _cielab(rgb)
     _, index = tree.query(lab)
     return color_names[index]
 
@@ -666,7 +670,7 @@ def lab_to_bgr(lab):
     return bgr
 
 
-def get_top_k_colors(hist, k=5, bins=(8,8,8)):
+def get_top_k_colors(hist, k=5, bins=(8,8,8), pixels=None):
     """
     Find top-k bins by frequency, return a list of dicts with:
     - bin_index
@@ -674,22 +678,35 @@ def get_top_k_colors(hist, k=5, bins=(8,8,8)):
     - approx_lab_center
     - approx_bgr_center
     - approx_color_name
+    2026-11-04: with `pixels` (N x 3 BGR uint8, the pixels the histogram was built from) each bin
+    also gets bin_mean_bgr (mean of its pixels) and approx_color_name is named from that mean.
+    The bin centre can lie far from the bin's pixels (median dE00 11 on 423 moth images).
     """
     indices = np.argsort(hist)[::-1]
     top_indices = indices[:k]
+    if pixels is not None:
+        lab8 = cv2.cvtColor(pixels.reshape(-1, 1, 3), cv2.COLOR_BGR2LAB).reshape(-1, 3)
+        q = [np.minimum((lab8[:, j].astype(np.int64) * bins[j]) // 256, bins[j] - 1) for j in range(3)]
+        flat = (q[0] * bins[1] + q[1]) * bins[2] + q[2]          # same order as np.histogramdd(...).flatten()
     results = []
     for i in top_indices:
         freq = float(hist[i])
         lab_center = lab_bin_index_to_center(i, bins=bins)
         bgr_center = lab_to_bgr(lab_center)
         name_approx = closest_color_name(bgr_center[::-1])  # bgr->rgb
-        results.append({
+        rec = {
             "bin_index": int(i),
             "freq": freq,
             "approx_lab_center": [float(x) for x in lab_center],
             "approx_bgr_center": [int(x) for x in bgr_center],
             "approx_color_name": name_approx
-        })
+        }
+        if pixels is not None and (flat == i).any():
+            mean_bgr = pixels.reshape(-1, 3)[flat == i].astype(np.float64).mean(0)
+            rec["bin_mean_bgr"] = [float(x) for x in mean_bgr]
+            rec["bin_center_color_name"] = name_approx
+            rec["approx_color_name"] = closest_color_name(mean_bgr[::-1])
+        results.append(rec)
     return results
 
 
@@ -861,7 +878,7 @@ def main():
             avg_color_name = closest_color_name(avg_rgb_uint8)
 
             # Top K bins
-            top_k_list = get_top_k_colors(hist, k=top_k_val, bins=(8,8,8))
+            top_k_list = get_top_k_colors(hist, k=top_k_val, bins=(8,8,8), pixels=pixels)
             dominant_info = top_k_list[0] if top_k_list else None
             group_name = grouping_dict.get(base_name, "Unassigned") if grouping_dict else None
 

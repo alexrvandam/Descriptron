@@ -457,7 +457,7 @@ def get_cell_feature_names(normalize_color=True):
 def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
                      image_dir, mask_lookup, ctrl_step=5, normalize_color=True,
                      normalize_intensity=True, glcm_levels=16,
-                     occluder_lookup=None, coverage_out=None):
+                     occluder_lookup=None, coverage_out=None, landmarks=None):
     """Process one specimen with warped quad grid cells."""
 
     # resolve image path
@@ -551,6 +551,8 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
         ctrl_idx = list(range(0, n, max(1, n // 10)))
     ctrl_mean = mean_pts[ctrl_idx]
     ctrl_spec = spec_pts[ctrl_idx]
+    if landmarks is not None:   # 2026-11-04: fixed landmarks join the outline semilandmarks (homology_landmarks_v1.py)
+        ctrl_mean, ctrl_spec = landmarks.controls(fn_gpa, ctrl_mean, ctrl_spec)
 
     # build TPS warp: mean → specimen
     try:
@@ -738,6 +740,11 @@ def parse_args():
                         'finer texture detail. Common values: 8, 16, 32. '
                         'Uses foreground min-max normalization + invariant '
                         'Haralick features (Brynolfsson et al. 2019).')
+    try:   # 2026-11-04: --landmarks auto|none and the keypoint options (homology_landmarks_v1.py)
+        from homology_landmarks_v1 import add_cli as _lm_cli
+        _lm_cli(p)
+    except ImportError:
+        pass
     return p.parse_args()
 
 
@@ -762,6 +769,16 @@ def main():
 
     # --- Load GPA outputs ---
     mean_shape, specimens = load_gpa_outputs(args.gpa_dir)
+    landmarks = None   # 2026-11-04: fixed landmarks as extra TPS control points (homology_landmarks_v1.py)
+    if getattr(args, 'landmarks', 'none') != 'none':
+        from homology_landmarks_v1 import from_args as _lm_from_args
+        landmarks = _lm_from_args(args, specimens, mean_shape)
+        if landmarks is not None:
+            os.makedirs(args.output_dir, exist_ok=True)
+            with open(os.path.join(args.output_dir, 'tps_landmarks_used.json'), 'w') as _f:
+                json.dump(dict(landmarks.info, names=landmarks.names,
+                               consensus=[[None if not np.isfinite(v) else round(float(v), 6) for v in r] for r in landmarks.mean_lm],
+                               per_specimen={k: landmarks.n_for(k) for k in specimens}), _f, indent=1)
 
     # --- Build mask lookup from ORIGINAL COCO ---
     cat_name = args.category_name or 'category'
@@ -807,7 +824,8 @@ def main():
                                 normalize_color=normalize_color,
                                 normalize_intensity=normalize_intensity,
                                 glcm_levels=glcm_levels,
-                                occluder_lookup=occluder_lookup, coverage_out=coverage)
+                                occluder_lookup=occluder_lookup, coverage_out=coverage,
+                                landmarks=landmarks)
 
     items = list(specimens.items())
     results = []
