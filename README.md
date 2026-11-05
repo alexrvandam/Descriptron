@@ -236,7 +236,7 @@ landmarks were identical.
   (P = 0.004). It does not differ significantly from patternize (P = 0.25), or from either tool given the
   recolorized wings (P = 0.06 and 0.38).
 
-The scripts and result tables will ship with 2.8.7 in `descriptron/measure/validation/recolorize_v22/`.
+The scripts and result tables are in [`descriptron/measure/validation/recolorize_v22/`](descriptron/measure/validation/recolorize_v22/).
 
 ![Colour-pattern PCA of 48 Diaphorina forewings: Descriptron vs patternize and Colormesh, all fed the recolorized wings](docs/tutorial/validation_colour_pca_recolorize.png)
 
