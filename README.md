@@ -197,6 +197,49 @@ Descriptron's colour relative to the wing's own mean removes it.
 
 ![Descriptron colour features vs patternize and Colormesh](docs/tutorial/validation_colour_vs_patternize_colormesh.png)
 
+**Colour pattern with recolorize and a grid warped by landmarks + sliding semilandmarks (from 2.8.7).** Release
+2.8.7 adds two things to the colour pipeline:
+- a recolorize mode (`FHS_and_CLAHE_V22.py --recolorize`, the GUI and pipeline default: 8 bins, average linkage,
+  cutoff 20). It is a Python implementation of the R package recolorize that reproduces its results on the moth
+  test set and on recolorize's own beetle examples.
+- a homology grid warped by the 17 vein-junction landmarks plus 100 outline semilandmarks. The semilandmarks
+  slide by bending energy (V42 `--slide_method bending`), and the slid points are put back onto each specimen's
+  outline (`--slid_on_outline project`).
+
+On the same 48 forewings (9 species), scored as before by leave-one-out nearest-neighbour species identification
+on all PCs (`descriptron_trait_stats`, Wilson 95% intervals):
+
+| Method | Species identified | 95% interval | PERMANOVA R² |
+|---|---|---|---|
+| Descriptron, normalise + recolorize | 94% | 83-98 | 0.75 |
+| Descriptron texture grid | 94% | 83-98 | 0.83 |
+| patternize, original photos | 71% | 57-82 | 0.66 |
+| Colormesh, original photos | 65% | 50-77 | 0.56 |
+
+Warping the grid by landmarks and semilandmarks together keeps it on the wing:
+- with the 17 landmarks alone, which is the patternize route, 3.3% of the warped grid falls outside the wing;
+- with landmarks and semilandmarks together, 0.7% does;
+- the interior error drops from 2.5 to 1.9% of wing size compared with semilandmarks alone.
+
+On 423 moths (43 species), the grid fits the AI mask with a median IoU of 0.976 at 100 control points. The
+colour-pattern grid carries phylogenetic signal (Kmult 0.66-0.72, P ≤ 0.002).
+
+![Descriptron colour-pattern homology vs patternize and Colormesh: species identification, grid slippage, grid fit, phylogenetic signal](docs/tutorial/validation_colour_descriptron_vs_tools.png)
+
+To separate the method from the image preparation, patternize and Colormesh were rerun with their September
+settings on the same recolorized wings that Descriptron used. Only the wing pixels changed; the canvas and
+landmarks were identical.
+- Recolorize improved both tools: Colormesh rose from 65% to 81% [68-90] and patternize from 71% to 77% [63-87],
+  both with PERMANOVA R² 0.67.
+- Descriptron still identified the most wings (94%) and separated species most strongly (R² 0.75).
+- In a paired test on PC1-5 (exact McNemar), Descriptron differs significantly from Colormesh run on photos
+  (P = 0.004). It does not differ significantly from patternize (P = 0.25), or from either tool given the
+  recolorized wings (P = 0.06 and 0.38).
+
+The scripts and result tables will ship with 2.8.7 in `descriptron/measure/validation/recolorize_v22/`.
+
+![Colour-pattern PCA of 48 Diaphorina forewings: Descriptron vs patternize and Colormesh, all fed the recolorized wings](docs/tutorial/validation_colour_pca_recolorize.png)
+
 **Texture.** Descriptron computes its grey-level co-occurrence matrix (GLCM) itself, because it counts only
 pixel pairs with both pixels inside the mask. Checked against scikit-image's `graycomatrix` on 180 masked
 matrices from 15 wing images, every entry is identical (difference 0). Contrast and homogeneity use the
