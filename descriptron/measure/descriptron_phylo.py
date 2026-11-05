@@ -14,21 +14,6 @@ any other continuous features), computes on species means:
   morphospace principal components of the species means with ancestral states estimated under Brownian motion
              (generalised least squares) projected into the same space and the tree drawn through them, as
              geomorph::gm.prcomp(phy = )
-  models     for every variable on its own: Brownian motion (BM), Ornstein-Uhlenbeck with one optimum (OU), early
-             burst (EB), Pagel's lambda and white noise (no phylogeny) fitted by maximum likelihood and compared by
-             AICc and Akaike weights, as geiger::fitContinuous (same covariance forms and default bounds); lambda
-             is also tested against 0 (no signal) and 1 (BM) by likelihood ratio
-  rates      for every variable on its own: a separate evolutionary rate on every branch (variable-rate Brownian
-             motion by penalised likelihood, Revell 2021), as phytools::multirateBM; the branches with the fastest
-             change are listed and the tree is drawn with its branches coloured by rate. Each branch's change
-             between the Brownian-motion ancestral states is also given, divided by its expected standard deviation
-             (sqrt(sigma^2 x branch length)), so single large jumps stand out from a generally fast clade
-
-Models and rates are univariate: fit them to the original variables (for colour, L*, a*, b* or chroma of each part,
-never a raw hue angle, which is circular), not to principal components, which favour OU and EB spuriously
-(Uyeda et al. 2015, Syst. Biol. 64: 677). OU and EB parameters are in the tree's units: on a tree in substitutions
-per site (not time) alpha and a are per substitution, and geiger's default bounds (alpha <= e, a >= ln(1e-5)/depth)
-depend on those units; estimates at a bound are flagged and the bounds can be changed with --model_bounds.
 
 Trait tables: CSV with one row per specimen (or per species) and numeric columns. The species of each row comes
 from a column (--species_col) or from a regular expression applied to an id column (--species_regex). Rows of the
@@ -44,12 +29,7 @@ Scaling (--scale NAME=none|standardize|log): Kmult and the PGLS statistics weigh
 set that mixes units (millimetres with ratios, colour channels with entropies) should be standardised; Procrustes
 shape coordinates are analysed as they are (the default for a set whose columns look like x/y coordinates).
 
-Tree tips holding more than the species (voucher codes such as "QH001-S1_Abemus chloropterus"): --tip_regex with one
-group extracts the species; a species appearing on several tips keeps the first. Spaces and underscores count as the
-same character when tips are matched to species.
-
-Validated against geomorph 4.1.1 and ape on geomorph's plethspecies data (validation/validate_phylo_real_tree.py);
-models and rates against geiger 2.0.11 and phytools 2.4.4 (validation/validate_phylo_models_vs_r.py).
+Validated against geomorph 4.1.1 and ape on geomorph's plethspecies data (validation/validate_phylo_real_tree.py).
 """
 from __future__ import annotations
 
@@ -221,241 +201,6 @@ def ancestral_states(Y: np.ndarray, tips: List[Node], nodes: List[Node]) -> np.n
     return mu + Cnt @ Ci @ (Y - one @ mu)
 
 
-# ============================================================================ evolutionary models
-MODELS = ("BM", "OU", "EB", "lambda", "white")
-MODEL_PARAM = {"OU": "alpha", "EB": "a", "lambda": "lambda"}
-MODEL_K = {"BM": 2, "white": 2, "OU": 3, "EB": 3, "lambda": 3}      # with sigma^2 and the root state, as geiger counts
-
-
-def model_vcv(C: np.ndarray, model: str, p: float = 0.0) -> np.ndarray:
-    """Tip covariance per unit sigma^2 under each model, geiger::fitContinuous's forms:
-    BM      C, the shared path length from the root
-    OU      one optimum at the root state: exp(-alpha (t_i + t_j - 2 s_ij)) (1 - exp(-2 alpha s_ij)) / (2 alpha),
-            geiger's covariance form (its branch-length transform gives the same on ultrametric trees)
-    EB      rate sigma^2 exp(a t) at time t from the root: (exp(a C) - 1) / a
-    lambda  shared paths times lambda, root-to-tip lengths unchanged
-    white   the identity: no phylogeny"""
-    if model == "BM":
-        return C
-    if model == "white":
-        return np.eye(len(C))
-    if model == "lambda":
-        V = C * p
-        np.fill_diagonal(V, np.diag(C))
-        return V
-    if model == "EB":
-        return C if abs(p) < 1e-12 else np.expm1(p * C) / p
-    if model == "OU":
-        d = np.diag(C)
-        return np.exp(-p * (d[:, None] + d[None, :] - 2 * C)) * -np.expm1(-2 * p * C) / (2 * p)
-    raise ValueError(model)
-
-
-def profile_loglik(y: np.ndarray, V: np.ndarray) -> Tuple[float, float, float]:
-    """log-likelihood of y ~ N(z0, sigma^2 V) with z0 (the GLS mean) and sigma^2 = Q / n at their maximum."""
-    from scipy.linalg import solve_triangular
-    n = len(y)
-    try:
-        L = np.linalg.cholesky(V)
-    except np.linalg.LinAlgError:
-        return -np.inf, np.nan, np.nan
-    ty = solve_triangular(L, y, lower=True)
-    t1 = solve_triangular(L, np.ones(n), lower=True)
-    z0 = float(t1 @ ty / (t1 @ t1))
-    s2 = float(((ty - z0 * t1) ** 2).sum()) / n
-    if not s2 > 0:
-        return -np.inf, s2, z0
-    return float(-0.5 * n * (np.log(2 * np.pi) + np.log(s2) + 1) - np.log(np.diag(L)).sum()), s2, z0
-
-
-def default_bounds(C: np.ndarray) -> Dict[str, Tuple[float, float]]:
-    """geiger::fitContinuous's defaults: alpha in (exp(-500), e], a in [ln(1e-5) / depth, -1e-6], lambda in (0, 1]."""
-    return {"alpha": (np.exp(-500), np.e), "a": (np.log(1e-5) / float(np.diag(C).max()), -1e-6),
-            "lambda": (np.exp(-500), 1.0)}
-
-
-def fit_model(y: np.ndarray, C: np.ndarray, model: str, bounds: Dict[str, Tuple[float, float]]) -> Dict:
-    """Maximum-likelihood fit of one model to one variable: a grid over the model's parameter, then Brent's method
-    between the grid points either side of the best (alpha on a log scale, where its likelihood surface is smooth)."""
-    from scipy.optimize import minimize_scalar
-    n = len(y)
-    par, at_bound = np.nan, ""
-    if model in MODEL_PARAM:
-        name = MODEL_PARAM[model]
-        lo, hi = bounds[name]
-        logscale = name == "alpha"
-        if logscale:            # below alpha * depth = 1e-8 OU is BM to machine precision: no need to search lower
-            lo_s = np.log(max(lo, 1e-8 / float(np.diag(C).max())))
-            to_p = np.exp
-            grid = np.linspace(lo_s, np.log(hi), 61)
-        else:
-            to_p = float
-            grid = np.linspace(lo, hi, 61)
-        f = lambda u: -profile_loglik(y, model_vcv(C, model, to_p(u)))[0]
-        vals = np.array([f(u) for u in grid])
-        i = int(np.argmin(vals))
-        best_u, best_v = grid[i], vals[i]
-        a_, b_ = grid[max(i - 1, 0)], grid[min(i + 1, len(grid) - 1)]
-        if b_ > a_:
-            r = minimize_scalar(f, bounds=(a_, b_), method="bounded", options={"xatol": 1e-10})
-            if r.fun < best_v:
-                best_u, best_v = float(r.x), float(r.fun)
-        par = float(to_p(best_u))
-        tol = 1e-6 * (grid[-1] - grid[0])
-        at_bound = "lower" if best_u - grid[0] < tol else "upper" if grid[-1] - best_u < tol else ""
-        V = model_vcv(C, model, par)
-    else:
-        V = model_vcv(C, model)
-    ll, s2, z0 = profile_loglik(y, V)
-    k = MODEL_K[model]
-    aicc = -2 * ll + 2 * k + (2 * k * (k + 1) / (n - k - 1) if n - k - 1 > 0 else np.inf)
-    return {"model": model, "logLik": ll, "k": k, "AICc": aicc, "sigsq": s2, "z0": z0,
-            "param": MODEL_PARAM.get(model, ""), "value": par, "at_bound": at_bound}
-
-
-def fit_models(y: np.ndarray, C: np.ndarray, models=MODELS, bounds=None) -> List[Dict]:
-    """every model for one variable, with delta-AICc, Akaike weights, OU half-life and the lambda tests."""
-    from scipy.stats import chi2
-    bounds = {**default_bounds(C), **(bounds or {})}
-    fits = [fit_model(y, C, m, bounds) for m in models]
-    best = min(f["AICc"] for f in fits)
-    w = np.array([np.exp(-0.5 * (f["AICc"] - best)) for f in fits])
-    depth = float(np.diag(C).max())
-    for f, wi in zip(fits, w / w.sum()):
-        f["dAICc"], f["weight"] = f["AICc"] - best, float(wi)
-        f["half_life"] = float(np.log(2) / f["value"]) if f["model"] == "OU" else np.nan
-        f["half_life_over_depth"] = f["half_life"] / depth if f["model"] == "OU" else np.nan
-        if f["model"] == "lambda":
-            ll0 = profile_loglik(y, model_vcv(C, "lambda", 0.0))[0]
-            ll1 = profile_loglik(y, C)[0]
-            f["P_lambda_vs_0"] = float(chi2.sf(max(0.0, 2 * (f["logLik"] - ll0)), 1))
-            f["P_lambda_vs_1"] = float(chi2.sf(max(0.0, 2 * (f["logLik"] - ll1)), 1))
-    return fits
-
-
-# ============================================================================ variable-rate Brownian motion
-def tree_arrays(root: Node):
-    """nodes in preorder (root first), each node's parent index (-1 for the root) and branch length, and the
-    ancestry matrix B (B[i, j] = 1 when the branch above node j lies on the path from the root to node i)."""
-    nodes: List[Node] = []
-
-    def rec(n):
-        nodes.append(n)
-        for k in n.kids:
-            rec(k)
-
-    rec(root)
-    ix = {id(n): i for i, n in enumerate(nodes)}
-    parent = np.array([ix[id(n.parent)] if n.parent is not None else -1 for n in nodes])
-    length = np.array([0.0 if n.parent is None else n.length for n in nodes])
-    B = np.zeros((len(nodes), len(nodes)))
-    for i in range(len(nodes)):
-        j = i
-        while parent[j] >= 0:
-            B[i, j] = 1.0
-            j = parent[j]
-    return nodes, parent, length, B
-
-
-def _logmean(u: np.ndarray, v: np.ndarray):
-    """mean rate along a branch whose log rate runs linearly from u (parent) to v (child), and its derivatives:
-    (e^u - e^v) / (u - v), phytools' ln.mean."""
-    d = u - v
-    ev = np.exp(v)
-    small = np.abs(d) < 1e-6
-    ds = np.where(small, 1.0, d)
-    phi = np.where(small, 1 + d / 2 + d * d / 6, np.expm1(ds) / ds)                     # (e^d - 1) / d
-    dphi = np.where(small, 0.5 + d / 3, (np.exp(ds) * ds - np.expm1(ds)) / (ds * ds))   # its derivative
-    return ev * phi, ev * dphi, ev * (phi - dphi)                                        # L, dL/du, dL/dv
-
-
-def multirate_bm(root: Node, tips: List[Node], y: np.ndarray, lam: float = 1.0, maxiter: int = 20000) -> Dict:
-    """Variable-rate Brownian motion (Revell 2021, phytools::multirateBM): a log rate at every node, each branch
-    evolving at the mean of the rates at its two ends, the tip data normal given those rates, and the log rates
-    themselves penalised as Brownian motion along the tree with weight lam. Maximised with L-BFGS-B within
-    phytools' bounds (log(var(y) / tree height) +/- 10) from its start (the Brownian-motion ML rate)."""
-    from scipy.optimize import minimize
-    nodes, parent, length, B = tree_arrays(root)
-    N = len(nodes)
-    tip_ix = {id(n): i for i, n in enumerate(nodes)}
-    ti = np.array([tip_ix[id(t)] for t in tips])
-    A = B[ti]                                                    # tips x branches
-    nr = np.arange(1, N)                                         # every node but the root (index 0)
-    pen_len = np.maximum(length, 1e-12 * length.max())           # zero-length branches would make Vn singular
-    Vn = (B[nr] * pen_len) @ B[nr].T                             # shared depth among the non-root nodes
-    Vn_i = np.linalg.inv(Vn)
-    _, Vn_logdet = np.linalg.slogdet(Vn)
-    n = len(y)
-
-    def obj(th):
-        L_, dLu, dLv = _logmean(th[parent[nr]], th[nr])
-        w = np.zeros(N)
-        w[nr] = length[nr] * L_
-        C = (A * w) @ A.T
-        try:
-            Lc = np.linalg.cholesky(C)
-        except np.linalg.LinAlgError:
-            return 1e300, np.zeros(N)
-        Ci = np.linalg.inv(C)
-        one = np.ones(n)
-        a = (one @ Ci @ y) / (one @ Ci @ one)
-        r = y - a
-        Cr = Ci @ r
-        ll1 = -0.5 * (n * np.log(2 * np.pi) + 2 * np.log(np.diag(Lc)).sum() + r @ Cr)
-        z = th[nr] - th[0]
-        s = Vn_i @ z
-        ll2 = -0.5 * ((N - 1) * np.log(2 * np.pi) + Vn_logdet + z @ s)
-        # gradients: d ll1 / d w_j = 1/2 A_j' (C^-1 r r' C^-1 - C^-1) A_j (the GLS mean drops out at its optimum)
-        M = np.outer(Cr, Cr) - Ci
-        gw = 0.5 * np.einsum("ij,ik,kj->j", A, M, A)
-        g = np.zeros(N)
-        np.add.at(g, parent[nr], gw[nr] * length[nr] * dLu)
-        g[nr] += gw[nr] * length[nr] * dLv
-        g[nr] += -lam * s
-        g[0] += lam * s.sum()
-        return -(ll1 + lam * ll2), -g
-
-    height = float((B * length).sum(axis=1).max())
-    vv = np.log(np.var(y, ddof=1) / height)
-    C0 = (A * length) @ A.T
-    s2_bm = profile_loglik(y, C0)[1]
-    th0 = np.full(N, np.clip(np.log(s2_bm), vv - 10, vv + 10))
-    res = minimize(obj, th0, jac=True, method="L-BFGS-B", bounds=[(vv - 10, vv + 10)] * N,
-                   options={"maxiter": maxiter, "maxfun": maxiter * 2, "ftol": 1e-13, "gtol": 1e-8})
-    th = res.x
-    edge_rate = np.full(N, np.nan)
-    edge_rate[nr] = _logmean(th[parent[nr]], th[nr])[0]
-    w = np.zeros(N)
-    w[nr] = length[nr] * edge_rate[nr]
-    C = (A * w) @ A.T
-    one = np.ones(n); Ci = np.linalg.inv(C); a = (one @ Ci @ y) / (one @ Ci @ one); r = y - a
-    ll = float(-0.5 * (n * np.log(2 * np.pi) + np.linalg.slogdet(C)[1] + r @ Ci @ r))    # unpenalised, as phytools
-    return {"nodes": nodes, "parent": parent, "length": length, "node_rate": np.exp(th), "edge_rate": edge_rate,
-            "penalised_logLik": float(-res.fun), "logLik": ll, "k": N + 1, "converged": bool(res.success),
-            "message": str(res.message), "lambda": lam}
-
-
-def branch_changes(root: Node, tips: List[Node], y: np.ndarray, nodes, parent, length) -> Tuple[np.ndarray, np.ndarray]:
-    """each branch's change between the Brownian-motion ancestral states (tips observed) and that change divided by
-    its standard deviation under the fitted Brownian motion, sqrt(sigma^2 x branch length)."""
-    inner = [n for n in nodes if n.kids]
-    anc = ancestral_states(y[:, None], tips, inner)[:, 0]
-    val = {id(n): float(v) for n, v in zip(inner, anc)}
-    val.update({id(t): float(v) for t, v in zip(tips, y)})
-    s2 = profile_loglik(y, vcv(tips, tips))[1]
-    state = np.array([val[id(n)] for n in nodes])
-    delta = np.full(len(nodes), np.nan)
-    delta[1:] = state[1:] - state[parent[1:]]
-    with np.errstate(divide="ignore", invalid="ignore"):
-        z = delta / np.sqrt(s2 * length)
-    return delta, z
-
-
-def clade_label(n: Node) -> str:
-    t = tips_of(n)
-    return t[0].name if len(t) == 1 else f"{t[0].name} .. {t[-1].name} ({len(t)} tips)"
-
-
 # ============================================================================ data
 def _is_number(v: str) -> bool:
     try:
@@ -555,86 +300,6 @@ def plot_morphospace(pc_tips, pc_nodes, tips, nodes, ev, path, title):
     fig.tight_layout(); fig.savefig(path, dpi=200); plt.close(fig)
 
 
-def plot_rate_tree(nodes, parent, length, edge_rate, path, title):
-    """rectangular tree, each branch coloured by its rate relative to the median branch (log scale: slow blue,
-    median grey, fast red)."""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from matplotlib.colors import LinearSegmentedColormap, Normalize
-    N = len(nodes)
-    x = np.zeros(N)
-    for i in range(1, N):
-        x[i] = x[parent[i]] + length[i]
-    tips = [i for i in range(N) if not nodes[i].kids]
-    yv = np.zeros(N)
-    yv[tips] = np.arange(len(tips))[::-1]
-    for i in range(N - 1, -1, -1):                      # preorder reversed: children before parents
-        if nodes[i].kids:
-            kids = [j for j in range(N) if parent[j] == i]
-            yv[i] = np.mean(yv[kids])
-    rel = np.log10(edge_rate / np.nanmedian(edge_rate[1:]))
-    lim = max(0.5, float(np.nanmax(np.abs(rel[1:]))))
-    cmap = LinearSegmentedColormap.from_list("rate", ["#2166ac", "#b8bec4", "#b2182b"])
-    norm = Normalize(-lim, lim)
-    fig, ax = plt.subplots(figsize=(7.5, max(4.0, 0.13 * len(tips) + 1.2)))
-    for i in range(1, N):
-        p = parent[i]
-        c = cmap(norm(rel[i]))
-        ax.plot([x[p], x[i]], [yv[i], yv[i]], color=c, lw=1.6, solid_capstyle="butt")
-        ax.plot([x[p], x[p]], [yv[p], yv[i]], color="#8a9399", lw=0.6)
-    for i in tips:
-        ax.text(x[i] + 0.01 * x.max(), yv[i], nodes[i].name, va="center", fontsize=5.5)
-    ax.set_xlim(0, x.max() * 1.45); ax.set_yticks([]); ax.set_xlabel("branch length")
-    for s in ("top", "right", "left"):
-        ax.spines[s].set_visible(False)
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    cb = fig.colorbar(sm, ax=ax, fraction=0.03, pad=0.01)
-    cb.set_label("log10 rate / median rate", fontsize=7); cb.ax.tick_params(labelsize=6)
-    ax.set_title(title, fontsize=9)
-    fig.tight_layout(); fig.savefig(path, dpi=200); plt.close(fig)
-
-
-def _safe(s: str) -> str:
-    return re.sub(r"[^A-Za-z0-9._-]+", "_", s).strip("_")[:80]
-
-
-def _norm_name(s: str) -> str:
-    """spaces and underscores count as the same character when tips are matched to species."""
-    return re.sub(r"[\s_]+", "_", str(s).strip())
-
-
-def load_tree(path: str, tip_regex: Optional[str] = None) -> Tuple[Node, List[str]]:
-    """the tree with tips renamed to species (--tip_regex) and duplicate species pruned to their first tip."""
-    root = parse_newick(Path(path).read_text().strip().split(";")[0] + ";")
-    rx = re.compile(tip_regex) if tip_regex else None
-    notes, seen, keep = [], set(), set()
-    for t in tips_of(root):
-        if rx:
-            m = rx.search(t.name)
-            if not m:
-                notes.append(f"tip '{t.name}' does not match --tip_regex - kept as it is")
-            else:
-                t.name = m.group(1)
-        t.name = _norm_name(t.name)
-        if t.name in seen:
-            notes.append(f"species '{t.name}' is on several tips - the first is kept")
-            t.name = f"__dup__{id(t)}"
-        else:
-            seen.add(t.name)
-        keep.add(t.name)
-    if any(n.startswith("__dup__") for n in keep):
-        root = prune(root, {n for n in keep if not n.startswith("__dup__")})
-    return root, notes
-
-
-def _copy_tree(n: Node, parent: Optional[Node] = None) -> Node:
-    c = Node(n.name, n.length)
-    c.parent = parent
-    c.kids = [_copy_tree(k, c) for k in n.kids]
-    return c
-
-
 # ============================================================================ main
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -653,29 +318,14 @@ def main(argv=None):
                     help="regex for a size column kept out of the trait set and used as the logCS predictor")
     ap.add_argument("--pgls", action="append", default=[], metavar="SET~PREDICTOR",
                     help="PREDICTOR is logCS (from a set's centroid-size column) or SET2:COLUMN")
-    ap.add_argument("--analyses", nargs="+", default=["signal", "morphospace"],
-                    choices=["signal", "pgls", "morphospace", "models", "rates"])
-    ap.add_argument("--tip_regex", default=None,
-                    help='regex with one group extracting the species from each tree tip (e.g. "_([A-Z][a-z]+ .+)$" '
-                         'for tips such as "QH001-S1_Abemus chloropterus")')
-    ap.add_argument("--models", nargs="+", default=list(MODELS), choices=list(MODELS),
-                    help="models compared by 'models' (default all)")
-    ap.add_argument("--model_bounds", action="append", default=[], metavar="PARAM=LO,HI",
-                    help="bounds for alpha (OU), a (EB) or lambda; default geiger::fitContinuous's")
-    ap.add_argument("--model_columns", action="append", default=[], metavar="NAME=REGEX",
-                    help="variables of trait set NAME analysed by 'models' and 'rates' (default all its variables)")
-    ap.add_argument("--rate_lambda", type=float, default=1.0,
-                    help="smoothing of the variable rates (phytools::multirateBM lambda; larger = smoother)")
-    ap.add_argument("--rate_top", type=int, default=10, help="fastest branches listed in the report per variable")
+    ap.add_argument("--analyses", nargs="+", default=["signal", "morphospace"], choices=["signal", "pgls", "morphospace"])
     ap.add_argument("--iterations", type=int, default=999); ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out_dir", required=True)
     a = ap.parse_args(argv)
     out = Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(a.seed)
-    root, tree_notes = load_tree(a.tree, a.tip_regex)
+    root = parse_newick(Path(a.tree).read_text())
     colsel = dict(x.split("=", 1) for x in a.columns)
-    modsel = dict(x.split("=", 1) for x in a.model_columns)
-    mbounds = {k: tuple(float(v) for v in b.split(",")) for k, b in (x.split("=", 1) for x in a.model_bounds)}
     gmap = load_group_map(a.groups) if a.groups else None
     scales = dict(x.split("=", 1) for x in a.scale)
 
@@ -683,8 +333,6 @@ def main(argv=None):
     for spec in a.traits:
         name, path = spec.split("=", 1)
         sp, cols, M, counts = load_traits(path, a.species_col, a.species_regex, a.id_col, gmap)
-        sp = [_norm_name(s) for s in sp]
-        counts = {_norm_name(k): v for k, v in counts.items()}
         if name in colsel:
             rx = re.compile(colsel[name]); k = [i for i, c in enumerate(cols) if rx.search(c)]
             cols, M = [cols[i] for i in k], M[:, k]
@@ -696,15 +344,13 @@ def main(argv=None):
                       "counts": counts}
 
     report = ["# Phylogenetic comparative analyses", "", f"Tree: {a.tree}", ""]
-    if tree_notes:
-        report += [f"- {x}" for x in tree_notes[:20]] + ([f"- ... {len(tree_notes) - 20} more"] if len(tree_notes) > 20 else []) + [""]
-    signal_rows, pgls_rows, model_rows, rate_summary = [], [], [], []
+    signal_rows, pgls_rows = [], []
     for name, S in sets.items():
         tipnames = {t.name for t in tips_of(root)}
         common = [s for s in S["species"] if s in tipnames]
         if len(common) < 4:
             report.append(f"{name}: only {len(common)} species match the tree - skipped"); continue
-        tree = prune(_copy_tree(root), set(common))
+        tree = prune(parse_newick(Path(a.tree).read_text()), set(common))
         tips = tips_of(tree)
         idx = [S["species"].index(t.name) for t in tips]
         how = scales.get(name, "none")
@@ -735,62 +381,6 @@ def main(argv=None):
             plot_morphospace(pc_t, pc_n, tips, nodes, ev, out / f"{name}_phylomorphospace.png",
                              f"{name}: phylomorphospace ({len(tips)} species)")
             report.append(f"Phylomorphospace: {name}_phylomorphospace.png (PC1 {100 * ev[0]:.1f}%, PC2 {100 * ev[1]:.1f}%)")
-        if "models" in a.analyses or "rates" in a.analyses:
-            cols = [c for c in S["cols"] if name not in modsel or re.search(modsel[name], c)]
-            Yraw = np.log(S["raw"][idx]) if how == "log" else S["raw"][idx]       # models are scale-free otherwise
-            depth = np.diag(C)
-            if depth.max() - depth.min() > 1e-6 * depth.max():
-                report.append(f"The tree is not ultrametric (root-to-tip {depth.min():.4g}-{depth.max():.4g}): rates, "
-                              "alpha and a are per unit of branch length, not per unit of time.")
-        if "models" in a.analyses:
-            best = {}
-            for c in cols:
-                y = Yraw[:, S["cols"].index(c)]
-                if np.ptp(y) == 0:
-                    continue
-                fits = fit_models(y, C, a.models, mbounds)
-                for f in fits:
-                    model_rows.append({"trait_set": name, "variable": c, "n_species": len(tips), **f})
-                b = min(fits, key=lambda f: f["AICc"])
-                best[b["model"]] = best.get(b["model"], 0) + 1
-            report.append(f"Evolutionary models ({len(cols)} variables, lowest AICc): "
-                          + ", ".join(f"{m} {best.get(m, 0)}" for m in a.models) + f"  (see {name}_model_fits.csv)")
-            nb = sum(1 for r in model_rows if r["trait_set"] == name and r["at_bound"])
-            if nb:
-                report.append(f"  {nb} fits have a parameter at its bound (column at_bound): widen --model_bounds or "
-                              "read those estimates as limits")
-        if "rates" in a.analyses:
-            rows = []
-            for c in cols:
-                y = Yraw[:, S["cols"].index(c)]
-                if np.ptp(y) == 0:
-                    continue
-                R = multirate_bm(tree, tips, y, a.rate_lambda)
-                delta, z = branch_changes(tree, tips, y, R["nodes"], R["parent"], R["length"])
-                med = float(np.nanmedian(R["edge_rate"][1:]))
-                for i in range(1, len(R["nodes"])):
-                    rows.append({"trait_set": name, "variable": c, "branch_to": clade_label(R["nodes"][i]),
-                                 "is_tip": not R["nodes"][i].kids, "length": R["length"][i],
-                                 "rate": R["edge_rate"][i], "rate_over_median": R["edge_rate"][i] / med,
-                                 "change": delta[i], "change_over_sd": z[i]})
-                tag = _safe(f"{name}__{c}")
-                plot_rate_tree(R["nodes"], R["parent"], R["length"], R["edge_rate"], out / f"{tag}_rate_tree.png",
-                               f"{name}: {c} - variable-rate Brownian motion (lambda = {a.rate_lambda:g})")
-                order = np.argsort(-R["edge_rate"][1:])[:a.rate_top] + 1
-                rate_summary.append({"trait_set": name, "variable": c, "penalised_logLik": R["penalised_logLik"],
-                                     "logLik": R["logLik"], "k": R["k"], "lambda": R["lambda"],
-                                     "converged": R["converged"],
-                                     "fastest": "; ".join(f"{clade_label(R['nodes'][i])} x{R['edge_rate'][i] / med:.1f}"
-                                                          for i in order)})
-                if not R["converged"]:
-                    report.append(f"  rates {c}: optimiser did not converge ({R['message']})")
-            if rows:
-                with open(out / f"{name}_branch_rates.csv", "w", newline="") as fh:
-                    w = csv.DictWriter(fh, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
-                report.append(f"Variable rates: {name}_branch_rates.csv and one <set>__<variable>_rate_tree.png per variable")
-                for r in rate_summary:
-                    if r["trait_set"] == name:
-                        report.append(f"  {r['variable']}: fastest branches (rate / median) {r['fastest']}")
         report.append("")
 
     if "pgls" in a.analyses:
@@ -812,13 +402,7 @@ def main(argv=None):
             pgls_rows.append({"model": f, **r})
             report.append(f"PGLS {f}: R2 = {r['Rsq']:.4f}, F = {r['F']:.3f}, P = {r['P']:.4f}")
 
-    for name in sets:
-        rows = [r for r in model_rows if r["trait_set"] == name]
-        if rows:
-            keys = list(dict.fromkeys(k for r in rows for k in r))
-            with open(out / f"{name}_model_fits.csv", "w", newline="") as fh:
-                w = csv.DictWriter(fh, fieldnames=keys); w.writeheader(); w.writerows(rows)
-    for fn, rows in (("phylogenetic_signal.csv", signal_rows), ("pgls.csv", pgls_rows), ("rate_fits.csv", rate_summary)):
+    for fn, rows in (("phylogenetic_signal.csv", signal_rows), ("pgls.csv", pgls_rows)):
         if rows:
             with open(out / fn, "w", newline="") as fh:
                 w = csv.DictWriter(fh, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
