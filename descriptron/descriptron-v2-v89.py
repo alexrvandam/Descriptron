@@ -1071,7 +1071,7 @@ def save_points_to_via2(save_path=None, quiet=False):
         file_ext = ".jpg"
 
     full_file_path = os.path.join(file_dir, file_base + file_ext)
-    # v81 fix: file_path_base has no extension already, so splitext cut "A.FHG149_x" to "A"
+    # v81 fix: file_path_base has no extension already, so splitext cut "A.sp149_x" to "A"
     file_base = file_name
     full_file_path = os.path.join(file_dir, _image_file_name(file_path_base))
 
@@ -1870,7 +1870,7 @@ folder_kp_cache = {}   # image path -> keypoints placed this session
 
 def _image_file_name(base_path):
     """v81 fix: the image's real file name for a path whose extension was stripped. Names with dots
-    ("A.FHG149_x") were cut at the first dot, and a missing extension was always written as .jpg, so a .tif
+    ("A.sp149_x") were cut at the first dot, and a missing extension was always written as .jpg, so a .tif
     was recorded as .jpg. Looks for the file on disk; falls back to .jpg only if none is found."""
     name = os.path.basename(str(base_path))
     for ext in IMAGE_EXTS + tuple(e.upper() for e in IMAGE_EXTS):
@@ -3847,7 +3847,7 @@ def load_json_contours(json_path):
     # (nothing to match against) is loaded as it is.
     _imgs = data.get("images", [])
     if file_path_base and _imgs:
-        def _stem(n):                    # strip a real image extension only ("A.FHG149_x" has no extension)
+        def _stem(n):                    # strip a real image extension only ("A.sp149_x" has no extension)
             b = os.path.basename(str(n))
             if os.path.splitext(b)[1].lower() in IMAGE_EXTS:
                 b = os.path.splitext(b)[0]
