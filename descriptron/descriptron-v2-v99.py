@@ -21090,4 +21090,170 @@ if _v98pt is not None:
                          "saves add a 'keypoint_types' list to the keypoint annotation.")
 # === end v98 ==================================================================================================
 
+# === v99 (2.8.7): scrollable label picker ======================================================================
+# A Tk OptionMenu cannot scroll: with many structure names (or after loading a set of predictions) the list grew
+# taller than the screen and the entries at its end (Custom, Trash) could no longer be reached. Clicking the
+# Select Label / Select Category / video label buttons now opens a picker instead: a filter box, the names sorted
+# alphabetically in a scrolling list of 18 rows, and Custom, Trash and Cancel always visible at the bottom.
+# The OptionMenus, their menus and every update_*_dropdown function are unchanged; the picker reads the names from
+# the menu and selects by invoking that menu entry, so whatever the entry did before still happens.
+_V99_PICKER_PINNED = ("Custom", "Trash")                 # kept at the bottom as buttons, in this order, then Cancel
+_V99_PICKER_TARGETS = ("label_dropdown", "category_label_dropdown", "video_label_dropdown")
+_V99_PICKER_ROWS = 18
+
+
+def _v99_picker_order(names):
+    """(names sorted alphabetically, pinned names in their original order). Placeholders are dropped."""
+    seen, main, pinned = set(), [], []
+    for n in names:
+        if n in seen or n in ("Select Label", "Select Category"):
+            continue
+        seen.add(n)
+        (pinned if n in _V99_PICKER_PINNED else main).append(n)
+    pinned.sort(key=_V99_PICKER_PINNED.index)            # Custom, then Trash
+    return sorted(main, key=lambda s: (s.casefold(), s)), pinned
+
+
+def _v99_menu_entries(om):
+    menu = om["menu"]
+    end = menu.index("end")
+    out = []
+    for i in range(0 if end is None else end + 1):
+        try:
+            if menu.type(i) == "command":
+                out.append((menu.entrycget(i, "label"), i))
+        except tk.TclError:
+            pass
+    return out
+
+
+def _v99_open_label_picker(om):
+    entries = _v99_menu_entries(om)
+    index_of = {}
+    for name, i in entries:
+        index_of.setdefault(name, i)
+    main, pinned = _v99_picker_order([n for n, _ in entries])
+
+    win = tk.Toplevel(om)
+    win.title("Select label")
+    win.transient(om.winfo_toplevel())
+    win.resizable(False, True)
+
+    def _choose(name):
+        win.destroy()
+        if name in index_of:
+            om["menu"].invoke(index_of[name])
+
+    flt = tk.StringVar()
+    top = tk.Frame(win)
+    top.pack(side=tk.TOP, fill=tk.X, padx=4, pady=(4, 2))
+    tk.Label(top, text="Filter:").pack(side=tk.LEFT)
+    ent = tk.Entry(top, textvariable=flt)
+    ent.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+    bottom = tk.Frame(win)                               # packed before the list so it can never be squeezed out
+    bottom.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=4)
+    for n in pinned:
+        tk.Button(bottom, text=n, command=lambda n=n: _choose(n),
+                  bg="#f1948a" if n == "Trash" else None).pack(side=tk.LEFT, padx=2)
+    tk.Button(bottom, text="Cancel", command=win.destroy).pack(side=tk.RIGHT, padx=2)
+
+    mid = tk.Frame(win)
+    mid.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=4)
+    sb = tk.Scrollbar(mid, orient="vertical")
+    width = max([20] + [len(n) + 2 for n in main])
+    lb = tk.Listbox(mid, height=max(1, min(_V99_PICKER_ROWS, len(main))), width=min(width, 50),
+                    yscrollcommand=sb.set, exportselection=False, activestyle="dotbox")
+    sb.config(command=lb.yview)
+    sb.pack(side=tk.RIGHT, fill=tk.Y)
+    lb.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    shown = []
+
+    def _refill(*_):
+        q = flt.get().strip().casefold()
+        shown[:] = [n for n in main if q in n.casefold()]
+        lb.delete(0, "end")
+        for n in shown:
+            lb.insert("end", n)
+        try:
+            cur = om.getvar(str(om.cget("textvariable")))
+        except tk.TclError:
+            cur = ""
+        sel = shown.index(cur) if cur in shown else (0 if shown else None)
+        if sel is not None:
+            lb.selection_set(sel); lb.activate(sel); lb.see(sel)
+    flt.trace_add("write", _refill)
+    _refill()
+
+    def _pick_current(event=None):
+        s = lb.curselection()
+        if s:
+            _choose(shown[s[0]])
+        elif len(shown) == 1:
+            _choose(shown[0])
+        return "break"
+
+    def _move(d):
+        s = lb.curselection()
+        i = (s[0] if s else -1) + d
+        if 0 <= i < len(shown):
+            lb.selection_clear(0, "end"); lb.selection_set(i); lb.activate(i); lb.see(i)
+        return "break"
+    lb.bind("<Double-Button-1>", _pick_current)
+    lb.bind("<Return>", _pick_current)
+    ent.bind("<Return>", _pick_current)
+    ent.bind("<KP_Enter>", _pick_current)
+    ent.bind("<Down>", lambda e: _move(1))
+    ent.bind("<Up>", lambda e: _move(-1))
+    win.bind("<Escape>", lambda e: win.destroy())
+    win._v99_pick = _pick_current                        # what Enter / double-click run (used by the GUI test)
+
+    # open under the button, kept on the screen
+    win.update_idletasks()
+    w, h = win.winfo_reqwidth(), win.winfo_reqheight()
+    sw, sh = win.winfo_screenwidth(), win.winfo_screenheight()
+    x = min(max(0, om.winfo_rootx()), max(0, sw - w))
+    y = om.winfo_rooty() + om.winfo_height()
+    if y + h > sh - 40:
+        y = max(0, om.winfo_rooty() - h)
+    win.geometry(f"+{x}+{y}")
+    ent.focus_set()
+    try:
+        win.grab_set()
+    except tk.TclError:
+        pass
+    return win
+
+
+def _v99_picker_click(event):
+    _v99_open_label_picker(event.widget)
+    return "break"                                       # stops the OptionMenu's own (unscrollable) menu
+
+
+def _v99_attach_picker(om):
+    try:
+        if om is None or not om.winfo_exists() or getattr(om, "_v99_picker", False):
+            return
+        om.bind("<Button-1>", _v99_picker_click)
+        om.bind("<space>", _v99_picker_click)
+        om._v99_picker = True
+    except Exception as e:
+        print(f"[v99] label picker not attached: {e}")
+
+
+for _v99_name in _V99_PICKER_TARGETS:
+    _v99_attach_picker(globals().get(_v99_name))
+
+
+def _v99_picker_on_enter(event):
+    # the video remote builds its dropdown later; attach when the pointer first reaches it (before any click)
+    w = event.widget
+    for _n in _V99_PICKER_TARGETS:
+        if globals().get(_n) is w:
+            _v99_attach_picker(w)
+
+
+root.bind_class("Menubutton", "<Enter>", _v99_picker_on_enter, add="+")
+# === end v99 label picker ======================================================================================
+
 root.mainloop()
