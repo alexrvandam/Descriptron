@@ -42,7 +42,13 @@ EXTRA_VISION = ["torchvision_det",                   # whole directory
                 # v2.8.0: BioRAG-Probe and the DINOv3-token wing tools (need torch + transformers)
                 "measure/biorag_probe_v1.py", "measure/biorag_probe_parts_v1.py", "measure/biorag_probe_panels_v2.py",
                 "measure/wing_vein_unsupervised_eval_v1.py", "measure/wing_spot_tokens_v1.py",
-                "measure/texture_hires_v3.py"]        # v2.8.3: high-resolution texture maps (DINOv3 teacher/student)
+                "measure/texture_hires_v3.py",        # v2.8.3: high-resolution texture maps (DINOv3 teacher/student)
+                # v2.8.8: segment split (DINOv3 boundary maps; imports descriptron_serial_homology_v1 from its own folder,
+                # so that module goes here too - it is also in core), wing vein setulae + pilosity profiles, texture
+                # teacher -> student for any region (all need torch + transformers)
+                "measure/descriptron_segment_split_v1.py", "measure/descriptron_serial_homology_v1.py",
+                "measure/vein_pilosity_profile_v1.py", "measure/vein_macrotrichia_detect_v1.py",
+                "measure/texture_teacher_student_v1.py"]
 # modules a core program imports that the inventory files elsewhere or does not list:
 # biosyslit_rag_retrieval_v2 (core) wraps biosyslit_rag_retrieval (listed under vision
 # because it CAN use Florence-2, which it loads lazily), and that imports
@@ -94,7 +100,19 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/wing_vein_naming_rule_v1.py", "measure/wing_fringe_character_v1.py",
               "measure/wing_spot_pattern_v1.py", "measure/annotation_scale_transfer_v1.py",
               "measure/line_drawing_v1.py",              # v2.8.3: line structures as skeletons + line drawings (pipeline step 2.5)
-              "measure/texture_band_profiles_v1.py"]     # v2.8.3: anterior-posterior texture band profiles, tested against groups
+              "measure/texture_band_profiles_v1.py",     # v2.8.3: anterior-posterior texture band profiles, tested against groups
+              # v2.8.8: plate split, serial homology, look-alike sorter, acuity blur, mask tools, combine characters
+              "measure/descriptron_plate_split_v1.py", "measure/descriptron_serial_homology_v1.py",
+              "measure/descriptron_lookalike_sorter_v1.py", "measure/descriptron_acuity_blur_v1.py",
+              "measure/descriptron_mask_tools_v1.py", "measure/descriptron_combine_characters_v1.py",
+              # v2.8.8: colour-pattern evolution (descriptron_phylo) and acuity blur checked against R
+              "measure/validation/validate_acuity_blur_vs_r.py",
+              "measure/validation/validate_phylo_ancestral_pattern_vs_r.py",
+              "measure/validation/validate_phylo_branch_rates_vs_r.py",
+              "measure/validation/validate_phylo_colour_convergence_vs_r.py",
+              "measure/validation/validate_phylo_mimicry_oum_vs_r.py",
+              "measure/validation/validate_phylo_models_vs_r.py",
+              "measure/validation/validate_phylo_palette_surface_vs_r.py"]
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)

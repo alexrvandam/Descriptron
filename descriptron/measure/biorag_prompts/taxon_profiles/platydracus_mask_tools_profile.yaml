@@ -1,0 +1,49 @@
+# Descriptron taxon profile, mask_tools section only: the Platydracus colour study (6 Nov 2026).
+# descriptron_mask_tools_v1.py combine / trim_end / tile read `mask_tools:`; the section can also be added to a full
+# taxon profile (biorag_make_taxon_profile_v1.py draft), whose other sections these tools ignore.
+profile_version: 1
+taxon:
+  genus: Platydracus
+  family: Staphylinidae
+mask_tools:
+  combine:                                   # soma_v5/make_soma_v5.py: DINOMask v6 predictions -> soma_v5.json
+    categories: [soma, abdomen, abdomen_ventral, soma_abdomen]
+    write_order: [soma, abdomen, abdomen_ventral, soma_abdomen]
+    image_table:                             # e.g. <image folder>/plate_split_panels.csv
+      file: crop_file
+      attrs:
+        - {name: species, column: species}
+        - {name: view, column: view}
+        - {name: scale_px_per_mm, column: px_per_mm, type: float}
+    image_filter: {view: [dorsal, ventral]}
+    fg_pattern: "{stem}_mask.png"
+    outputs:
+      # the abdomen: pale intersegmental membranes are background in the specimen mask -> bridge 12 px
+      - {name: abdomen, only: {view: [dorsal]}, ops: [{union: [pred:abdomen]}, {foreground: 12}, {open: 3}, {largest: true}]}
+      - {name: abdomen_ventral, only: {view: [ventral]}, ops: [{union: [pred:abdomen]}, {foreground: 12}, {open: 3}, {largest: true}]}
+      # the predicted 'soma' label is the whole body: with the abdomen it is soma_abdomen
+      - name: soma_abdomen
+        only: {view: [dorsal]}
+        ops: [{union: [pred:soma]}, {foreground: 0}, {open: 3}, {largest: true}, {union: [out:abdomen]}, {close: 3}, {largest: true}]
+      # soma = head + pronotum + elytra: the whole body minus the abdomen and the thin margin 20 px beside it
+      - name: soma
+        only: {view: [dorsal]}
+        ops: [{union: [out:soma_abdomen]}, {subtract: [out:abdomen]}, {subtract_dilated: {masks: [out:abdomen], size: [1, 41]}}, {open: 3}, {largest: true}]
+  trim_end:                                  # soma_v5/fix_ventral_top.py: soma_v5.json -> soma_v5b.json
+    category: abdomen_ventral
+    axis: y
+    end: start                               # the top: the ventral abdomen starts at the line before sternite 2
+    width_frac: 0.8
+    width_search: 0.5
+    snap_frac: 0.15
+    pale_dL: 15.0
+    central: 0.6
+  tile:                                      # parts_v1/make_parts_v2.py: soma_v5b.json + DINOMask parts -> parts_v2.json
+    container: soma
+    parts: [head, pronotum, elytra]
+    extra: {abdomen: abdomen}
+    merge_narrow: ["head:pronotum:0.6"]       # the neck (pronotum lines < 0.6 of its widest, in front of it) -> head
+    trim_wedge: ["elytra:pronotum:0.12:0.6"]  # elytra reach in front of the shoulders by <= 0.12 of their length
+    order_check: [head, pronotum, elytra, abdomen]
+    axis: y
+    image_filter: {view: dorsal}

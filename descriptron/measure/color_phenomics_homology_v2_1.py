@@ -718,6 +718,8 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
     # v2.1: was 8, now 11 (added 3 absolute per-cell LAB means)
     n_feats = len(COLOR_CELL_FEATURE_NAMES)
     cell_features = []
+    _npix = np.full(n_rows * n_cols, np.nan)    # 2026-11-06 (--save_cell_geometry): foreground pixels per cell
+    _qarea = np.full(n_rows * n_cols, np.nan)   # and the area of the warped quadrilateral, in specimen pixels
     for r in range(n_rows):
         for c in range(n_cols):
             if not cell_inside[r, c]:
@@ -725,6 +727,9 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
                 _cov.append(np.nan)
                 continue
             cm = build_cell_mask(warped_ints, r, c, h, w, fg_mask)
+            _q = np.array([warped_ints[r, c], warped_ints[r, c + 1], warped_ints[r + 1, c + 1], warped_ints[r + 1, c]])
+            _npix[r * n_cols + c] = float(cm.sum())
+            _qarea[r * n_cols + c] = 0.5 * abs(float(np.dot(_q[:, 0], np.roll(_q[:, 1], 1)) - np.dot(_q[:, 1], np.roll(_q[:, 0], 1))))
             if _expected is not None:
                 _e = build_cell_mask(warped_ints, r, c, h, w, _expected).sum()
                 _cov.append(cm.sum() / _e if _e else np.nan)
@@ -740,7 +745,8 @@ def process_specimen(fn_gpa, specimen_contour, mean_shape, grid_info,
     if coverage_out is not None and _expected is not None:
         coverage_out[fn_gpa] = np.array(_cov, dtype=float)
     # v2: 6-tuple now — trailing hue_feats is the specimen-level block.
-    return (fn_gpa, fv, img, fg_mask, warped_ints, hue_feats)
+    # 2026-11-06: 7th element = per-cell foreground pixels / quad area (written with --save_cell_geometry)
+    return (fn_gpa, fv, img, fg_mask, warped_ints, hue_feats, {'n_pixels': _npix, 'quad_area': _qarea})
 
 
 ###############################################################################
@@ -829,6 +835,51 @@ def mk_thumb(img, mask, sz=(80, 80)):
     return np.array(ni)
 
 
+def write_cell_geometry(args, cat, mean_shape, grid_info, results, X_raw, n_feats):
+    """--save_cell_geometry: the grid cells in consensus space (exactly the rectangles x_lines x y_lines that are
+    TPS-warped onto every specimen), the outline, and which cells each specimen left empty (NaN before imputation)."""
+    ci = grid_info['cell_inside']; NR, NC = ci.shape
+    xl, yl = [float(v) for v in grid_info['x_lines']], [float(v) for v in grid_info['y_lines']]
+    ov = grid_info.get('cell_overlap')
+    cells = []
+    for r in range(NR):
+        for c in range(NC):
+            if ci[r, c]:
+                cells.append({'cell': f'r{r}c{c}', 'row': r, 'col': c,
+                              'polygon': [[xl[c], yl[r]], [xl[c + 1], yl[r]], [xl[c + 1], yl[r + 1]], [xl[c], yl[r + 1]]],
+                              'overlap': None if ov is None else round(float(ov[r, c]), 6)})
+    spec, rows = {}, []
+    for res, xr in zip(results, X_raw):
+        fn = res[0]; info = res[6] if len(res) > 6 else None
+        miss = [f'r{r}c{c}' for r in range(NR) for c in range(NC)
+                if ci[r, c] and np.isnan(xr[(r * NC + c) * n_feats + 3])]     # L_mean_abs of the cell
+        spec[fn] = {'missing': miss}
+        if info is not None:
+            for r in range(NR):
+                for c in range(NC):
+                    if ci[r, c]:
+                        k = r * NC + c
+                        rows.append((fn, f'r{r}c{c}', r, c, int(info['n_pixels'][k]),
+                                     round(float(info['quad_area'][k]), 2), int(f'r{r}c{c}' in miss)))
+    ms = np.asarray(mean_shape, float)
+    out = {'category': cat, 'gpa_dir': os.path.abspath(args.gpa_dir), 'image_dir': os.path.abspath(args.image_dir),
+           'coordinates': 'GPA consensus (gpa_mean.csv); y increases downwards as in the images',
+           'grid_rows': args.grid_rows, 'grid_cols': args.grid_cols, 'grid_ext': args.grid_ext,
+           'min_cell_overlap': args.min_cell_overlap if args.grid_ext > 0 else None,
+           'cell_rule': ('overlap with the consensus outline >= min_cell_overlap' if args.grid_ext > 0
+                         else 'cell centre inside the consensus outline (grid over the bounding box + 5% margin)'),
+           'n_rows': NR, 'n_cols': NC, 'x_lines': xl, 'y_lines': yl, 'min_pixels': 25,
+           'consensus_outline': ms.round(8).tolist(), 'cells': cells, 'specimens': spec}
+    with open(os.path.join(args.output_dir, f'color_homology_cells_{cat}.json'), 'w') as fh:
+        json.dump(out, fh)
+    if rows:
+        pd.DataFrame(rows, columns=['filename', 'cell', 'row', 'col', 'n_pixels', 'quad_area_px', 'missing']).to_csv(
+            os.path.join(args.output_dir, f'color_homology_cell_pixels_{cat}.csv'), index=False)
+    nm = sum(len(v['missing']) for v in spec.values())
+    logging.info(f"Cell geometry: {len(cells)} cells written; {nm} empty specimen-cells "
+                 f"({nm / max(1, len(cells) * len(spec)):.2%}) -> color_homology_cells_{cat}.json")
+
+
 ###############################################################################
 # 8. CLI + MAIN
 ###############################################################################
@@ -891,6 +942,13 @@ def parse_args():
                         'asymmetry (~500 pattern cols vs 6 hue cols). '
                         '>1.0 pushes clustering toward hue; <1.0 toward '
                         'pattern. Ignored in pattern/hue-only modes.')
+    p.add_argument('--save_cell_geometry', action='store_true',
+                   help='Also write color_homology_cells_<category>.json (the grid in consensus (gpa_mean.csv) '
+                        'coordinates: every kept cell as its rectangle TL,TR,BR,BL, its overlap with the consensus '
+                        'outline, the outline itself, and per specimen the cells left empty (< 25 foreground pixels; '
+                        'the features CSV holds column means there)) and color_homology_cell_pixels_<category>.csv '
+                        '(foreground pixels and warped-cell area per specimen and cell). For drawing per-cell results '
+                        'back on the consensus outline (descriptron_phylo --analyses ancestral_pattern). Off by default')
     try:   # 2026-11-04: --landmarks auto|none and the keypoint options (homology_landmarks_v1.py)
         from homology_landmarks_v1 import add_cli as _lm_cli
         _lm_cli(p)
@@ -1014,6 +1072,8 @@ def main():
     # --- Assemble feature matrix ---
     fns = [r[0] for r in results]
     X_raw = np.array([r[1] for r in results])            # per-cell features
+    if args.save_cell_geometry:   # 2026-11-06: before the NaN imputation below, which hides the empty cells
+        write_cell_geometry(args, cat_name, mean_shape, grid_info, results, X_raw, len(feature_names))
     all_imgs = [r[2] for r in results]
     all_masks = [r[3] for r in results]
     X_hue_raw = np.array([r[5] for r in results])        # v2: specimen-level hue block
@@ -1259,8 +1319,10 @@ def main():
     row_height = max(0.12, min(0.3, 15.0 / n_spec))
     fig_h = max(8, n_spec * row_height)
     fontsize = max(3, min(8, int(400 / n_spec)))
-    fig, ax = plt.subplots(figsize=(max(14, len(feat_hm_cols) * 0.3), fig_h))
-    sns.heatmap(vals_z, xticklabels=feat_hm_cols,
+    # 2026-11-06: fine grids give thousands of columns; cap the width (Agg's 2^16-pixel limit) and drop the labels
+    _many = len(feat_hm_cols) > 600
+    fig, ax = plt.subplots(figsize=(min(150, max(14, len(feat_hm_cols) * 0.3)), fig_h))
+    sns.heatmap(vals_z, xticklabels=False if _many else feat_hm_cols,
                 yticklabels=hm_df['filename'].values,
                 cmap='RdBu_r', center=0, ax=ax)
     ax.set_title(f"Color features z-scored ({mode}) — {cat_name} — {n_spec} specimens")
