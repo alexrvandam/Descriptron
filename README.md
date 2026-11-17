@@ -45,6 +45,7 @@ every claim in the output is checked against the data it came from.
 - [The workflow](#the-workflow)
   - **[SAM2-PAL & DINOLand annotation SOP](docs/SAM2PAL_DINOLand_Annotation_SOP.md)** — imaging, references, recipes and the orientation/mirror options
 - [What BioRAG retrieves: the data matrix and the literature](#what-biorag-retrieves-the-data-matrix-and-the-literature)
+- [PhyloRAG: a character matrix from the literature](#phylorag-a-character-matrix-from-the-literature)
 - [What the programs produce](#what-the-programs-produce)
 - [Reproducing an analysis](#reproducing-an-analysis)
 - [Provenance and auditing](#provenance-and-auditing)
@@ -945,6 +946,82 @@ JSON file: build it once per group and reuse it.
 The taxonomist's own questions (which characters to examine and what matters in
 the group) are a separate input: a plain-text, .docx or .csv file given with
 `--user_prompts`, or named as `questions_file` in the taxon profile.
+
+---
+
+## PhyloRAG: a character matrix from the literature
+
+PhyloRAG (`measure/phylorag_v1.py`; the **PhyloRAG** button in the Describe tab
+from GUI v100) builds a morphological character matrix from published
+descriptions, for analysis on its own or with molecular data (total evidence,
+tip dating). A language model reads the treatments of each taxon and scores your
+characters; it can also collect counts and measurements (meristic and continuous
+characters) for taxonomy. **The model proposes, the taxonomist decides:** a
+state enters the matrix only if it carries a verbatim quote that is found in
+its source, and only if you accept it in the review sheet.
+
+It generalises the pipeline written for a UCE study of Scolopendromorpha (in
+preparation), and each rule answers a failure that study's audit found:
+
+| Rule | Why |
+|---|---|
+| Only the taxon's own treatments: BioSysLit records whose title begins with its name (or a synonym's), PDFs whose title or file name contains it, sources you assign in the taxa file | figure captions of other species had been retrieved because the paper's title named the taxon |
+| Every state needs a verbatim quote, found in the source (exact, or near-verbatim at `--near 0.90`) | a third of the quotes of a first, unchecked extraction were not in the source |
+| No state from silence, none from knowledge of the genus or family | "not mentioned" had been scored as "absent" |
+| States allowed for the character; counts and measurements must contain the numbers they report | |
+| Flags for review: another taxon named just before the quote, a quote naming another taxon, comparisons, a source that is not a treatment of the taxon, conflicting quotes, variation | states had been quoted from treatments of other species, or from the species' own text for a different character |
+| Export takes only rows you mark `accept` | a correct quote can still be scored against the wrong character |
+| An existing matrix is never overwritten: only its missing cells are filled, disagreements are logged | |
+
+```bash
+# 1. characters from a published matrix (MorphoBank, Mesquite, PAUP): labels, states, ordered characters
+python phylorag_v1.py init --from-nexus published_matrix.nex --out characters.json
+# 2. literature: BioSysLit treatments by keyword (an order or family) and/or taxon name, plus PDFs or text files
+python phylorag_v1.py fetch --keywords Scolopendromorpha --taxa taxa.tsv --names --pdf-dir pdfs/ --out sources.json
+# 3. see which sources each taxon would use (no model), then extract
+python phylorag_v1.py extract --characters characters.json --taxa taxa.tsv --sources sources.json \
+    --out-dir run1 --group centipede --llm-backend claude-code --dry-run
+python phylorag_v1.py extract ... (same, without --dry-run)
+# 4. open run1/review_sheet.tsv, write accept / reject in the 'decision' column, save; then
+python phylorag_v1.py export --review run1/review_sheet.tsv --characters characters.json --taxa taxa.tsv \
+    --out-dir run1/export --base-nexus published_matrix.nex --molecular uce_75p.phy --add-missing-taxa
+```
+
+`taxa.tsv` has the columns `taxon` ("Genus epithet"), `tip_label` (the name in
+your alignment), `synonyms` and `sources` (;-separated). Export writes the NEXUS
+matrix, a CSV, a provenance table with the source and quote of every state, a
+table of counts and measurements, a merge log, and a report of which taxa are in
+the matrix, the molecular data or both. `audit` re-checks any states table
+without a model (an edited review sheet keeps its decisions; also a hand-coded
+table or an older run). Every model reply is saved, so a run can be re-read with
+other thresholds without calling the model again (`--replay`).
+
+**Checked on the Scolopendromorpha data** (BioSysLit treatment database of
+2,879 Chilopoda records; the 122 characters of Vahtera et al. 2013, MorphoBank
+P987):
+
+- `init` reproduces all 122 characters, their state labels and the two ordered
+  characters (3 and 74).
+- Source selection is the same as the study's extraction for 15 of 16 taxa; for
+  the 16th it leaves out the four figure records of other species that had been
+  retrieved.
+- All 134 states of the study's second (verified) extraction pass the checks; 4
+  are flagged, among them two comparisons with other species.
+- On the 232 states of its first, unchecked extraction, PhyloRAG rejects or
+  flags all 29 states that a manual check later removed because they came from
+  other species or a genus diagnosis. Of the 11 first-pass states the manual
+  check kept, 9 pass without a flag. The 19 states that quoted the species' own
+  treatment for a different character are not caught (16 pass without a flag):
+  that is what the review is for.
+- Export reproduces all 134 states in their cells, on their own and merged into
+  P987, with all 108 P987 rows unchanged (including the 9 rows whose
+  polymorphisms are written with a space, whose beginnings an earlier reader had lost).
+- A live extraction (Claude Opus 5.5 through `claude -p`) of *Newportia anopla*
+  gave 14 states, all quotes verbatim, all the same as the study's states for
+  those characters.
+
+Tests: `measure/tests/test_phylorag_v1.py` (every step, with replayed model
+replies), `test_brush/test_phylorag_dialog.py`, `test_brush/test_v100_phylorag.py`.
 
 ---
 

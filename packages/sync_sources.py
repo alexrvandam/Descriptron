@@ -112,7 +112,8 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/validation/validate_phylo_colour_convergence_vs_r.py",
               "measure/validation/validate_phylo_mimicry_oum_vs_r.py",
               "measure/validation/validate_phylo_models_vs_r.py",
-              "measure/validation/validate_phylo_palette_surface_vs_r.py"]
+              "measure/validation/validate_phylo_palette_surface_vs_r.py",
+              "measure/phylorag_v1.py"]                  # PhyloRAG (17 Nov 2026): character matrix from the literature
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
@@ -138,7 +139,8 @@ EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptro
                    "descriptron-v2-v96.py", "descriptron_undo_v1.py",  # v2.8.1: general undo / redo + save prompt (v96)
                    "descriptron-v2-v97.py",                            # v2.8.2: = v96 + Load Folder skips mask files
                    "descriptron-v2-v98.py", "descriptron_point_types_v1.py",   # v2.8.5: = v97 + keypoint Point type
-                   "descriptron-v2-v99.py",                            # v2.8.7: = v98 + recolorize colour segmentation (default GUI)
+                   "descriptron-v2-v99.py",                            # v2.8.7: = v98 + recolorize colour segmentation
+                   "descriptron-v2-v100.py", "descriptron_phylorag_dialog_v1.py",   # = v99 + PhyloRAG button (default GUI)
                    # v2.8.1: ontology templates for the label menus; the module finds the json beside itself
                    "descriptron_ontology.py", "descriptron_ontology_templates.json",
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
