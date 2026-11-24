@@ -21,7 +21,7 @@ a free account, access to each model, and a token on your computer.
 SAM2, SAM2-PAL and the Florence-2 scale-bar reader are **not** gated; they need no token.
 
 Note for DINOMask: all our reported DINOMask results used the ViT-L above. From 2.8.1 the commands
-`descriptron-dinomask`, `descriptron-dinomask-rot4` and `descriptron-dinomask-v5` (pip and Docker) and the GUI's DINOMask
+`descriptron-dinomask` (v6 from 2.8.9), `descriptron-dinomask-rot4`, `descriptron-dinomask-v5` and `descriptron-dinomask-v4` (pip and Docker) and the GUI's DINOMask
 dialog use it by default; when you run a DINOMask `.py` file directly, pass `--model facebook/dinov3-vitl16-pretrain-lvd1689m`
 as in the [DINOMask recipe](../descriptron/dinomask/README.md) - without it the script falls back to the much smaller ViT-S/16.
 

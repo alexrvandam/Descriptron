@@ -514,7 +514,8 @@ trains with `dinomask/dinomask_train_predict_v6.py --label_sampling centre`. v4 
 at its top-left pixel and so placed every predicted part about half a patch (8 px) right of and below its annotation; v6
 reads it at the patch centre (on *Platydracus*, held-out abdomen IoU 0.88 with v5, 0.94 with v6). The dialog runs v6 at its
 default layer, the final output as in v4, so runs trained in the dialog still work with "Predict with a trained run". The
-`descriptron-dinomask` command still runs v4; for the fix from the command line, run `dinomask_train_predict_v6.py`.
+`descriptron-dinomask` command (pip) and `descriptron dinomask` (Docker) run v6 from 2.8.9; `descriptron-dinomask-v4`
+and `descriptron dinomask-v4` keep the old behaviour, to reproduce earlier runs.
 
 **BioRAG-Probe** tests whether a character described in the literature (sculpture, setosity, vein setulae...) can be
 read from DINOv3 patch tokens inside a mask, with the taxon held out, a simple baseline and a shuffled-label null

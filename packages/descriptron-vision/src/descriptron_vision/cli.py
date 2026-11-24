@@ -90,7 +90,8 @@ def _dinomask_argv() -> list[str]:
 
 
 # 2.8.0: DINOMask (frozen DINOv3 + per-patch classifier) and BioRAG-Probe (literature labels x DINOv3 tokens)
-def dinomask():       _run("dinomask_train_predict_v4.py", _dinomask_argv(), "dinomask")
+def dinomask():       _run("dinomask_train_predict_v6.py", _dinomask_argv(), "dinomask")   # 2.8.9: v6 (labels at patch centres; v4/v5 put parts ~8 px off)
+def dinomask_v4():    _run("dinomask_train_predict_v4.py", _dinomask_argv(), "dinomask")   # 2.8.9: the 2.8.0-2.8.8 behaviour, to reproduce old runs
 def dinomask_rot4():  _run("dinomask_predict_rot4_v1.py", _dinomask_argv(), "dinomask")
 def dinomask_v5():    _run("dinomask_train_predict_v5.py", _dinomask_argv(), "dinomask")   # 2.8.1: v5 (token cache, --bg_keep, --grid)
 def probe():          _run("biorag_probe_v1.py", sys.argv[1:])

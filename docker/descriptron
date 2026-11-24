@@ -47,9 +47,10 @@ descriptron <command> [args...]
   predict-d2          predict with a Detectron2 checkpoint    [detectron2_env]
   sam2-pal            SAM2-PAL mask propagation               [samm]
   dinoland            DINOv3 landmark transfer                [samm]
-  dinomask            DINOMask part segmentation: train + predict (DINOv3 tokens)  [samm]
+  dinomask            DINOMask part segmentation: train + predict (DINOv3 tokens; v6)  [samm]
   dinomask-rot4       DINOMask prediction with test-time rotation                  [samm]
   dinomask-v5         DINOMask v5: + token cache, --bg_keep, --grid, --curve_json   [samm]
+  dinomask-v4         DINOMask v4: what "dinomask" ran up to 2.8.8                  [samm]
   probe               BioRAG-Probe: literature labels x DINOv3 tokens               [samm]
   measure             measurements from COCO                  [measure_env]
   pipeline            the full BioRAG v2 pipeline             [measure_env]
@@ -116,7 +117,11 @@ case "$cmd" in
   dinomask)
     need_env samm
     hf_token_from_store
-    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v4.py" --model "$DINOMASK_MODEL" "$@" ;;   # 2.8.0; 2.8.1 ViT-L + key store
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v6.py" --model "$DINOMASK_MODEL" "$@" ;;   # 2.8.0; 2.8.1 ViT-L + key store; 2.8.9 v6
+  dinomask-v4)
+    need_env samm
+    hf_token_from_store
+    exec $CONDA_RUN samm python "$GUI/dinomask/dinomask_train_predict_v4.py" --model "$DINOMASK_MODEL" "$@" ;;   # 2.8.9: the old default
   dinomask-rot4)
     need_env samm
     hf_token_from_store
