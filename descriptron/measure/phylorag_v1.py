@@ -1412,8 +1412,14 @@ def cmd_export(a):
 
 
 # ══════════════════════════════════════════════════════════════════════ main ══
+UNDER_DEVELOPMENT = ("UNDER DEVELOPMENT (24 Nov 2026): in our tests PhyloRAG still makes many mistakes - states for the wrong "
+                     "character or the wrong taxon, and states its source does not support. Check every state against its "
+                     "source before you accept it, and do not use the matrix unchecked.")
+
+
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="phylorag_v1.py", description=__doc__.split("\n\n")[1].replace("\n", " "),
+    ap = argparse.ArgumentParser(prog="phylorag_v1.py",
+                                 description=UNDER_DEVELOPMENT + "\n\n" + __doc__.split("\n\n")[1].replace("\n", " "),
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--version", action="version", version=f"PhyloRAG {VERSION}")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1487,6 +1493,7 @@ def main(argv=None):
     p.set_defaults(func=cmd_export)
 
     a = ap.parse_args(argv)
+    print(UNDER_DEVELOPMENT, file=sys.stderr)
     if a.cmd == "init" and not a.from_nexus and not a.out_dir:
         ap.error("init needs --from-nexus or --out-dir")
     a.func(a)
