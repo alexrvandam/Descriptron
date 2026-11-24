@@ -1,0 +1,17 @@
+# Ant waist in profile (anterior left, dorsal up): measurements and indices on the Descriptron lateral-waist landmarks (17 Nov 2026):
+# 1 petiole-postpetiole joint, 2 postpetiole-gaster joint, 3 postpetiole dorsal apex (farthest above 1-2), 4 postpetiole ventral-most point
+# (ventral process, farthest below 1-2), 5 petiole anterior end (peduncle tip), 6 petiolar node apex (farthest above 5-1), 7 petiole ventral
+# outline below 6, 8/9 anterior/posterior end of the node's dorsal face.
+kind	name	definition	description
+measure	PPL	1-2	postpetiole length, joint to joint
+measure	PPH	3-4^1-2	postpetiole height across its joint axis (dorsal apex to ventral-most point)
+measure	PPD	3>1-2	postpetiole dorsal height above the joint axis
+measure	PPV	4>1-2	ventral process: how far the postpetiole bulges below the joint axis
+measure	PTL	5-1	petiole length (peduncle tip to the postpetiole joint)
+measure	NH	6-7^5-1	petiolar node height (apex to the ventral outline below it, across the petiole axis)
+measure	NL	8-9|5-1	petiolar node dorsal length (dorsal face, along the petiole axis)
+ratio	PPVI	PPV/PPL*100	ventral process bulge / postpetiole length
+ratio	PPVH	PPV/PPH*100	ventral process share of postpetiole height
+ratio	PPHI	PPH/PPL*100	postpetiole height / length in profile
+ratio	NI	NL/NH*100	petiolar node length / height (< 100 = higher than long)
+ratio	PTPP	NH/PPH*100	petiolar node height / postpetiole height (> 100 = petiole node taller)

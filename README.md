@@ -509,7 +509,12 @@ cannot break it. Held out against hand masks it scored 0.60 mean IoU on 11 weevi
 `descriptron-dinomask-rot4` (pip) or `descriptron dinomask` / `dinomask-rot4` (Docker). From 2.8.3 the DINOMask
 dialog also has a **points probe** for small repeated structures (setae, scales, punctures): click 15-30 examples
 with the keypoint tool, and it finds the structure on every image as editable points
-(`descriptron-vision dinomask/dinomask_hypercolumn_probe_v1.py`; see the DINOMask README).
+(`descriptron-vision dinomask/dinomask_hypercolumn_probe_v1.py`; see the DINOMask README). From GUI v101 the dialog
+trains with `dinomask/dinomask_train_predict_v6.py --label_sampling centre`. v4 and v5 read each patch's training label
+at its top-left pixel and so placed every predicted part about half a patch (8 px) right of and below its annotation; v6
+reads it at the patch centre (on *Platydracus*, held-out abdomen IoU 0.88 with v5, 0.94 with v6). The dialog runs v6 at its
+default layer, the final output as in v4, so runs trained in the dialog still work with "Predict with a trained run". The
+`descriptron-dinomask` command still runs v4; for the fix from the command line, run `dinomask_train_predict_v6.py`.
 
 **BioRAG-Probe** tests whether a character described in the literature (sculpture, setosity, vein setulae...) can be
 read from DINOv3 patch tokens inside a mask, with the taxon held out, a simple baseline and a shuffled-label null
@@ -1022,6 +1027,17 @@ P987):
 
 Tests: `measure/tests/test_phylorag_v1.py` (every step, with replayed model
 replies), `test_brush/test_phylorag_dialog.py`, `test_brush/test_v100_phylorag.py`.
+
+## Ratios: measurements and taxonomic indices (GUI v101)
+
+The **Ratios** button (Measure tab, SHAPE row; `measure/descriptron_landmark_ratios_v2.py`) computes the linear
+measurements and indices a taxonomist reports (e.g. ant CI = HW/HL x 100, OI = EL/HW x 100) from the landmarks and
+masks of a COCO file, and tests whether they separate species: Kruskal-Wallis with false discovery rate, Dunn pairwise
+tests, leave-one-out species identification with permutations, PERMANOVA with PERMDISP, agreement with a coded
+character, and an optional allometry check. Measurements are defined once in a ratio config (TSV; ready-made ones in
+`measure/ratio_configs/`) or typed in the dialog, one NAME=TERM per line, e.g. `HL=9-10`, `CI=HW/HL*100`.
+Tests: `measure/tests/test_descriptron_landmark_ratios_v2.py`, `test_brush/test_ratios_dialog.py`,
+`test_brush/test_v101_ratios.py`.
 
 ---
 

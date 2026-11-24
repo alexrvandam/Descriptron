@@ -1,0 +1,22 @@
+# Ant waist in profile (anterior left, dorsal up), v2 (18 Nov 2026, AVD-checked definitions; v1 kept): 1 middle of the postpetiole's anterior
+# articulation face, 2 ventral end of the postpetiole-gaster joint, 3 postpetiole dorsal apex (farthest above 1-2), 4 postpetiole ventral-most
+# point (ventral process, farthest below 1-2), 5 petiole anterior end (peduncle tip), 6 petiolar node apex (farthest above 5-1), 7 petiole
+# ventral outline below 6, 8 / 9 elbows where the node's anterior face meets the peduncle / its posterior face meets the posterior neck,
+# 10 petiole lip (posterodorsal corner of the petiole at the joint).
+kind	name	definition	description
+measure	PPL	1-2	postpetiole length, anterior articulation to the ventral end of the gaster joint
+measure	PPH	3-4^1-2	postpetiole height across its joint axis (dorsal apex to ventral-most point)
+measure	PPD	3>1-2	postpetiole dorsal height above the joint axis
+measure	PPV	4>1-2	ventral process: how far the postpetiole bulges below the joint axis
+measure	PTL	5-1	petiole length (peduncle tip to the postpetiole articulation)
+measure	NH	6-7^5-1	petiolar node height (apex to the ventral outline below it, across the petiole axis)
+measure	NL	8-9|5-1	petiolar node length between the anterior and posterior elbows, along the petiole axis
+measure	NECK	9-10|5-1	posterior neck of the petiole: posterior elbow to the lip, along the petiole axis
+measure	LIPH	10>5-1@6	height of the petiole lip above the petiole axis (+ = dorsal)
+ratio	PPVI	PPV/PPL*100	ventral process bulge / postpetiole length
+ratio	PPVH	PPV/PPH*100	ventral process share of postpetiole height
+ratio	PPHI	PPH/PPL*100	postpetiole height / length in profile
+ratio	NI	NL/NH*100	petiolar node length / height (< 100 = higher than long)
+ratio	PTPP	NH/PPH*100	petiolar node height / postpetiole height (> 100 = petiole node taller)
+ratio	NECKI	NECK/NL*100	posterior neck length / node length
+ratio	LIPI	LIPH/NH*100	lip height / node height

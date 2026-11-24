@@ -64,6 +64,7 @@ line_drawing_v1.py texture_band_profiles_v1.py texture_hires_v3.py
 FHS_and_CLAHE_V22.py descriptron-v2-v99.py homology_landmarks_v1.py
 descriptron_acuity_blur_v1.py descriptron_lookalike_sorter_v1.py descriptron_mask_tools_v1.py descriptron_plate_split_v1.py descriptron_segment_split_v1.py descriptron_serial_homology_v1.py descriptron_combine_characters_v1.py vein_pilosity_profile_v1.py vein_macrotrichia_detect_v1.py texture_teacher_student_v1.py
 descriptron-v2-v100.py descriptron_phylorag_dialog_v1.py phylorag_v1.py
+descriptron-v2-v101.py descriptron_ratios_dialog_v1.py descriptron_landmark_ratios_v2.py
 descriptron_pattern_tanglegram_v1.py descriptron_lookalike_sorter_v2.py seta_instance_detect_v1.py"
 
 is_live() {  # is_live <basename>
@@ -106,7 +107,7 @@ cp "$GUI/measure/BIORAG_PROBE_DESIGN.md" "$DST/descriptron/measure/"
 for t in test_folder_save test_biorag_annotate test_logic test_keypoints test_v87_fixes test_v88_context_tools \
          test_category_nav test_dinomask_dialog test_undo test_biorag_annotate_v2 \
          test_v97_folder_filter test_point_types test_point_types_gui test_probe_point_type gui_boot_withdrawn test_v99_recolorize test_v99_label_picker \
-         test_phylorag_dialog test_v100_phylorag; do   # 2.8.1: + the v91-v96 module tests; 2.8.2: + v97 folder filter; 2.8.5: + v98 point types
+         test_phylorag_dialog test_v100_phylorag test_ratios_dialog test_v101_ratios; do   # 2.8.1: + the v91-v96 module tests; 2.8.2: + v97 folder filter; 2.8.5: + v98 point types
   cp "$GUI/test_brush/$t.py" "$DST/descriptron/test_brush/"
 done
 for f in detectron2_training_and_filterV10_and_kpts-17.py \
@@ -138,6 +139,7 @@ rsync -a --exclude '*.bak*' --exclude '__pycache__/' "$GUI/measure/examples" "$D
 
 # --- data that is part of the code, not of a dataset -----------------------
 cp -r "$GUI/measure/biorag_prompts" "$DST/descriptron/measure/" 2>/dev/null || true
+cp -r "$GUI/measure/ratio_configs" "$DST/descriptron/measure/" 2>/dev/null || true   # v101: Ratios configs
 cp "$GUI/marmot.jpg" "$DST/descriptron/" 2>/dev/null || true
 # v2.7.5: the descriptive-character vocabulary the GUI panel and the converter read (copy_py takes .py/.sh only)
 cp "$GUI/descriptron_descriptive_characters.json" "$DST/descriptron/"

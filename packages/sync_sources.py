@@ -113,7 +113,8 @@ EXTRA_CORE = ["measure/biosyslit_rag_retrieval.py", "measure/descriptron_rosetta
               "measure/validation/validate_phylo_mimicry_oum_vs_r.py",
               "measure/validation/validate_phylo_models_vs_r.py",
               "measure/validation/validate_phylo_palette_surface_vs_r.py",
-              "measure/phylorag_v1.py"]                  # PhyloRAG (17 Nov 2026): character matrix from the literature
+              "measure/phylorag_v1.py",                  # PhyloRAG (17 Nov 2026): character matrix from the literature
+              "measure/descriptron_landmark_ratios_v2.py"]   # GUI v101 Ratios: measurements, indices and species tests
 EXTRA_GUI = ["marmot.jpg", "icons"]
 EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptron-v2-v76.py",
                    "descriptron-v2-v77.py", "descriptron-v2-v78.py",   # v2.5.0: SAM 3 dialog (v77); drag and drop + SAM 3 prompts (v78)
@@ -140,7 +141,8 @@ EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptro
                    "descriptron-v2-v97.py",                            # v2.8.2: = v96 + Load Folder skips mask files
                    "descriptron-v2-v98.py", "descriptron_point_types_v1.py",   # v2.8.5: = v97 + keypoint Point type
                    "descriptron-v2-v99.py",                            # v2.8.7: = v98 + recolorize colour segmentation
-                   "descriptron-v2-v100.py", "descriptron_phylorag_dialog_v1.py",   # = v99 + PhyloRAG button (default GUI)
+                   "descriptron-v2-v100.py", "descriptron_phylorag_dialog_v1.py",   # = v99 + PhyloRAG button
+                   "descriptron-v2-v101.py", "descriptron_ratios_dialog_v1.py",   # = v100 + Ratios button; DINOMask dialog trains with v6 (default GUI)
                    # v2.8.1: ontology templates for the label menus; the module finds the json beside itself
                    "descriptron_ontology.py", "descriptron_ontology_templates.json",
                    "descriptron_sam3_instances.py"]                    # v2.5.0: run by the GUI in the separate sam3 env
@@ -148,7 +150,7 @@ EXTRA_GUI_TOOLS = ["descriptron-v2-v74.py", "descriptron-v2-v75.py", "descriptro
 # in BOTH places it runs from: the sam3 wheel leaves it out.
 SAM3_FILES = ["descriptron_sam3_instances.py"]
 SAM3_DIRS = ["sam3_assets"]   # v2.1.2: v75 = v74 + Keypoint R-CNN train/predict; cli.py runs the newest descriptron-v2-*.py
-DATA_FOR_CORE = ["measure/biorag_prompts"]
+DATA_FOR_CORE = ["measure/biorag_prompts", "measure/ratio_configs"]   # v101: ready-made ratio configs for the Ratios program
 
 
 def find(gui_dir: Path, name: str) -> Path | None:

@@ -1,6 +1,6 @@
 """DINOMask dialog for the Descriptron GUI (v94, 21 Oct 2026).
 
-DINOMask (dinomask/dinomask_train_predict_v4.py, dinomask/dinomask_predict_rot4_v1.py) trains a small per-patch
+DINOMask (dinomask/dinomask_train_predict_v6.py, dinomask/dinomask_predict_rot4_v1.py) trains a small per-patch
 classifier on frozen DINOv3 ViT-L tokens of a few hand-annotated images and predicts every structure on the rest.
 Until v94 it could only be run from the command line. This module holds the dialog and the pure functions behind it
 (command building, interpreter choice, vocabulary), which the tests call without a display.
@@ -13,6 +13,11 @@ Three modes:
   points_probe   learn one structure (setae, scales, punctures ...) from keypoint clicks, then predict a folder
                  -> predictions_keypoints.json (opens as editable points; fix them and retrain)
   probe_run      predict a folder with an already trained probe (probe.joblib)
+GUI v101 (24 Nov 2026): training runs dinomask_train_predict_v6.py with --label_sampling centre. v4 and v5 read each
+patch's training label at its top-left pixel and so placed every predicted part half a patch (about 8 px at the
+working size) right of and below its annotation; v6 reads it at the patch centre. v6 is run at its default layer (the
+final output, as v4), so runs stay compatible with "Predict with a trained run" (rot4). v4 is used only when v6 is
+missing (an older install).
 """
 import json
 import os
@@ -25,15 +30,26 @@ NOT_PARTS = {"line_keypoints", "Select Label", "Trash", "keypoints"}
 AUGS = ("rot90", "rot180", "rot270", "hflip")
 
 
+TRAIN_SCRIPTS = ("dinomask_train_predict_v6.py", "dinomask_train_predict_v4.py")   # v101: v6 first (centre labels)
+
+
+def train_script(sdir):
+    """The training script in sdir: v6 (patch-centre labels) when present, else v4."""
+    for name in TRAIN_SCRIPTS:
+        if (Path(sdir) / name).is_file():
+            return name
+    return TRAIN_SCRIPTS[-1]
+
+
 def script_dir(gui_dir):
     """dinomask/ beside the GUI (source tree, Docker) or in the descriptron-vision package (pip)."""
     d = Path(gui_dir) / "dinomask"
-    if (d / "dinomask_train_predict_v4.py").is_file():
+    if any((d / n).is_file() for n in TRAIN_SCRIPTS):
         return d
     try:
         from descriptron_vision.cli import tools_dir
         d = Path(tools_dir()) / "dinomask"
-        if (d / "dinomask_train_predict_v4.py").is_file():
+        if any((d / n).is_file() for n in TRAIN_SCRIPTS):
             return d
     except Exception:
         pass
@@ -147,10 +163,13 @@ def build_cmd(v, sdir, python):
                "--images", v["predict_dir"], "--out", v["out"], "--model", v.get("model") or MODEL_VITL,
                "--size", str(int(v.get("size") or 2048) or 2048)]
     else:
-        cmd = [python, "-u", str(sdir / "dinomask_train_predict_v4.py"), "--coco", v["coco"], "--images", v["images"],
+        script = train_script(sdir)
+        cmd = [python, "-u", str(sdir / script), "--coco", v["coco"], "--images", v["images"],
                "--out", v["out"], "--model", v.get("model") or MODEL_VITL, "--size", str(int(v.get("size", 2048))),
                "--epochs", str(int(v.get("epochs") or 30)), "--containers", "auto", "--min_count", "1",
                "--species_regex", "^$", "--drop", "Select Label,line_keypoints,Trash"]
+        if script.endswith("_v6.py"):
+            cmd += ["--label_sampling", "centre"]   # v101: labels at patch centres (no half-patch shift)
         augs = [a for a in v.get("augs", []) if a in AUGS]
         if augs:
             cmd += ["--aug", ",".join(augs)]

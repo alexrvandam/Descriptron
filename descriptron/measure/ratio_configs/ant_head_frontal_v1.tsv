@@ -1,0 +1,19 @@
+# Ant head, full-face view: measurements and indices of Hita Garcia & Fisher (Tetramorium revisions) on the Descriptron frontal-head
+# landmark template (17 Nov 2026): 1/2 and 3/4 posterior/anterior eye extremes (image-left eye, image-right eye), 5/6 and 7/8 outer/inner
+# eye margins opposite each other, 9 posterior head margin on the midline, 10 anterior clypeal margin on the midline, 11/12 head sides at
+# the maximum width directly behind the eyes, 13 apex of the frontal triangle, 14/15 highest points of the posterior margin either side.
+# Scape length (SL, SI) needs scape landmarks (colour images; not in the CT template).
+kind	name	definition	description
+measure	HL	9-10	head length: anterior clypeal margin to posterior head margin, on the midline
+measure	HW	11-12^9-10	head width: maximum width directly behind the eyes, across the midline
+measure	HWe	5-7^9-10	head width across the eyes (outer eye margins), across the midline
+measure	EL	mean(1-2|9-10;3-4|9-10)	eye length (maximum diameter along the midline), mean of both eyes
+measure	EW	mean(5-6^9-10;7-8^9-10)	eye width (outer to inner margin), mean of both eyes
+measure	VD	9>14-15@10	vertexal impression depth: midline point of the posterior margin behind the line 14-15 (+ = impressed)
+measure	FT	9-13|9-10	posterior margin to the apex of the frontal triangle, along the midline
+ratio	CI	HW/HL*100	cephalic index
+ratio	CIe	HWe/HL*100	cephalic index with the width across the eyes
+ratio	OI	EL/HW*100	ocular index
+ratio	EWI	EW/EL*100	eye width / eye length
+ratio	VDI	VD/HL*100	vertexal impression depth / HL
+ratio	FTI	FT/HL*100	frontal triangle apex position / HL
