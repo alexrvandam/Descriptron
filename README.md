@@ -956,6 +956,10 @@ the group) are a separate input: a plain-text, .docx or .csv file given with
 
 ## PhyloRAG: a character matrix from the literature
 
+> **Under development.** In our tests PhyloRAG still makes many mistakes: states for the wrong character or the wrong
+> taxon, and states its source does not support. Treat its output as a first draft in which every state must be
+> checked against the source, not as a finished matrix. The checks described below catch some of these errors, not all.
+
 PhyloRAG (`measure/phylorag_v1.py`; the **PhyloRAG** button in the Describe tab
 from GUI v100) builds a morphological character matrix from published
 descriptions, for analysis on its own or with molecular data (total evidence,

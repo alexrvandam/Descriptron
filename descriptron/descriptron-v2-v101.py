@@ -18789,7 +18789,7 @@ _TIPS = {
     "btn_delimit": "Quality checks and comparisons between species.",
     "btn_biorag": "Character matrix, key and audited species descriptions (BioRAG).",
     "btn_ratios": "Measurements and indices (e.g. CI = HW/HL x 100) from landmarks and masks, defined in a ratio config or typed in; tests whether they separate species (Kruskal-Wallis with FDR, pairwise, leave-one-out ID, PERMANOVA) and agree with a coded character.",
-    "btn_phylorag": "Morphological character matrix from the literature (BioSysLit treatments, your PDFs): a model scores your characters, every state needs a verbatim quote found in its source, and only states you accept enter the NEXUS matrix - on its own, filling a published matrix, or with molecular data.",
+    "btn_phylorag": "Under development (makes many mistakes; check every state). Morphological character matrix from the literature (BioSysLit treatments, your PDFs): a model scores your characters, every state needs a verbatim quote found in its source, and only states you accept enter the NEXUS matrix - on its own, filling a published matrix, or with molecular data.",
     "btn_treatment_docx": "Formatted species treatments (Word).", "btn_zenodo": "Deposit results on Zenodo.",
     "btn_export_enhanced": "COCO with ontology terms.", "btn_export_kg": "Knowledge graph (JSON-LD).",
     "btn_convert_formats": "tpsDig, MorphoJ, StereoMorph, landmark tables and VIA 2 to Descriptron COCO, and back.",

@@ -186,7 +186,7 @@ def open_dialog(root, gui_dir, tooltip=None):
         return None
     py = python_for()
     win = tk.Toplevel(root)
-    win.title("PhyloRAG - character matrix from the literature")
+    win.title("PhyloRAG - character matrix from the literature (under development)")
     S = {k: tk.StringVar() for k in ("nexus", "chars", "taxa", "sources", "keywords", "pdf_dir", "text_dir", "out_dir",
                                      "group", "context", "backend", "model", "near", "max_sources", "review",
                                      "base_nexus", "molecular", "export_dir", "labels")}
@@ -196,6 +196,9 @@ def open_dialog(root, gui_dir, tooltip=None):
     S["labels"].set("tip")
     state = {"proc": None, "q": queue.Queue(), "step": None}
 
+    tk.Label(win, text="Under development: in our tests PhyloRAG still makes many mistakes. Check every proposed state "
+                       "against its source before you accept it, and do not use the matrix unchecked.", fg="red3",
+             wraplength=760, justify="left", font=("Arial", 9, "bold")).pack(padx=10, pady=(8, 0), anchor="w")
     tk.Label(win, text="The model proposes, you decide: every state needs a verbatim quote found in its source, and "
                        "only states you accept in the review sheet enter the matrix.", fg="gray25", wraplength=760,
              justify="left").pack(padx=10, pady=(8, 2), anchor="w")
